@@ -13,14 +13,14 @@ namespace Genesis.App.Data
         {
             var m = new Species()
             {
-                Name = "Mus muscuslus musculus"
+                Name = "Mus musculus musculus"
             };
             
             context.Species.Add(m);
 
             var d = new Species()
             {
-                Name = "Mus muscuslus domesticus"
+                Name = "Mus musculus domesticus"
             };
 
             context.Species.Add(d);

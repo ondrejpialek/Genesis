@@ -9,6 +9,7 @@ using DotSpatial.Controls;
 using DotSpatial.Data;
 using DotSpatial.Topology;
 using DotSpatial.Projections;
+using System.Data;
 
 namespace Genesis.ViewModel
 {
@@ -144,6 +145,7 @@ namespace Genesis.ViewModel
                         if (localities != null)
                         {
                             localities.Features.Clear();
+                            localities.DataTable.Clear();
                         }
 
                         if (View == MapView.Localities)
@@ -161,7 +163,9 @@ namespace Genesis.ViewModel
                                     {
                                         Coordinate coord = new Coordinate(locality.Location.Longitude ?? 0, locality.Location.Latitude ?? 0);
                                         DotSpatial.Topology.Point p = new DotSpatial.Topology.Point(coord);
-                                        localities.AddFeature(p);
+                                       
+                                        var feature = localities.AddFeature(p);
+                                        feature.DataRow["Code"] = locality.Code;
                                     }
                                 }
                             }
@@ -181,7 +185,9 @@ namespace Genesis.ViewModel
                                     {
                                         Coordinate coord = new Coordinate(frequency.Locality.Location.Longitude ?? 0, frequency.Locality.Location.Latitude ?? 0);
                                         DotSpatial.Topology.Point p = new DotSpatial.Topology.Point(coord);
-                                        localities.AddFeature(p);
+                                        var feature = localities.AddFeature(p);
+                                        feature.DataRow["Frequency"] = frequency.Value;
+                                        feature.DataRow["Code"] = frequency.Locality.Code;
                                     }
                                 }
                             }
@@ -217,6 +223,8 @@ namespace Genesis.ViewModel
 
                                               localities = new FeatureSet(FeatureType.Point);
                                               localities.Projection = KnownCoordinateSystems.Geographic.World.WGS1984;
+                                              localities.DataTable.Columns.Add(new DataColumn("Frequency", typeof(double)));
+                                              localities.DataTable.Columns.Add(new DataColumn("Code", typeof(string)));
 
                                               spatialMap.Layers.Add(localities);
                                               Refresh.Execute(null);

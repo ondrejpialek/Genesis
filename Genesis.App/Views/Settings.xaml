@@ -6,6 +6,75 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid DataContext="{Binding Source={StaticResource Locator}, Path=Settings}">
-        <TreeView ItemsSource="{Binding Chromosomes}" Background="Red"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.7*" />
+            <ColumnDefinition Width="0.3*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TreeView ItemsSource="{Binding Chromosomes}">
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Genes}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="{Binding Name}"/>
+                        <Button Grid.Column="1">Add trait</Button>
+                    </Grid>
+                    <HierarchicalDataTemplate.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Alleles}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Text="{Binding Name, Mode=TwoWay}" />
+                                <Button Grid.Column="1">Remove trait</Button>
+                                <Button Grid.Column="2">Add allele</Button>
+                            </Grid>
+                            <HierarchicalDataTemplate.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition></ColumnDefinition>
+                                            <ColumnDefinition Width="Auto" /> 
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox Text="{Binding Value, Mode=TwoWay}" />
+                                        <ComboBox Grid.Column="1" ItemsSource="{Binding Source={StaticResource Locator}, Path=Settings.Species}" DisplayMemberPath="Name" SelectedItem="{Binding Species, Mode=TwoWay}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </HierarchicalDataTemplate.ItemTemplate>
+                        </HierarchicalDataTemplate>
+                    </HierarchicalDataTemplate.ItemTemplate>
+                </HierarchicalDataTemplate >
+            </TreeView.ItemTemplate>
+        </TreeView>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Label>Species</Label>
+            <StackPanel Grid.Row="1" Orientation="Horizontal">
+                <Button>Add</Button>
+                <Button>Remove</Button>
+            </StackPanel>
+            <ListBox Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding Species}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBox Text="{Binding Name, Mode=TwoWay}" />
+                    </DataTemplate>
+                    </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,5">
+            <Button HorizontalAlignment="Right">Save</Button>
+        </StackPanel>
     </Grid>
 </UserControl>

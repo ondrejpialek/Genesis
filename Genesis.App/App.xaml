@@ -5,8 +5,19 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="clr-namespace:Genesis.ViewModel">
     <Application.Resources>
-        <vm:Locator x:Key="Locator"/>
-        <Thickness x:Key="DefaultMargin">6</Thickness>
-        <Thickness x:Key="DefaultVerticalMargin">0,6</Thickness>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            
+            <vm:Locator x:Key="Locator"/>
+            <Thickness x:Key="DefaultMargin">6</Thickness>
+            <Thickness x:Key="DefaultVerticalMargin">0,6</Thickness>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

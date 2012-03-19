@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using GalaSoft.MvvmLight;
+using System.Data.Entity;
 
 namespace Genesis.ViewModel
 {
@@ -14,18 +15,24 @@ namespace Genesis.ViewModel
         public SettingsViewModel()
         {
             context = new GenesisContext();
-
-            Chromosomes = new ObservableCollection<Chromosome>();
-            foreach (var chromosome in context.Chromosomes)
-            {
-                Chromosomes.Add(chromosome);
-            }
+            context.Chromosomes.Load();
+            context.Species.Load();
         }
 
         public ObservableCollection<Chromosome> Chromosomes
         {
-            get;
-            protected set;
+            get
+            {
+                return context.Chromosomes.Local;
+            }
+        }
+
+        public ObservableCollection<Species> Species
+        {
+            get
+            {
+                return context.Species.Local;
+            }
         }
     }
 }
