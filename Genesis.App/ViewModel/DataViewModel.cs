@@ -67,6 +67,19 @@ namespace Genesis.ViewModel
             FrequencyAnalysis = new ObservableCollection<FrequencyAnalysis>();
         }
 
+        private FrequencyAnalysis selectedAnalysis = null;
+        public FrequencyAnalysis SelectedAnalysis
+        {
+            get
+            {
+                return selectedAnalysis;
+            }
+            set
+            {
+                Set(() => SelectedAnalysis, ref selectedAnalysis, value);
+            }
+        }
+
         public ObservableCollection<FrequencyAnalysis> FrequencyAnalysis
         {
             get;
@@ -100,21 +113,16 @@ namespace Genesis.ViewModel
         }
 
         private RelayCommand<string> changeView;
-
-        /// <summary>
-        /// Gets the ChangeView.
-        /// </summary>
         public RelayCommand<string> ChangeView
         {
             get
             {
-                return changeView
-                    ?? (changeView = new RelayCommand<string>(
-                                          p =>
-                                          {
-                                              view = (MapView)Enum.Parse(typeof(MapView), p);
-                                              Refresh.Execute(null);
-                                          }));
+                return changeView ?? (changeView = new RelayCommand<string>(
+                p =>
+                {
+                    view = (MapView)Enum.Parse(typeof(MapView), p);
+                    Refresh.Execute(null);
+                }));
             }
         }
 
@@ -172,22 +180,25 @@ namespace Genesis.ViewModel
                         }
                         else
                         {
-                            foreach (var frequency in FrequencyAnalysis.First().Frequencies)
+                            if (selectedAnalysis != null)
                             {
-                                if (string.IsNullOrEmpty(frequency.Locality.Code))
-                                    continue;
-
-                                if (frequency.Locality.Location != null)
+                                foreach (var frequency in selectedAnalysis.Frequencies)
                                 {
-                                    Data.Add(new PushpinViewModel(frequency.Locality, string.Format("{0} {1:F2} ({2})", frequency.Locality.Code, frequency.Value, frequency.SampleSize)));
+                                    if (string.IsNullOrEmpty(frequency.Locality.Code))
+                                        continue;
 
-                                    if (localities != null)
+                                    if (frequency.Locality.Location != null)
                                     {
-                                        Coordinate coord = new Coordinate(frequency.Locality.Location.Longitude ?? 0, frequency.Locality.Location.Latitude ?? 0);
-                                        DotSpatial.Topology.Point p = new DotSpatial.Topology.Point(coord);
-                                        var feature = localities.AddFeature(p);
-                                        feature.DataRow["Frequency"] = frequency.Value;
-                                        feature.DataRow["Code"] = frequency.Locality.Code;
+                                        Data.Add(new PushpinViewModel(frequency.Locality, string.Format("{0} {1:F2} ({2})", frequency.Locality.Code, frequency.Value, frequency.SampleSize)));
+
+                                        if (localities != null)
+                                        {
+                                            Coordinate coord = new Coordinate(frequency.Locality.Location.Longitude ?? 0, frequency.Locality.Location.Latitude ?? 0);
+                                            DotSpatial.Topology.Point p = new DotSpatial.Topology.Point(coord);
+                                            var feature = localities.AddFeature(p);
+                                            feature.DataRow["Frequency"] = frequency.Value;
+                                            feature.DataRow["Code"] = frequency.Locality.Code;
+                                        }
                                     }
                                 }
                             }
@@ -201,53 +212,47 @@ namespace Genesis.ViewModel
 
         DotSpatial.Controls.Map spatialMap = null;
         private RelayCommand<DotSpatial.Controls.Map> spatialMapLoaded;
-
-        /// <summary>
-        /// Gets the SpatialMapLoaded.
-        /// </summary>
         public RelayCommand<DotSpatial.Controls.Map> SpatialMapLoaded
         {
             get
             {
-                return spatialMapLoaded
-                    ?? (spatialMapLoaded = new RelayCommand<DotSpatial.Controls.Map>(
-                                          map =>
-                                          {
-                                              spatialMap = map;
-                                              if (spatialMaplegend != null)
-                                              {
-                                                  spatialMap.Legend = spatialMaplegend;
-                                              }
+                return spatialMapLoaded ?? (spatialMapLoaded = new RelayCommand<DotSpatial.Controls.Map>(
+                map =>
+                {
+                    spatialMap = map;
+                    if (spatialMaplegend != null)
+                    {
+                        spatialMap.Legend = spatialMaplegend;
+                    }
 
-                                              spatialMap.FunctionMode = DotSpatial.Controls.FunctionMode.Pan;
+                    spatialMap.FunctionMode = DotSpatial.Controls.FunctionMode.Pan;
 
-                                              localities = new FeatureSet(FeatureType.Point);
-                                              localities.Projection = KnownCoordinateSystems.Geographic.World.WGS1984;
-                                              localities.DataTable.Columns.Add(new DataColumn("Frequency", typeof(double)));
-                                              localities.DataTable.Columns.Add(new DataColumn("Code", typeof(string)));
+                    localities = new FeatureSet(FeatureType.Point);
+                    localities.Projection = KnownCoordinateSystems.Geographic.World.WGS1984;
+                    localities.DataTable.Columns.Add(new DataColumn("Frequency", typeof(double)));
+                    localities.DataTable.Columns.Add(new DataColumn("Code", typeof(string)));
 
-                                              spatialMap.Layers.Add(localities);
-                                              Refresh.Execute(null);
-                                          }));
+                    spatialMap.Layers.Add(localities);
+                    Refresh.Execute(null);
+                }));
             }
         }
 
         DotSpatial.Controls.Legend spatialMaplegend = null;
-        private RelayCommand<DotSpatial.Controls.Legend> spatialMapLegendLoaded;
-        public RelayCommand<DotSpatial.Controls.Legend> SpatialMapLegendLoaded
+        private RelayCommand<Legend> spatialMapLegendLoaded;
+        public RelayCommand<Legend> SpatialMapLegendLoaded
         {
             get
             {
-                return spatialMapLegendLoaded
-                    ?? (spatialMapLegendLoaded = new RelayCommand<DotSpatial.Controls.Legend>(
-                                          legend =>
-                                          {
-                                              spatialMaplegend = legend;
-                                              if (spatialMap != null)
-                                              {
-                                                  spatialMap.Legend = spatialMaplegend;
-                                              }
-                                          }));
+                return spatialMapLegendLoaded ?? (spatialMapLegendLoaded = new RelayCommand<Legend>(
+                legend =>
+                {
+                    spatialMaplegend = legend;
+                    if (spatialMap != null)
+                    {
+                        spatialMap.Legend = spatialMaplegend;
+                    }
+                }));
             }
         }
 

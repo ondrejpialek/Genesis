@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
@@ -14,12 +15,12 @@ namespace Genesis
         public abstract int Males { get; }
         public abstract int Females { get; }
 
-        public virtual ICollection<Gene> Genes { get; private set; }
+        public virtual ObservableCollection<Gene> Genes { get; private set; }
         #endregion
 
         public Chromosome()
         {
-            Genes = new List<Gene>();
+            Genes = new ObservableCollection<Gene>();
         }
     }
 

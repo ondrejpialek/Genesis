@@ -30,7 +30,7 @@ namespace Genesis.App.Data
                 Name = "MtDNA"
             });
 
-            context.Chromosomes.Add(new XChromosome()
+            var Xchrom = context.Chromosomes.Add(new XChromosome()
             {
                 Name = "X"
             });
@@ -51,7 +51,7 @@ namespace Genesis.App.Data
                 Name = "Btk"
             };
 
-            autosomalChrom.Genes.Add(btk);
+            Xchrom.Genes.Add(btk);
 
             btk.Alleles.Add(new Allele()
             {

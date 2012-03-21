@@ -23,7 +23,7 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Label Content="{Binding Name}"/>
-                        <Button Grid.Column="1">Add trait</Button>
+                        <Button Grid.Column="1" Command="{Binding Source={StaticResource Locator}, Path=Settings.AddTrait}" CommandParameter="{Binding}">Add trait</Button>
                     </Grid>
                     <HierarchicalDataTemplate.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Alleles}">
@@ -34,18 +34,20 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBox Text="{Binding Name, Mode=TwoWay}" />
-                                <Button Grid.Column="1">Remove trait</Button>
-                                <Button Grid.Column="2">Add allele</Button>
+                                <Button Command="{Binding Source={StaticResource Locator}, Path=Settings.RemoveTrait}" CommandParameter="{Binding}" Grid.Column="1">Remove trait</Button>
+                                <Button Command="{Binding Source={StaticResource Locator}, Path=Settings.AddAllele}" CommandParameter="{Binding}" Grid.Column="2">Add allele</Button>
                             </Grid>
                             <HierarchicalDataTemplate.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition></ColumnDefinition>
-                                            <ColumnDefinition Width="Auto" /> 
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         <TextBox Text="{Binding Value, Mode=TwoWay}" />
                                         <ComboBox Grid.Column="1" ItemsSource="{Binding Source={StaticResource Locator}, Path=Settings.Species}" DisplayMemberPath="Name" SelectedItem="{Binding Species, Mode=TwoWay}"/>
+                                        <Button Grid.Column="2" Command="{Binding Source={StaticResource Locator}, Path=Settings.RemoveAllele}" CommandParameter="{Binding}">Remove allele</Button>
                                     </Grid>
                                 </DataTemplate>
                             </HierarchicalDataTemplate.ItemTemplate>
@@ -62,10 +64,10 @@
             </Grid.RowDefinitions>
             <Label>Species</Label>
             <StackPanel Grid.Row="1" Orientation="Horizontal">
-                <Button>Add</Button>
-                <Button>Remove</Button>
+                <Button Command="{Binding AddSpecies}">Add</Button>
+                <Button Command="{Binding RemoveSpecies}" CommandParameter="{Binding SelectedItem, ElementName=speciesBox}">Remove</Button>
             </StackPanel>
-            <ListBox Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding Species}">
+            <ListBox x:Name="speciesBox" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding Species}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBox Text="{Binding Name, Mode=TwoWay}" />
@@ -74,7 +76,7 @@
             </ListBox>
         </Grid>
         <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,5">
-            <Button HorizontalAlignment="Right">Save</Button>
+            <Button HorizontalAlignment="Right" Command="{Binding Save}">Save</Button>
         </StackPanel>
     </Grid>
 </UserControl>

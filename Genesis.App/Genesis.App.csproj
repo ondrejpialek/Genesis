@@ -30,11 +30,13 @@
     <PublisherName>Ondřej Piálek</PublisherName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>index.html</WebPage>
-    <ApplicationRevision>5</ApplicationRevision>
+    <ApplicationRevision>6</ApplicationRevision>
     <ApplicationVersion>0.1.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <Utf8Output>true</Utf8Output>
+    <ExpressionBlendVersion>4.0.30816.0</ExpressionBlendVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -117,6 +119,8 @@
     <Reference Include="MahApps.Metro">
       <HintPath>..\packages\MahApps.Metro.0.7.2.0\lib\net40\MahApps.Metro.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Expression.Effects" />
+    <Reference Include="Microsoft.Expression.Interactions" />
     <Reference Include="Microsoft.Maps.MapControl.WPF">
       <HintPath>C:\Program Files (x86)\Bing Maps WPF Control\Beta\Libraries\Microsoft.Maps.MapControl.WPF.dll</HintPath>
     </Reference>
@@ -156,10 +160,6 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
-    <Reference Include="WPFToolkit, Version=3.5.40128.1, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\WPF Toolkit\v3.5.50211.1\WPFToolkit.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -294,6 +294,38 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="Resources\Layers\10m_ocean.dbf" />
+    <None Include="Resources\Layers\10m_ocean.prj" />
+    <None Include="Resources\Layers\10m_ocean.sbn" />
+    <None Include="Resources\Layers\10m_ocean.sbx" />
+    <None Include="Resources\Layers\10m_ocean.shp" />
+    <None Include="Resources\Layers\10m_ocean.shx" />
+    <None Include="Resources\Layers\CZE_water_areas_dcw.dbf" />
+    <None Include="Resources\Layers\CZE_water_areas_dcw.prj" />
+    <None Include="Resources\Layers\CZE_water_areas_dcw.shp" />
+    <None Include="Resources\Layers\CZE_water_areas_dcw.shx" />
+    <None Include="Resources\Layers\CZE_water_lines_dcw.dbf" />
+    <None Include="Resources\Layers\CZE_water_lines_dcw.prj" />
+    <None Include="Resources\Layers\CZE_water_lines_dcw.sbn" />
+    <None Include="Resources\Layers\CZE_water_lines_dcw.sbx" />
+    <None Include="Resources\Layers\CZE_water_lines_dcw.shp" />
+    <None Include="Resources\Layers\CZE_water_lines_dcw.shx" />
+    <None Include="Resources\Layers\ne_10m_admin_0_countries.dbf" />
+    <None Include="Resources\Layers\ne_10m_admin_0_countries.prj" />
+    <None Include="Resources\Layers\ne_10m_admin_0_countries.sbn" />
+    <None Include="Resources\Layers\ne_10m_admin_0_countries.sbx" />
+    <None Include="Resources\Layers\ne_10m_admin_0_countries.shp" />
+    <None Include="Resources\Layers\ne_10m_admin_0_countries.shx" />
+    <None Include="Resources\Layers\ne_10m_lakes.dbf" />
+    <None Include="Resources\Layers\ne_10m_lakes.prj" />
+    <None Include="Resources\Layers\ne_10m_lakes.shp" />
+    <None Include="Resources\Layers\ne_10m_lakes.shx" />
+    <None Include="Resources\Layers\ne_10m_rivers_lake_centerlines_scale_ranks.dbf" />
+    <None Include="Resources\Layers\ne_10m_rivers_lake_centerlines_scale_ranks.prj" />
+    <None Include="Resources\Layers\ne_10m_rivers_lake_centerlines_scale_ranks.sbn" />
+    <None Include="Resources\Layers\ne_10m_rivers_lake_centerlines_scale_ranks.sbx" />
+    <None Include="Resources\Layers\ne_10m_rivers_lake_centerlines_scale_ranks.shp" />
+    <None Include="Resources\Layers\ne_10m_rivers_lake_centerlines_scale_ranks.shx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

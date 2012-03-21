@@ -1,133 +1,187 @@
-﻿<UserControl xmlns:my="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"  x:Class="Genesis.Views.Map"
+﻿<UserControl xmlns:my="clr-namespace:System.Windows.Forms.Integration;assembly=WindowsFormsIntegration"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF"
-             mc:Ignorable="d" 
+             xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF" 
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:gc="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
              xmlns:sp="clr-namespace:DotSpatial.Controls;assembly=DotSpatial.Controls"
-            DataContext="{Binding Source={StaticResource Locator}, Path=Data}"
+            xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" xmlns:ee="http://schemas.microsoft.com/expression/2010/effects"  x:Class="Genesis.Views.Map"
+             mc:Ignorable="d"
              
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
-        <Style TargetType="m:Pushpin">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="m:Pushpin">
-                        <Canvas HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
-                            <Canvas.RenderTransform>
-                                <ScaleTransform ScaleY="-1" />
-                            </Canvas.RenderTransform>
+    	<Style TargetType="{x:Type m:Pushpin}">
+    		<Setter Property="Template">
+    			<Setter.Value>
+    				<ControlTemplate TargetType="{x:Type m:Pushpin}">
+    					<Canvas HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+    						<Canvas.RenderTransform>
+    							<ScaleTransform ScaleY="-1" />
+    						</Canvas.RenderTransform>
                             
-                            <Grid x:Name="grid" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <Grid.RenderTransform>
-                                    <ScaleTransform ScaleY="-1"/>
-                                </Grid.RenderTransform>
+    						<Grid x:Name="grid" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" VerticalAlignment="Center">
+    							<Grid.RenderTransform>
+    								<ScaleTransform ScaleY="-1"/>
+    							</Grid.RenderTransform>
 
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                <Border Background="{TemplateBinding Background}">
-                                    <Border x:Name="border" Background="#001AA4B6">
-                                        <ContentPresenter Content="{TemplateBinding Content}" Margin="{TemplateBinding Padding}"/>
-                                    </Border>
-                                </Border>
-                                <Path x:Name="path1" Data="M6,20 L6,30 L16,20 z" Fill="{TemplateBinding Background}" Grid.Row="1" Stretch="Fill" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Width="15" Margin="0,-1,0,0"/>
-                                <Path x:Name="path" Data="M6,20 L6,30 L16,20 z" Grid.Row="1" Stretch="Fill" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Width="15" Margin="0,-1,0,0" Fill="#001AA4B6"/>
-                            </Grid>
-                        </Canvas>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Padding" Value="4,3"/>
-            <Setter Property="Width" Value="0" />
-            <Setter Property="Height" Value="0"/>
-            <Setter Property="UseLayoutRounding" Value="True"/>
-        </Style>
+    							<Grid.RowDefinitions>
+    								<RowDefinition Height="*" />
+    								<RowDefinition Height="Auto" />
+    							</Grid.RowDefinitions>
+    							<Border Background="{TemplateBinding Background}">
+    								<Border x:Name="border" Background="#001AA4B6">
+    									<ContentPresenter Content="{TemplateBinding Content}" Margin="{TemplateBinding Padding}"/>
+    								</Border>
+    							</Border>
+    							<Path x:Name="path1" Data="M6,20 L6,30 L16,20 z" Fill="{TemplateBinding Background}" Grid.Row="1" Stretch="Fill" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Width="15" Margin="0,-1,0,0"/>
+    							<Path x:Name="path" Data="M6,20 L6,30 L16,20 z" Grid.Row="1" Stretch="Fill" HorizontalAlignment="Left" VerticalAlignment="Top" Height="20" Width="15" Margin="0,-1,0,0" Fill="#001AA4B6"/>
+    						</Grid>
+    					</Canvas>
+    				</ControlTemplate>
+    			</Setter.Value>
+    		</Setter>
+    		<Setter Property="Padding" Value="4,3"/>
+    		<Setter Property="Width" Value="0" />
+    		<Setter Property="Height" Value="0"/>
+    		<Setter Property="UseLayoutRounding" Value="True"/>
+    	</Style>
     </UserControl.Resources>
+	<UserControl.DataContext>
+		<Binding Path="Data" Source="{StaticResource Locator}"/>
+	</UserControl.DataContext>
     <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded" >
-            <gc:EventToCommand Command="{Binding Refresh}" />
-        </i:EventTrigger>
+    	<i:EventTrigger EventName="Loaded" >
+    		<gc:EventToCommand Command="{Binding Refresh}" />
+    	</i:EventTrigger>
     </i:Interaction.Triggers>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition></ColumnDefinition>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+	<Grid>
+		<VisualStateManager.VisualStateGroups>
+			<VisualStateGroup x:Name="MapSelection" ei:ExtendedVisualStateManager.UseFluidLayout="True">
+				<VisualStateGroup.Transitions>
+					<VisualTransition GeneratedDuration="0:0:0.3">
+						<ei:ExtendedVisualStateManager.TransitionEffect>
+							<ee:FadeTransitionEffect/>
+						</ei:ExtendedVisualStateManager.TransitionEffect>
+					</VisualTransition>
+				</VisualStateGroup.Transitions>
+				<VisualState x:Name="Bing">
+					<Storyboard>
+						<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="map">
+							<DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+						</ObjectAnimationUsingKeyFrames>
+						<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="windowsFormsHost">
+							<DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
+						</ObjectAnimationUsingKeyFrames>
+						<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="grid">
+							<DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
+						</ObjectAnimationUsingKeyFrames>
+					</Storyboard>
+				</VisualState>
+				<VisualState x:Name="GIS">
+					<Storyboard>
+						<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="grid">
+							<DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+						</ObjectAnimationUsingKeyFrames>
+						<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="windowsFormsHost">
+							<DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}"/>
+						</ObjectAnimationUsingKeyFrames>
+						<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="map">
+							<DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}"/>
+						</ObjectAnimationUsingKeyFrames>
+					</Storyboard>
+				</VisualState>
+			</VisualStateGroup>
+		</VisualStateManager.VisualStateGroups>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition />
+			<ColumnDefinition Width="Auto"/>
+		</Grid.ColumnDefinitions>
+		<VisualStateManager.CustomVisualStateManager>
+			<ei:ExtendedVisualStateManager/>
+		</VisualStateManager.CustomVisualStateManager>
+		<m:Map x:Name="map" CredentialsProvider="Aq150CT4Xwwr-FROJjj5Ieq5CCGQ5xaByYrxY58_XUaFvifqOshSEe1jyabmis33">
+			<m:MapItemsControl x:Name="mapa" ItemsSource="{Binding Data}">
+				<m:MapItemsControl.ItemTemplate>
+					<DataTemplate>
+						<m:Pushpin Location="{Binding Location}">
+							<Label Content="{Binding Label}" />
+						</m:Pushpin>
+					</DataTemplate>
+				</m:MapItemsControl.ItemTemplate>
+			</m:MapItemsControl>
+		</m:Map>
 
-        <m:Map CredentialsProvider="Aq150CT4Xwwr-FROJjj5Ieq5CCGQ5xaByYrxY58_XUaFvifqOshSEe1jyabmis33">
-            <m:MapItemsControl x:Name="mapa" ItemsSource="{Binding Data}">
-                <m:MapItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <m:Pushpin Location="{Binding Location}">
-                            <m:Pushpin.Content>
-                                <Label Content="{Binding Label}" />
-                            </m:Pushpin.Content>
-                        </m:Pushpin>
-                    </DataTemplate>
-                </m:MapItemsControl.ItemTemplate>
-            </m:MapItemsControl>
-        </m:Map>
+		<WindowsFormsHost x:Name="windowsFormsHost">
+			<i:Interaction.Triggers>
+				<i:EventTrigger EventName="Loaded" >
+					<gc:EventToCommand Command="{Binding SpatialMapLoaded}" CommandParameter="{Binding ElementName=SpatialMap}" />
+				</i:EventTrigger>
+			</i:Interaction.Triggers>
+			<sp:Map x:Name="SpatialMap"/>
+		</WindowsFormsHost>
 
-        <GridSplitter Grid.Row="1" ResizeDirection="Rows" Height="5" HorizontalAlignment="Stretch" Grid.ColumnSpan="3"/>
+		<Grid Grid.Column="1" Width="150" Margin="5,0,0,0">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="0.5*" />
+				<RowDefinition Height="6"/>
+				<RowDefinition Height="0.5*"/>
+			</Grid.RowDefinitions>
+			<StackPanel>
+				<Label Content="Select map type"/>
+				<RadioButton GroupName="MapType" Content="Bing">
+					<i:Interaction.Triggers>
+						<i:EventTrigger EventName="Checked">
+							<ei:GoToStateAction StateName="Bing"/>
+						</i:EventTrigger>
+					</i:Interaction.Triggers>
+				</RadioButton>
+				<RadioButton GroupName="MapType" Content="GIS">
+					<i:Interaction.Triggers>
+						<i:EventTrigger EventName="Checked">
+							<ei:GoToStateAction StateName="GIS"/>
+						</i:EventTrigger>
+					</i:Interaction.Triggers>
+				</RadioButton>
+			</StackPanel>
+			<StackPanel Grid.Row="1">
+				<Label Content="Select data"/>
+				<RadioButton GroupName="ViewType" Command="{Binding ChangeView}" CommandParameter="Localities" Content="Localities"/>
+				<RadioButton GroupName="ViewType" Command="{Binding ChangeView}" CommandParameter="Frequencies" Content="Frequencies:"/>
+			</StackPanel>
+			<ListBox Grid.Row="2" Margin="0,5,0,0"/>
+			<GridSplitter HorizontalAlignment="Stretch" Grid.Row="3" Height="5" ResizeDirection="Rows"/>
 
-        <my:WindowsFormsHost Grid.Row="2">
-            <sp:Map x:Name="SpatialMap"></sp:Map>
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="Loaded" >
-                    <gc:EventToCommand Command="{Binding SpatialMapLoaded}" CommandParameter="{Binding ElementName=SpatialMap}" />
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-        </my:WindowsFormsHost>
+			<Grid x:Name="grid" Grid.Row="4" d:LayoutOverrides="GridBox">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition />
+				</Grid.RowDefinitions>
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+					<Label Content="Layers"/>
+					<Button Grid.Column="1" HorizontalAlignment="Right" Command="{Binding AddLayer}" Content="Add"/>
+					<Button Grid.Column="2" HorizontalAlignment="Right" Command="{Binding ClearLayers}" Content="Cls"/>
+				</Grid>
 
-        <Grid Grid.Column="1" Width="100" Margin="5,0,0,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition></RowDefinition>
-            </Grid.RowDefinitions>
-            <StackPanel >
-                <RadioButton GroupName="ViewType" Command="{Binding ChangeView}" CommandParameter="Localities">Localities</RadioButton>
-                <RadioButton GroupName="ViewType" Command="{Binding ChangeView}" CommandParameter="Frequencies">Frequencies:</RadioButton>
-            </StackPanel>
-            <ListBox Grid.Row="1" Margin="0,5,0,0">
-                
-            </ListBox>
-        </Grid>
+				<WindowsFormsHost Grid.Row="1">
+					<i:Interaction.Triggers>
+						<i:EventTrigger EventName="Loaded" >
+							<gc:EventToCommand Command="{Binding SpatialMapLegendLoaded}" CommandParameter="{Binding ElementName=SpatialMapLegend}" />
+						</i:EventTrigger>
+					</i:Interaction.Triggers>
+					<sp:Legend x:Name="SpatialMapLegend"/>
+				</WindowsFormsHost>
+			</Grid>
+		</Grid>
 
-        <Grid Grid.Column="1" Grid.Row="2" Width="100" Margin="5,0,0,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition></RowDefinition>
-            </Grid.RowDefinitions>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <Label>Layers</Label>
-                <Button Grid.Column="1" HorizontalAlignment="Right" Command="{Binding AddLayer}">Add</Button>
-                <Button Grid.Column="2" HorizontalAlignment="Right" Command="{Binding ClearLayers}">Cls</Button>
-            </Grid>
-
-            <my:WindowsFormsHost Grid.Row="1">
-                <sp:Legend x:Name="SpatialMapLegend"></sp:Legend>
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="Loaded" >
-                        <gc:EventToCommand Command="{Binding SpatialMapLegendLoaded}" CommandParameter="{Binding ElementName=SpatialMapLegend}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </my:WindowsFormsHost>
-
-        </Grid>
-    </Grid>
+        
+	</Grid>
 </UserControl>
