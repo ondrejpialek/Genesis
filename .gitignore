@@ -2,3 +2,5 @@
 /Genesis.App/bin
 /Genesis.App/obj
 *.suo
+*.psess
+*.vsp

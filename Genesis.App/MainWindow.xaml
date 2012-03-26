@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:command="clr-namespace:Genesis.Command"
         xmlns:gc="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
         Title="Genesis" Height="350" Width="525"
         DataContext="{Binding Source={StaticResource Locator}, Path=Main}">
@@ -15,6 +16,11 @@
     </Window.Resources>
     <Grid>
         <TabControl ItemsSource="{Binding Items}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <command:ItsEventToCommand Command="{Binding Refresh}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <ContentPresenter Content="{Binding Title}" />

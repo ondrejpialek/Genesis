@@ -9,18 +9,40 @@
             DataContext="{Binding Source={StaticResource Locator}, Path=Data}"
              
              d:DesignHeight="300" d:DesignWidth="300">
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded" >
-            <gc:EventToCommand Command="{Binding Refresh}" />
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.7*" />
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="0.3*"/>
+        </Grid.ColumnDefinitions>
         <DataGrid ItemsSource="{Binding Mice}" AutoGenerateColumns="False">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Loaded" >
+                    <gc:EventToCommand Command="{Binding DataGridLoaded}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="PIN" Binding="{Binding Name}" />
                 <DataGridTextColumn Header="Locality" Binding="{Binding Locality.Name}" />
                 <DataGridTextColumn Header="Sex" Binding="{Binding Sex}" />
-        </DataGrid.Columns>
+            </DataGrid.Columns>
         </DataGrid>
+        <GridSplitter Grid.Column="1" Width="3"/>
+        <ListBox Grid.Column="2" ItemsSource="{Binding Genes}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <CheckBox Content="{Binding Name}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Checked">
+                                <gc:EventToCommand Command="{Binding Source={StaticResource Locator}, Path=Data.AddColumn}" CommandParameter="{Binding}" />
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="Unchecked">
+                                <gc:EventToCommand Command="{Binding Source={StaticResource Locator}, Path=Data.RemoveColumn}" CommandParameter="{Binding}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </CheckBox>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </Grid>
 </UserControl>

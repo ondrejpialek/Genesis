@@ -7,6 +7,7 @@ using Microsoft.Win32;
 using System.Linq;
 using System;
 using System.Windows;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace Genesis.ViewModel
 {
@@ -19,7 +20,18 @@ namespace Genesis.ViewModel
         public ObservableCollection<string> Sheets { get; private set; }
         public ObservableCollection<ColumnViewModel> Columns { get; protected set; }
         public ObservableCollection<ICellReader> Fields { get; protected set; }
-        public ObservableCollection<Gene> Genes { get; protected set; }
+        
+        public ObservableCollection<Gene> Genes
+        {
+            get
+            {
+                if (context != null) {
+                    context.Genes.ToList();
+                    return context.Genes.Local;
+                }
+                return null;
+            }
+        }
 
         private readonly IEnumerable<ICellReader<Locality>> localityFields = new List<ICellReader<Locality>> { new CodeColumn(), new LatitudeColumn(), new LongitudeColumn(), new LocalityNameColumn() };
         private readonly ICollection<ICellReader<Mouse>> miceFields = new List<ICellReader<Mouse>> { new PINColumn(), new TraitColumn(), new SexColumn()};
@@ -32,13 +44,37 @@ namespace Genesis.ViewModel
             Sheets = new ObservableCollection<string>();
             Columns = new ObservableCollection<ColumnViewModel>();
 
-            Genes = new ObservableCollection<Gene>(context.Genes);
+            Messenger.Default.Register<Message>(this, (m) => {
+                switch (m)
+                {
+                    case Message.Refresh:
+                        Refresh();
+                        break;
+                }
+            });
 
-            miceFields.Add(new MouseLocalityColumn(context.Localities));
-
-            Fields = new ObservableCollection<ICellReader>(localityFields.Cast<ICellReader>().Union(miceFields));
+            Refresh();
         }
 
+        private void Refresh()
+        {
+            if (context != null)
+            {
+                context.Dispose();
+                context = new GenesisContext();
+            }
+
+            RaisePropertyChanged(() => Genes);
+
+            var oldLookup = miceFields.FirstOrDefault(f => f is MouseLocalityColumn);
+            if (oldLookup != null)
+                miceFields.Remove(oldLookup);
+
+            miceFields.Add(new MouseLocalityColumn(context.Localities));
+            Fields = new ObservableCollection<ICellReader>(localityFields.Cast<ICellReader>().Union(miceFields));
+
+            RaisePropertyChanged(() => Fields);
+        }
 
         private string filename = null;
         public string Filename

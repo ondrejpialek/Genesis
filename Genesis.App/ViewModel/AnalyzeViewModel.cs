@@ -221,7 +221,7 @@ namespace Genesis.ViewModel
                                 Value = frequency };
                         })
                         .Where(r => r.SampleSize > 0)  
-                        .SubscribeOn(DispatcherScheduler.Instance)                    
+                        .ObserveOn(DispatcherScheduler.Instance)                    
                         .Subscribe(f =>
                         {
                             analysis.Frequencies.Add(f);

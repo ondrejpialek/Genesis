@@ -7,7 +7,8 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:gc="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
              xmlns:sp="clr-namespace:DotSpatial.Controls;assembly=DotSpatial.Controls"
-            xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" xmlns:ee="http://schemas.microsoft.com/expression/2010/effects"  x:Class="Genesis.Views.Map"
+             xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+             xmlns:ee="http://schemas.microsoft.com/expression/2010/effects"  x:Class="Genesis.Views.Map"
              mc:Ignorable="d"
              
              d:DesignHeight="300" d:DesignWidth="300">
@@ -152,8 +153,14 @@
 				<RadioButton GroupName="ViewType" Command="{Binding ChangeView}" CommandParameter="Localities" Content="Localities"/>
 				<RadioButton GroupName="ViewType" Command="{Binding ChangeView}" CommandParameter="Frequencies" Content="Frequencies:"/>
 			</StackPanel>
-			<ListBox Grid.Row="2" Margin="0,5,0,0"/>
-			<GridSplitter HorizontalAlignment="Stretch" Grid.Row="3" Height="5" ResizeDirection="Rows"/>
+            <ListBox Grid.Row="2" ItemsSource="{Binding FrequencyAnalysis}" SelectedItem="{Binding SelectedAnalysis, Mode=TwoWay}" Margin="0,5,0,0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Label Content="{Binding Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <GridSplitter HorizontalAlignment="Stretch" Grid.Row="3" Height="5" ResizeDirection="Rows"/>
 
 			<Grid x:Name="grid" Grid.Row="4" d:LayoutOverrides="GridBox">
 				<Grid.RowDefinitions>

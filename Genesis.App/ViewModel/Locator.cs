@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Text;
+using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Ioc;
+using GalaSoft.MvvmLight.Messaging;
 using Genesis.App.Data;
 using Genesis.Excel;
 using Microsoft.Practices.ServiceLocation;
@@ -21,6 +23,7 @@ namespace Genesis.ViewModel
             SimpleIoc.Default.Register<DataViewModel>();
             SimpleIoc.Default.Register<ImportViewModel>();
             SimpleIoc.Default.Register<AnalyzeViewModel>();
+            SimpleIoc.Default.Register<FstViewModel>();
             SimpleIoc.Default.Register<IExcelService, ExcelService>();
         }
 
@@ -64,5 +67,12 @@ namespace Genesis.ViewModel
             }
         }
 
+        public FstViewModel Fst
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<FstViewModel>();
+            }
+        }
     }
 }

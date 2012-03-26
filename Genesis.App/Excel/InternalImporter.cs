@@ -98,10 +98,10 @@ namespace Genesis.Excel
 
         private void Import()
         {
-            var records = new List<TEntity>(repository);
-            var imports = worksheetReader.Records;
+            step = (double)1 / worksheetReader.GetRecordCount();
 
-            IDictionary<RowApplicator<TEntity>, TEntity> data = new Dictionary<RowApplicator<TEntity>, TEntity>();
+            var records = repository.ToList();
+            var imports = worksheetReader.Records;
 
             var o = Observable.Create<Tuple<RowApplicator<TEntity>, TEntity>>(observer => {
                 foreach (var import in imports)
@@ -127,31 +127,8 @@ namespace Genesis.Excel
 
                 return () => { };
             });
-            /*
-            foreach (var import in imports)
-            {
-                TEntity record = default(TEntity);
-                for(int i = 0; i < records.Count; i++) {
-                    if (import.Matches(records[i])) {
-                        record = records[i];
-                        records.RemoveAt(i);
-                        break;
-                    }
-                }
-                if (record == null)
-                {
-                    record = repository.Create();
-                    repository.Add(record);
-                }
-
-                data.Add(import, record);
-            }*/
 
             results = o.ObserveOn(Scheduler.TaskPool).Select(x => Update(x.Item1, x.Item2)).ToList().First();
-
-            step = (double)1 / data.Count;
-
-            //results = data.ToList().AsParallel().WithCancellation(cancellationToken).Select(x => Update(x.Key, x.Value)).ToList();
         }
 
         private TEntity Update(RowApplicator<TEntity> applicator, TEntity entity) {

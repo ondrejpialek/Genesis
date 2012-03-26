@@ -21,5 +21,6 @@ namespace Genesis
         public DbSet<Chromosome> Chromosomes { get; set; }
         public DbSet<Gene> Genes { get; set; }
         public DbSet<FrequencyAnalysis> FrequencyAnalysis { get; set; }
+        public DbSet<FstAnalysis> FstAnalysis { get; set; }
     }
 }

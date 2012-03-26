@@ -24,6 +24,9 @@ namespace Genesis.Excel
 
         public T GetValue<T>()
         {
+            if (typeof(T) == typeof(string)) {
+                return range.Text;
+            }
             return (T)range.Value;
         }
     }

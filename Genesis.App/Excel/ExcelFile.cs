@@ -66,7 +66,7 @@ namespace Genesis.Excel
 
         public void Dispose()
         {
-            workbook.Close();
+            workbook.Close(SaveChanges: false);
             application.Quit();
             application = null;
         }

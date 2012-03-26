@@ -20,8 +20,13 @@ namespace Genesis.Excel
         {
             var locality = localities.FirstOrDefault(l => string.Equals(l.Code, value, StringComparison.InvariantCultureIgnoreCase));
             if (locality != null) {
-                entity.Locality = locality;
+                if (entity.Locality != null)
+                {
+                    entity.Locality.Mice.Remove(entity);
+                }
+                locality.Mice.Add(entity);
             }
+            entity.Locality = locality;
         }
     }
 }

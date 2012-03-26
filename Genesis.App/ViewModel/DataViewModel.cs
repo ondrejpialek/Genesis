@@ -10,6 +10,12 @@ using DotSpatial.Data;
 using DotSpatial.Topology;
 using DotSpatial.Projections;
 using System.Data;
+using GalaSoft.MvvmLight.Messaging;
+using Genesis.Views;
+using System.Data.Entity;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows;
 
 namespace Genesis.ViewModel
 {
@@ -55,16 +61,22 @@ namespace Genesis.ViewModel
 
         private GenesisContext context;
 
-        FeatureSet localities;
-
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
         public DataViewModel()
         {
             Data = new ObservableCollection<PushpinViewModel>();
-            Mice = new ObservableCollection<object>();
-            FrequencyAnalysis = new ObservableCollection<FrequencyAnalysis>();
+
+            Messenger.Default.Register<Message>(this, m =>
+            {
+                switch (m)
+                {
+                    case Message.Refresh:
+                        Refresh();
+                        break;
+                }
+            });
         }
 
         private FrequencyAnalysis selectedAnalysis = null;
@@ -77,19 +89,60 @@ namespace Genesis.ViewModel
             set
             {
                 Set(() => SelectedAnalysis, ref selectedAnalysis, value);
+                UpdateData();
             }
         }
 
         public ObservableCollection<FrequencyAnalysis> FrequencyAnalysis
         {
-            get;
-            protected set;
+            get
+            {
+                if (context != null)
+                {
+                    context.FrequencyAnalysis.Load();
+                    return context.FrequencyAnalysis.Local;
+                }
+                return null;
+            }
         }
 
-        public ObservableCollection<object> Mice
+        public ObservableCollection<Locality> Localities
         {
-            get;
-            protected set;
+            get
+            {
+                if (context != null)
+                {
+                    context.Localities.Load();
+                    return context.Localities.Local;
+                }
+                return null;
+            }
+        }
+
+        public ObservableCollection<Mouse> Mice
+        {
+            get
+            {
+                if (context != null)
+                {
+                    context.Mice.Load();
+                    return context.Mice.Local;
+                }
+                return null;
+            }
+        }
+
+        public ObservableCollection<Gene> Genes
+        {
+            get
+            {
+                if (context != null)
+                {
+                    context.Genes.Load();
+                    return context.Genes.Local;
+                }
+                return null;
+            }
         }
 
         public ObservableCollection<PushpinViewModel> Data
@@ -109,6 +162,7 @@ namespace Genesis.ViewModel
             set
             {
                 Set(() => View, ref view, value);
+                UpdateData();
             }
         }
 
@@ -120,121 +174,136 @@ namespace Genesis.ViewModel
                 return changeView ?? (changeView = new RelayCommand<string>(
                 p =>
                 {
-                    view = (MapView)Enum.Parse(typeof(MapView), p);
-                    Refresh.Execute(null);
+                    View = (MapView)Enum.Parse(typeof(MapView), p);
                 }));
             }
         }
 
-        private RelayCommand refresh;
-        public RelayCommand Refresh
+        private void Refresh() {
+            context = new GenesisContext();
+
+            RaisePropertyChanged(() => Mice);
+            RaisePropertyChanged(() => FrequencyAnalysis);
+            RaisePropertyChanged(() => Localities);
+
+            UpdateData();
+        }
+
+        private void UpdateData()
         {
-            get
+            UpdateBingData();
+            UpdateGisData();
+        }
+
+        private void UpdateBingData()
+        {
+            Data.Clear();
+            if (View == MapView.Localities)
             {
-                if (refresh == null)
+                foreach (var locality in context.Localities)
                 {
-                    refresh = new RelayCommand(() =>
-                    {
-                        context = new GenesisContext();
-                        
-                        Mice.Clear();
-                        foreach (var mice in context.Mice)
-                        {
-                            Mice.Add(mice);
-                        }
+                    if (string.IsNullOrEmpty(locality.Code) || locality.Location == null)
+                        continue;
 
-                        FrequencyAnalysis.Clear();
-                        foreach (var analysis in context.FrequencyAnalysis)
-                        {
-                            FrequencyAnalysis.Add(analysis);
-                        }
-
-                        Data.Clear();
-                        if (localities != null)
-                        {
-                            localities.Features.Clear();
-                            localities.DataTable.Clear();
-                        }
-
-                        if (View == MapView.Localities)
-                        {
-                            foreach (var locality in context.Localities)
-                            {
-                                if (string.IsNullOrEmpty(locality.Code))
-                                    continue;
-
-                                if (locality.Location != null)
-                                {
-                                    Data.Add(new PushpinViewModel(locality, locality.Code));
-
-                                    if (localities != null)
-                                    {
-                                        Coordinate coord = new Coordinate(locality.Location.Longitude ?? 0, locality.Location.Latitude ?? 0);
-                                        DotSpatial.Topology.Point p = new DotSpatial.Topology.Point(coord);
-                                       
-                                        var feature = localities.AddFeature(p);
-                                        feature.DataRow["Code"] = locality.Code;
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (selectedAnalysis != null)
-                            {
-                                foreach (var frequency in selectedAnalysis.Frequencies)
-                                {
-                                    if (string.IsNullOrEmpty(frequency.Locality.Code))
-                                        continue;
-
-                                    if (frequency.Locality.Location != null)
-                                    {
-                                        Data.Add(new PushpinViewModel(frequency.Locality, string.Format("{0} {1:F2} ({2})", frequency.Locality.Code, frequency.Value, frequency.SampleSize)));
-
-                                        if (localities != null)
-                                        {
-                                            Coordinate coord = new Coordinate(frequency.Locality.Location.Longitude ?? 0, frequency.Locality.Location.Latitude ?? 0);
-                                            DotSpatial.Topology.Point p = new DotSpatial.Topology.Point(coord);
-                                            var feature = localities.AddFeature(p);
-                                            feature.DataRow["Frequency"] = frequency.Value;
-                                            feature.DataRow["Code"] = frequency.Locality.Code;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
+                    Data.Add(new PushpinViewModel(locality, locality.Code));
                 }
+            }
+            else
+            {
+                if (selectedAnalysis != null)
+                {
+                    foreach (var frequency in selectedAnalysis.Frequencies)
+                    {
+                        if (string.IsNullOrEmpty(frequency.Locality.Code) || frequency.Locality.Location == null)
+                            continue;
 
-                return refresh;
+                        Data.Add(new PushpinViewModel(frequency.Locality,
+                            string.Format("{0} {1:F2} ({2})", frequency.Locality.Code, frequency.Value, frequency.SampleSize)));
+                    }
+                }
             }
         }
 
-        DotSpatial.Controls.Map spatialMap = null;
         private RelayCommand<DotSpatial.Controls.Map> spatialMapLoaded;
         public RelayCommand<DotSpatial.Controls.Map> SpatialMapLoaded
         {
             get
             {
-                return spatialMapLoaded ?? (spatialMapLoaded = new RelayCommand<DotSpatial.Controls.Map>(
-                map =>
+                return spatialMapLoaded ?? (spatialMapLoaded = new RelayCommand<DotSpatial.Controls.Map>(map => InitGisMap(map)));
+            }
+        }
+
+        DotSpatial.Controls.Map spatialMap = null;
+        private void InitGisMap(DotSpatial.Controls.Map map)
+        {
+            if (spatialMap == null)
+            {
+                spatialMap = map;
+                if (spatialMaplegend != null)
                 {
-                    spatialMap = map;
-                    if (spatialMaplegend != null)
+                    spatialMap.Legend = spatialMaplegend;
+                }
+
+                spatialMap.FunctionMode = DotSpatial.Controls.FunctionMode.Pan;
+
+                UpdateGisData();
+            }
+        }
+
+        IMapFeatureLayer spatialDataLayer = null;
+        private void UpdateGisData()
+        {
+            if (spatialMap != null)
+            {
+                if (spatialDataLayer != null)
+                {
+                    spatialMap.Layers.Remove(spatialDataLayer);
+                    spatialDataLayer.Dispose();
+                }
+                /*
+                if (spatialDataLayer != null)
+                {
+                    spatialDataLayer.DataSet.Features.Clear();
+                    spatialDataLayer.DataSet.DataTable.Clear();
+                }*/
+
+                dataset = new FeatureSet(FeatureType.Point);
+                dataset.Projection = KnownCoordinateSystems.Geographic.World.WGS1984;
+
+                dataset.DataTable.Columns.Add(new DataColumn("Code", typeof(string)));
+
+                if (View == MapView.Localities)
+                {
+                    foreach (var locality in context.Localities)
                     {
-                        spatialMap.Legend = spatialMaplegend;
+                        if (string.IsNullOrEmpty(locality.Code) || locality.Location == null)
+                            continue;
+
+                        Coordinate coord = new Coordinate(locality.Location.Longitude ?? 0, locality.Location.Latitude ?? 0);
+                        var feature = dataset.AddFeature(new DotSpatial.Topology.Point(coord));
+
+                        feature.DataRow["Code"] = locality.Code;
                     }
+                }
+                else
+                {
+                    dataset.DataTable.Columns.Add(new DataColumn("Frequency", typeof(double)));
+                    if (selectedAnalysis != null)
+                    {
+                        foreach (var frequency in selectedAnalysis.Frequencies)
+                        {
+                            if (string.IsNullOrEmpty(frequency.Locality.Code) || frequency.Locality.Location == null)
+                                continue;
 
-                    spatialMap.FunctionMode = DotSpatial.Controls.FunctionMode.Pan;
+                            Coordinate coord = new Coordinate(frequency.Locality.Location.Longitude ?? 0, frequency.Locality.Location.Latitude ?? 0);
+                            var feature = dataset.AddFeature(new DotSpatial.Topology.Point(coord));
+                            feature.DataRow["Frequency"] = frequency.Value;
+                            feature.DataRow["Code"] = frequency.Locality.Code;
+                        }
+                    }
+                }
 
-                    localities = new FeatureSet(FeatureType.Point);
-                    localities.Projection = KnownCoordinateSystems.Geographic.World.WGS1984;
-                    localities.DataTable.Columns.Add(new DataColumn("Frequency", typeof(double)));
-                    localities.DataTable.Columns.Add(new DataColumn("Code", typeof(string)));
-
-                    spatialMap.Layers.Add(localities);
-                    Refresh.Execute(null);
-                }));
+                spatialDataLayer = spatialMap.Layers.Add(dataset);
             }
         }
 
@@ -244,13 +313,15 @@ namespace Genesis.ViewModel
         {
             get
             {
-                return spatialMapLegendLoaded ?? (spatialMapLegendLoaded = new RelayCommand<Legend>(
-                legend =>
+                return spatialMapLegendLoaded ?? (spatialMapLegendLoaded = new RelayCommand<Legend>(legend =>
                 {
-                    spatialMaplegend = legend;
-                    if (spatialMap != null)
+                    if (spatialMaplegend == null)
                     {
-                        spatialMap.Legend = spatialMaplegend;
+                        spatialMaplegend = legend;
+                        if (spatialMap != null)
+                        {
+                            spatialMap.Legend = spatialMaplegend;
+                        }
                     }
                 }));
             }
@@ -271,6 +342,67 @@ namespace Genesis.ViewModel
             get
             {
                 return clearLayers ?? (clearLayers = new RelayCommand(() => { spatialMap.ClearLayers(); }));
+            }
+        }
+
+        public FeatureSet dataset { get; set; }
+
+        DataGrid grid;
+        private RelayCommand<DataGrid> dataGridLoaded;
+        public RelayCommand<DataGrid> DataGridLoaded
+        {
+            get
+            {
+                return dataGridLoaded
+                    ?? (dataGridLoaded = new RelayCommand<DataGrid>(
+                                          g =>
+                                          {
+                                              grid = g;
+                                          }));
+            }
+        }
+
+        private MouseToAllelesConverter mouseToAllelesConverter;
+        private RelayCommand<Gene> addGeneColumn;
+        public RelayCommand<Gene> AddColumn
+        {
+            get
+            {
+                return addGeneColumn
+                    ?? (addGeneColumn = new RelayCommand<Gene>(
+                        gene =>
+                        {
+                            if (grid != null)
+                            {
+                                var col = new DataGridTextColumn() { Header = gene.Name };
+                                grid.Columns.Add(col);
+                                var binding = new Binding();
+                                binding.Converter = mouseToAllelesConverter ?? (mouseToAllelesConverter = new MouseToAllelesConverter());
+                                binding.ConverterParameter = gene;
+                                col.Binding = binding;                                                  
+                            }
+                        }));
+            }
+        }
+
+        private RelayCommand<Gene> removeGeneColumn;
+        public RelayCommand<Gene> RemoveColumn
+        {
+            get
+            {
+                return removeGeneColumn
+                    ?? (removeGeneColumn = new RelayCommand<Gene>(
+                        gene =>
+                        {
+                            if (grid != null)
+                            {
+                                var col = grid.Columns.Where(c => c.Header == gene.Name).FirstOrDefault();
+                                if (col != null)
+                                {
+                                    grid.Columns.Remove(col);
+                                }
+                            }
+                        }));
             }
         }
     }
