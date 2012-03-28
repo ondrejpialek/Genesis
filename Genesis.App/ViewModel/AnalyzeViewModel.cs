@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Reactive.Concurrency;
 using System.Linq;
 using System;
+using System.Data.Entity;
 
 namespace Genesis.ViewModel
 {
@@ -49,15 +50,20 @@ namespace Genesis.ViewModel
         /// </summary>
         public AnalyzeViewModel()
         {
-            FrequencyAnalysis = new ObservableCollection<FrequencyAnalysis>();
             Genes = new ObservableCollection<GeneViewModel>();
-            Species = new ObservableCollection<Species>();
         }
 
         public ObservableCollection<FrequencyAnalysis> FrequencyAnalysis
         {
-            get;
-            protected set;
+            get
+            {
+                if (context != null)
+                {
+                    context.FrequencyAnalysis.Load();
+                    return context.FrequencyAnalysis.Local;
+                }
+                return null;
+            }
         }
 
         public ObservableCollection<GeneViewModel> Genes
@@ -68,8 +74,16 @@ namespace Genesis.ViewModel
 
         public ObservableCollection<Species> Species
         {
-            get;
-            protected set;
+            get
+            {
+                if (context != null)
+                {
+
+                    context.Species.Load();
+                    return context.Species.Local;
+                }
+                return null;
+            }
         }
 
         private Species selectedSpecies = null;
@@ -108,22 +122,9 @@ namespace Genesis.ViewModel
                             Genes.Add(new GeneViewModel(gene));
                         }
 
-                        FrequencyAnalysis.Clear();
-                        foreach (var analysis in context.FrequencyAnalysis)
-                        {
-                            FrequencyAnalysis.Add(analysis);
-                        }
-
-                        Species.Clear();
-                        foreach (var species in context.Species)
-                        {
-                            Species.Add(species);
-
-                            if (SelectedSpecies == null)
-                            {
-                                SelectedSpecies = species;
-                            }
-                        }
+                        RaisePropertyChanged(() => FrequencyAnalysis);
+                        RaisePropertyChanged(() => Species);
+                        SelectedSpecies = Species.FirstOrDefault();
                     });
                 }
 
@@ -145,21 +146,18 @@ namespace Genesis.ViewModel
             }
         }
 
-        private RelayCommand deleteAnalysis;
-        public RelayCommand DeleteAnalysis
+        private RelayCommand<FrequencyAnalysis> deleteAnalysis;
+        public RelayCommand<FrequencyAnalysis> DeleteAnalysis
         {
             get
             {
                 if (deleteAnalysis == null)
                 {
-                    deleteAnalysis = new RelayCommand(() =>
+                    deleteAnalysis = new RelayCommand<FrequencyAnalysis>((a) =>
                     {
-                        if (selectedFrequencyAnalysis != null)
-                        {
-                            context.FrequencyAnalysis.Remove(selectedFrequencyAnalysis);
-                            FrequencyAnalysis.Remove(selectedFrequencyAnalysis);
-                            SelectedFrequencyAnalysis = null;
-                        }
+                        //a.Frequencies.ToList(); // bug in EF, need to load all to delete
+                        FrequencyAnalysis.Remove(a);
+                        context.SaveChanges();
                     });
                 }
 

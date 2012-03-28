@@ -145,20 +145,19 @@ namespace Genesis.ViewModel
             }
         }
 
-        private RelayCommand deleteAnalysis;
-        public RelayCommand DeleteAnalysis
+        private RelayCommand<FstAnalysis> deleteAnalysis;
+        public RelayCommand<FstAnalysis> DeleteAnalysis
         {
             get
             {
                 if (deleteAnalysis == null)
                 {
-                    deleteAnalysis = new RelayCommand(() =>
+                    deleteAnalysis = new RelayCommand<FstAnalysis>((a) =>
                     {
-                        if (selectedFstAnalysis != null)
-                        {
-                            FstAnalysis.Remove(selectedFstAnalysis);
-                            SelectedFstAnalysis = null;
-                        }
+                        FstAnalysis.Remove(a);
+                        context.SaveChanges();
+                        if (SelectedFstAnalysis == a)
+                            SelectedFstAnalysis = FstAnalysis.FirstOrDefault();
                     });
                 }
 

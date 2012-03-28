@@ -396,7 +396,7 @@ namespace Genesis.ViewModel
                         {
                             if (grid != null)
                             {
-                                var col = grid.Columns.Where(c => c.Header == gene.Name).FirstOrDefault();
+                                var col = grid.Columns.Where(c => string.Equals(c.Header, gene.Name)).FirstOrDefault();
                                 if (col != null)
                                 {
                                     grid.Columns.Remove(col);

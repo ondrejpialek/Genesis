@@ -22,5 +22,11 @@ namespace Genesis
         public DbSet<Gene> Genes { get; set; }
         public DbSet<FrequencyAnalysis> FrequencyAnalysis { get; set; }
         public DbSet<FstAnalysis> FstAnalysis { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<FrequencyAnalysis>().HasMany(f => f.Frequencies).WithRequired().WillCascadeOnDelete();
+        }
+
     }
 }

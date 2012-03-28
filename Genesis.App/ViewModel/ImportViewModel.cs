@@ -236,6 +236,10 @@ namespace Genesis.ViewModel
                             excelImport.Save();
                             MessageBox.Show("Import complete");
                         });
+                        excelImport.Cancelled += (o, e) =>
+                        {
+                            MessageBox.Show("Import cancelled.");
+                        };
                         excelImport.Start(importArgs);
                     });
                 }

@@ -1,0 +1,11 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style x:Key="DeleteGlyph" TargetType="{x:Type Path}">
+        <Setter Property="Data" Value="F1M608.038,178.012L595.565,165.539 576.036,185.068 556.509,165.54 544.038,178.012 563.565,197.539 544.038,217.066 556.512,229.538 576.038,210.012 595.565,229.539 608.036,217.068 588.509,197.54 608.038,178.012z" />
+        <Setter Property="Fill" Value="#FF000000" />
+        <Setter Property="Stretch" Value="Uniform" />
+        <Setter Property="Margin" Value="0,0,0,0" />
+    </Style>
+
+</ResourceDictionary>

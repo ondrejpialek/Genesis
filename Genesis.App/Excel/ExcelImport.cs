@@ -68,6 +68,7 @@ namespace Genesis.Excel
             importer = new InternalImporter<TEntity>(repository, TaskScheduler.FromCurrentSynchronizationContext(), cancellationTokenSource.Token);
             importer.ProgressUpdate = step => Progress += step;
             importer.CompletedAction = OnFinished;
+            importer.CancelledAction = OnCancelled;
             importer.Start(parser);
         }
 

@@ -24,12 +24,21 @@
             <Label Content="{Binding Name}"></Label>
         </DataTemplate>
         <DataTemplate x:Key="AnalysisDataTemplate">
-            <StackPanel Orientation="Horizontal">
-                <Label Content="{Binding Name}"></Label>
-                <Label> (</Label>
-                <Label Content="{Binding Analyzed}"></Label>
-                <Label>)</Label>
-            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="{Binding Name}"></Label>
+                    <Label>(</Label>
+                    <Label Content="{Binding Analyzed}"></Label>
+                    <Label>)</Label>
+                </StackPanel>
+                <Button Grid.Column="1" Width="20" Command="{Binding Source={StaticResource Locator}, Path=Analyze.DeleteAnalysis}" CommandParameter="{Binding}">
+                    <Path Style="{StaticResource DeleteGlyph}" Margin="1,1,1,1" />
+                </Button>
+            </Grid>
         </DataTemplate>
     </UserControl.Resources>
     <Grid>
