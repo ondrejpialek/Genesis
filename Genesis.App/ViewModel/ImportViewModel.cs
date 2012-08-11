@@ -14,6 +14,10 @@ namespace Genesis.ViewModel
 
     public class ImportViewModel : ViewModelBase
     {
+        public enum ImportType { Localities, Data };
+        private static IEnumerable<ImportType> importTypes = new ImportType[] { ImportType.Localities, ImportType.Data };
+        public IEnumerable<ImportType> ImportTypes { get { return importTypes; } }
+
         private GenesisContext context;
         private IExcelService excelService;
 
@@ -66,14 +70,35 @@ namespace Genesis.ViewModel
 
             RaisePropertyChanged(() => Genes);
 
-            var oldLookup = miceFields.FirstOrDefault(f => f is MouseLocalityColumn);
-            if (oldLookup != null)
-                miceFields.Remove(oldLookup);
+            ReloadFields();
+        }
 
-            miceFields.Add(new MouseLocalityColumn(context.Localities));
-            Fields = new ObservableCollection<ICellReader>(localityFields.Cast<ICellReader>().Union(miceFields));
-
+        private void ReloadFields()
+        {
+            if (SelectedImport == ImportType.Localities)
+            {
+                Fields = new ObservableCollection<ICellReader>(localityFields);
+            }
+            else
+            {
+                Fields = new ObservableCollection<ICellReader>(miceFields);
+                Fields.Add(new MouseLocalityColumn(context.Localities));
+            }
             RaisePropertyChanged(() => Fields);
+        }
+
+        private ImportType selectedImport = ImportType.Localities;
+        public ImportType SelectedImport
+        {
+            get
+            {
+                return selectedImport;
+            }
+            set
+            {
+                Set(() => SelectedImport, ref selectedImport, value);
+                ReloadFields();
+            }
         }
 
         private string filename = null;
@@ -165,87 +190,87 @@ namespace Genesis.ViewModel
             }
         }
 
-        private RelayCommand importlocalities;
-        public RelayCommand ImportLocalities
+        private RelayCommand import;
+        public RelayCommand Import
         {
             get
             {
-                if (importlocalities == null)
+                if (import == null)
                 {
-                    importlocalities = new RelayCommand(() =>
+                    import = new RelayCommand(() =>
                     {
-                        ImportArgs<Locality> importArgs = new ImportArgs<Locality>();
-                        importArgs.Filename = filename;
-                        importArgs.WorkSheetName = sheet;
-                        importArgs.Columns.Clear();
-                        foreach (var column in Columns.Where(c => c.Column != null))
+                        if (SelectedImport == ImportType.Localities)
                         {
-                            column.Column.Column = column.Key;
-                            importArgs.Columns.Add((ICellReader<Locality>)column.Column);
+                            DoImportLocalities();
                         }
-
-                        var excelImport = new ExcelImport<Locality>(context);
-                        excelImport.ProgressChanged += new EventHandler((o, e) =>
+                        else
                         {
-                            Progress = excelImport.Progress * 100;
-                        });
-
-                        //excelImport.Started += new EventHandler(import_Started);
-                        //excelImport.Saved += new EventHandler();
-                        //excelImport.Cancelled += new EventHandler(import_Finished);
-                        excelImport.Finished += new EventHandler((o, e) =>
-                        {
-                            excelImport.Save();
-                            MessageBox.Show("Import complete");
-                        });
-                        excelImport.Start(importArgs);
+                            DoImportData();
+                        }
                     });
                 }
 
-                return importlocalities;
+                return import;
             }
         }
 
-        private RelayCommand importData;
-        public RelayCommand ImportData
+        private void DoImportData()
         {
-            get
+            ImportArgs<Mouse> importArgs = new ImportArgs<Mouse>();
+            importArgs.Filename = filename;
+            importArgs.WorkSheetName = sheet;
+            importArgs.Columns.Clear();
+            foreach (var columnViewModel in Columns.Where(c => c.Column != null))
             {
-                if (importData == null)
-                {
-                    importData = new RelayCommand(() =>
-                    {
-                        ImportArgs<Mouse> importArgs = new ImportArgs<Mouse>();
-                        importArgs.Filename = filename;
-                        importArgs.WorkSheetName = sheet;
-                        importArgs.Columns.Clear();
-                        foreach (var columnViewModel in Columns.Where(c => c.Column != null))
-                        {
-                            columnViewModel.Column.Column = columnViewModel.Key;
-                            importArgs.Columns.Add((ICellReader<Mouse>)columnViewModel.Column);
-                        }
-
-                        var excelImport = new ExcelImport<Mouse>(context);
-                        excelImport.ProgressChanged += new EventHandler((o, e) =>
-                        {
-                            Progress = excelImport.Progress * 100;
-                        });
-
-                        excelImport.Finished += new EventHandler((o, e) =>
-                        {
-                            excelImport.Save();
-                            MessageBox.Show("Import complete");
-                        });
-                        excelImport.Cancelled += (o, e) =>
-                        {
-                            MessageBox.Show("Import cancelled.");
-                        };
-                        excelImport.Start(importArgs);
-                    });
-                }
-
-                return importData;
+                columnViewModel.Column.Column = columnViewModel.Key;
+                importArgs.Columns.Add((ICellReader<Mouse>)columnViewModel.Column);
             }
+
+            var excelImport = new ExcelImport<Mouse>(context);
+            excelImport.ProgressChanged += new EventHandler((o, e) =>
+            {
+                Progress = excelImport.Progress * 100;
+            });
+
+            excelImport.Finished += new EventHandler((o, e) =>
+            {
+                excelImport.Save();
+                MessageBox.Show("Import complete");
+            });
+            excelImport.Cancelled += (o, e) =>
+            {
+                MessageBox.Show("Import cancelled.");
+            };
+            excelImport.Start(importArgs);
+        }
+
+        private void DoImportLocalities()
+        {
+            ImportArgs<Locality> importArgs = new ImportArgs<Locality>();
+            importArgs.Filename = filename;
+            importArgs.WorkSheetName = sheet;
+            importArgs.Columns.Clear();
+            foreach (var column in Columns.Where(c => c.Column != null))
+            {
+                column.Column.Column = column.Key;
+                importArgs.Columns.Add((ICellReader<Locality>)column.Column);
+            }
+
+            var excelImport = new ExcelImport<Locality>(context);
+            excelImport.ProgressChanged += new EventHandler((o, e) =>
+            {
+                Progress = excelImport.Progress * 100;
+            });
+
+            //excelImport.Started += new EventHandler(import_Started);
+            //excelImport.Saved += new EventHandler();
+            //excelImport.Cancelled += new EventHandler(import_Finished);
+            excelImport.Finished += new EventHandler((o, e) =>
+            {
+                excelImport.Save();
+                MessageBox.Show("Import complete");
+            });
+            excelImport.Start(importArgs);
         }
     }
 }

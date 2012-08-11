@@ -36,9 +36,8 @@
             </StackPanel>
         </DataTemplate>        
     </UserControl.Resources>
-    <Grid Margin="0">
+    <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -46,8 +45,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <ProgressBar Value="{Binding Progress}"></ProgressBar>
-        <Label Grid.Row="1" Margin="{DynamicResource DefaultVerticalMargin}">Select an excel or a csv file and a sheet to import:</Label>
-        <Grid Grid.Row="2" Margin="{DynamicResource DefaultVerticalMargin}">
+        <Grid Grid.Row="1" Margin="{DynamicResource DefaultVerticalMargin}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*"/>
@@ -56,23 +54,29 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Label Margin="{DynamicResource DefaultVerticalMargin}" VerticalAlignment="Center">Filename</Label>
-            <TextBox Grid.Column="1" Margin="{DynamicResource DefaultMargin}" VerticalAlignment="Center" Text="{Binding Filename}" IsReadOnly="True"/>
-            <Button Grid.Column="2" Margin="{DynamicResource DefaultVerticalMargin}" VerticalAlignment="Center" Padding="6,1" Command="{Binding Browse}">Browse ...</Button>
-            <Label Grid.Row="1" Margin="{DynamicResource DefaultVerticalMargin}" VerticalAlignment="Center">Sheet</Label>
-            <ComboBox Grid.Row="1" Grid.Column="1" Margin="{DynamicResource DefaultMargin}" VerticalAlignment="Center" ItemsSource="{Binding Sheets}" SelectedItem="{Binding Sheet, Mode=TwoWay}"></ComboBox>
+            
+            <Label Margin="{DynamicResource DefaultVerticalMargin}" VerticalAlignment="Center" Content="Import data"/>
+            <ComboBox Grid.Column="1" Margin="6,8" VerticalAlignment="Center" ItemsSource="{Binding ImportTypes}" SelectedItem="{Binding SelectedImport, Mode=TwoWay}"></ComboBox>
+
+            <Label Grid.Row="1" Margin="{DynamicResource DefaultVerticalMargin}" Grid.ColumnSpan="3">Select an excel or a csv file and a sheet to import:</Label>
+
+            <Label Margin="{DynamicResource DefaultVerticalMargin}" VerticalAlignment="Center" Grid.Row="2">Filename</Label>
+            <TextBox Grid.Column="1" Margin="6,1,6,10" VerticalAlignment="Center" Text="{Binding Filename}" IsReadOnly="True" Grid.Row="2"/>
+            <Button Grid.Column="2" Margin="0,0,0,9" VerticalAlignment="Center" Padding="6,1" Command="{Binding Browse}" Grid.Row="2">Browse ...</Button>
+            <Label Grid.Row="3" Margin="{DynamicResource DefaultVerticalMargin}" VerticalAlignment="Center">Sheet</Label>
+            <ComboBox Grid.Row="3" Grid.Column="1" Margin="6,8" VerticalAlignment="Center" ItemsSource="{Binding Sheets}" SelectedItem="{Binding Sheet, Mode=TwoWay}"></ComboBox>
+            
         </Grid>
-        <Label Grid.Row="3" Margin="{DynamicResource DefaultVerticalMargin}">Identify columns:</Label>
-        <ListBox Grid.Row="4" Margin="3" BorderThickness="0" ItemsSource="{Binding Columns}" SelectedItem="{Binding SelectedColumn}" ItemTemplate="{StaticResource ImportColumnTemplate}" HorizontalContentAlignment="Stretch">
+        <Label Grid.Row="2" Margin="{DynamicResource DefaultVerticalMargin}">Identify columns:</Label>
+        <ListBox Grid.Row="3" Margin="3" BorderThickness="0" ItemsSource="{Binding Columns}" SelectedItem="{Binding SelectedColumn}" ItemTemplate="{StaticResource ImportColumnTemplate}" HorizontalContentAlignment="Stretch">
 
         </ListBox>
-        <StackPanel Grid.Row="5" HorizontalAlignment="Right" Orientation="Horizontal">
-            <Button  Margin="{DynamicResource DefaultMargin}" Padding="6,1" Command="{Binding ImportLocalities}">
-                Import localities
-            </Button>
-            <Button Margin="{DynamicResource DefaultVerticalMargin}" Padding="6,1" Command="{Binding ImportData}">
-                Import data
+        <StackPanel Grid.Row="4" HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button  Margin="{DynamicResource DefaultMargin}" Padding="6,1" Command="{Binding Import}">
+                Import
             </Button>
         </StackPanel>
     </Grid>
