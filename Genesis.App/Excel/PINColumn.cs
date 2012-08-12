@@ -8,7 +8,9 @@ namespace Genesis.Excel
 {
     public class PINColumn : CellReader<Mouse, string>
     {
-        public PINColumn() : base("PIN", true) { }
+        private static Func<Mouse, string, bool> COMPARATOR = (mouse, value) => (!string.IsNullOrEmpty(value) && value.Equals(mouse.Name));
+
+        public PINColumn() : base("PIN", COMPARATOR) { }
 
         protected override void Apply(Mouse entity, string value)
         {

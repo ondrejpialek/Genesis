@@ -125,7 +125,9 @@ namespace Genesis.ViewModel
             {
                 if (context != null)
                 {
-                    context.Mice.Load();
+                    context.Mice
+                        .OrderBy(m => m.Locality == null ? string.Empty : m.Locality.Name)
+                        .ThenBy(m => m.Sex).ThenBy(m => m.Name).Load();
                     return context.Mice.Local;
                 }
                 return null;

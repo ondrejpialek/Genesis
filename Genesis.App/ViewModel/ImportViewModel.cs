@@ -158,8 +158,12 @@ namespace Genesis.ViewModel
             set
             {
                 Set(() => Sheet, ref sheet, value);
-                worksheet = excelFile.Worksheets[Sheets.IndexOf(value)];
-                LoadColumns();
+                int index = Sheets.IndexOf(value);
+                if ((excelFile != null) && index > -1)
+                {
+                    worksheet = excelFile.Worksheets[Sheets.IndexOf(value)];
+                    LoadColumns();
+                }
             }
         }
 
