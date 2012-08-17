@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectView>ShowAllFiles</ProjectView>
-    <PublishUrlHistory>ftp://ftp.pialek.eu/htdocs/applications/genesis/|ftp://ftp.pialek.eu/applications/genesis/|ftp://ftp.pialek.eu/applications/|D:\test\|publish\</PublishUrlHistory>
+    <PublishUrlHistory>D:\dev\Genesis\Genesis.App\deploy\|ftp://ftp.pialek.eu/htdocs/applications/genesis/|ftp://ftp.pialek.eu/applications/genesis/|ftp://ftp.pialek.eu/applications/|D:\test\</PublishUrlHistory>
     <InstallUrlHistory>http://www.pialek.eu/applications/genesis/|http://www.pialek.eu/applications/</InstallUrlHistory>
     <SupportUrlHistory />
     <UpdateUrlHistory />

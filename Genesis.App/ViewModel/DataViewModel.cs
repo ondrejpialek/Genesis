@@ -68,9 +68,12 @@ namespace Genesis.ViewModel
         {
             Data = new ObservableCollection<PushpinViewModel>();
 
-            Messenger.Default.Register<Message>(this, m =>
+            Messenger.Default.Register<GenericMessage<Message>>(this, m =>
             {
-                switch (m)
+                if (m.Target != this)
+                    return;
+
+                switch (m.Content)
                 {
                     case Message.Refresh:
                         Refresh();
@@ -119,34 +122,6 @@ namespace Genesis.ViewModel
             }
         }
 
-        public ObservableCollection<Mouse> Mice
-        {
-            get
-            {
-                if (context != null)
-                {
-                    context.Mice
-                        .OrderBy(m => m.Locality == null ? string.Empty : m.Locality.Name)
-                        .ThenBy(m => m.Sex).ThenBy(m => m.Name).Load();
-                    return context.Mice.Local;
-                }
-                return null;
-            }
-        }
-
-        public ObservableCollection<Gene> Genes
-        {
-            get
-            {
-                if (context != null)
-                {
-                    context.Genes.Load();
-                    return context.Genes.Local;
-                }
-                return null;
-            }
-        }
-
         public ObservableCollection<PushpinViewModel> Data
         {
             get;
@@ -182,9 +157,10 @@ namespace Genesis.ViewModel
         }
 
         private void Refresh() {
+            if (context != null)
+                context.Dispose();
             context = new GenesisContext();
 
-            RaisePropertyChanged(() => Mice);
             RaisePropertyChanged(() => FrequencyAnalysis);
             RaisePropertyChanged(() => Localities);
 
@@ -348,64 +324,5 @@ namespace Genesis.ViewModel
         }
 
         public FeatureSet dataset { get; set; }
-
-        DataGrid grid;
-        private RelayCommand<DataGrid> dataGridLoaded;
-        public RelayCommand<DataGrid> DataGridLoaded
-        {
-            get
-            {
-                return dataGridLoaded
-                    ?? (dataGridLoaded = new RelayCommand<DataGrid>(
-                                          g =>
-                                          {
-                                              grid = g;
-                                          }));
-            }
-        }
-
-        private MouseToAllelesConverter mouseToAllelesConverter;
-        private RelayCommand<Gene> addGeneColumn;
-        public RelayCommand<Gene> AddColumn
-        {
-            get
-            {
-                return addGeneColumn
-                    ?? (addGeneColumn = new RelayCommand<Gene>(
-                        gene =>
-                        {
-                            if (grid != null)
-                            {
-                                var col = new DataGridTextColumn() { Header = gene.Name };
-                                grid.Columns.Add(col);
-                                var binding = new Binding();
-                                binding.Converter = mouseToAllelesConverter ?? (mouseToAllelesConverter = new MouseToAllelesConverter());
-                                binding.ConverterParameter = gene;
-                                col.Binding = binding;                                                  
-                            }
-                        }));
-            }
-        }
-
-        private RelayCommand<Gene> removeGeneColumn;
-        public RelayCommand<Gene> RemoveColumn
-        {
-            get
-            {
-                return removeGeneColumn
-                    ?? (removeGeneColumn = new RelayCommand<Gene>(
-                        gene =>
-                        {
-                            if (grid != null)
-                            {
-                                var col = grid.Columns.Where(c => string.Equals(c.Header, gene.Name)).FirstOrDefault();
-                                if (col != null)
-                                {
-                                    grid.Columns.Remove(col);
-                                }
-                            }
-                        }));
-            }
-        }
     }
 }

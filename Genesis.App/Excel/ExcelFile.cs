@@ -21,14 +21,15 @@ namespace Genesis.Excel
                 if (worksheets == null)
                 {
                     var sheets = new List<ExcelWorksheet>();
-                    foreach (var s in workbook.Worksheets)
-                    {
-                        Worksheet w = s as Worksheet;
-                        if (w != null)
+
+                        foreach (var s in workbook.Worksheets)
                         {
-                            sheets.Add(new ExcelWorksheet(w));
+                            Worksheet w = s as Worksheet;
+                            if (w != null)
+                            {
+                                sheets.Add(new ExcelWorksheet(w));
+                            }
                         }
-                    }
                     worksheets = new ReadOnlyCollection<ExcelWorksheet>(sheets);
                 }
                 return worksheets;

@@ -6,7 +6,7 @@
              mc:Ignorable="d" 
                      xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:gc="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
-            DataContext="{Binding Source={StaticResource Locator}, Path=Data}"
+            DataContext="{Binding Source={StaticResource Locator}, Path=Mice}"
              
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
@@ -34,10 +34,10 @@
                     <CheckBox Content="{Binding Name}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="Checked">
-                                <gc:EventToCommand Command="{Binding Source={StaticResource Locator}, Path=Data.AddColumn}" CommandParameter="{Binding}" />
+                                <gc:EventToCommand Command="{Binding DataContext.AddColumn, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" CommandParameter="{Binding}" />
                             </i:EventTrigger>
                             <i:EventTrigger EventName="Unchecked">
-                                <gc:EventToCommand Command="{Binding Source={StaticResource Locator}, Path=Data.RemoveColumn}" CommandParameter="{Binding}" />
+                                <gc:EventToCommand Command="{Binding DataContext.RemoveColumn, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" CommandParameter="{Binding}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </CheckBox>

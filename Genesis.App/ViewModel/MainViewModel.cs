@@ -26,6 +26,19 @@ namespace Genesis.ViewModel
             };
         }
 
+        private SectionViewModel selectedSection;
+        public SectionViewModel SelectedSection
+        {
+            get
+            {
+                return selectedSection;
+            }
+            set
+            {
+                Set(() => SelectedSection, ref selectedSection, value);
+            }
+        }
+
         private RelayCommand refresh;
         public RelayCommand Refresh
         {
@@ -33,7 +46,7 @@ namespace Genesis.ViewModel
             {
                 return refresh ?? (refresh = new RelayCommand(() =>
                 {
-                    Messenger.Default.Send(Message.Refresh);
+                    Messenger.Default.Send(new GenericMessage<Message>(this, SelectedSection.Content.DataContext, Message.Refresh));
                 }));
             }
         }

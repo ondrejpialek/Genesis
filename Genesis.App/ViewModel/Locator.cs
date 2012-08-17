@@ -21,6 +21,7 @@ namespace Genesis.ViewModel
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<SettingsViewModel>();
             SimpleIoc.Default.Register<DataViewModel>();
+            SimpleIoc.Default.Register<MiceViewModel>();
             SimpleIoc.Default.Register<ImportViewModel>();
             SimpleIoc.Default.Register<AnalyzeViewModel>();
             SimpleIoc.Default.Register<FstViewModel>();
@@ -72,6 +73,14 @@ namespace Genesis.ViewModel
             get
             {
                 return ServiceLocator.Current.GetInstance<FstViewModel>();
+            }
+        }
+
+        public MiceViewModel Mice
+        {
+            get
+            {
+                return ServiceLocator.Current.GetInstance<MiceViewModel>();
             }
         }
     }

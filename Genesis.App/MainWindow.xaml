@@ -21,7 +21,7 @@
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
-        <TabControl ItemsSource="{Binding Items}">
+        <TabControl ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedSection}">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <command:ItsEventToCommand Command="{Binding Refresh}" />

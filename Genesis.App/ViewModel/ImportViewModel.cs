@@ -48,8 +48,11 @@ namespace Genesis.ViewModel
             Sheets = new ObservableCollection<string>();
             Columns = new ObservableCollection<ColumnViewModel>();
 
-            Messenger.Default.Register<Message>(this, (m) => {
-                switch (m)
+            Messenger.Default.Register<GenericMessage<Message>>(this, (m) =>
+            {
+                if (m.Target != this)
+
+                switch (m.Content)
                 {
                     case Message.Refresh:
                         Refresh();
