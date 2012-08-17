@@ -1,6 +1,7 @@
 
-/Genesis.App/bin
-/Genesis.App/obj
+bin
+obj
 *.suo
 *.psess
 *.vsp
+deploy
