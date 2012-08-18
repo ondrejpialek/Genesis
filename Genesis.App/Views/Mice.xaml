@@ -15,7 +15,7 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="0.3*"/>
         </Grid.ColumnDefinitions>
-        <DataGrid ItemsSource="{Binding Mice}" AutoGenerateColumns="False">
+        <DataGrid ItemsSource="{Binding Mice}" AutoGenerateColumns="False" VirtualizingPanel.IsVirtualizing="True">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="Loaded" >
                     <gc:EventToCommand Command="{Binding DataGridLoaded}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}" />
