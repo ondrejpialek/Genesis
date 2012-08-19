@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using System.Reactive.Concurrency;
 using System.Linq;
 using System;
+using Genesis.Analysis;
 
 namespace Genesis.ViewModel
 {
@@ -42,7 +43,6 @@ namespace Genesis.ViewModel
         }
 
         private GenesisContext context;
-        private bool analyzing;
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -105,10 +105,7 @@ namespace Genesis.ViewModel
                 if (refresh == null)
                 {
                     refresh = new RelayCommand(() =>
-                    {
-                        if (analyzing)
-                            return;
-                        
+                    {                       
                         if (context != null)
                             context.Dispose();
 
@@ -188,61 +185,23 @@ namespace Genesis.ViewModel
                 {
                     analyze = new RelayCommand(async () =>
                     {
-                        analyzing = true;
-
-                        var selectedGenes = Genes.Where(g => g.Selected).Select(g => g.Gene).ToList();
-
-                        var analysis = await Task.Run(() =>
+                        currentAnalysis = new FstAnalyzer(AnalysisName, new FstAnalyzer.Settings()
                         {
-                            var frequencies = context.Localities.ToList().Select(l =>
-                            {
-                                var alleles = (from mouse in l.Mice
-                                               from record in mouse.Alleles
-                                               where selectedGenes.Contains(record.Allele.Gene)
-                                               select new { Mouse = mouse, Allele = record.Allele.Species }).ToList();
-
-                                double frequency = 0;
-                                int sampleSize = 0;
-                                if (alleles.Count > 0)
-                                {
-                                    double spec = alleles.Where(s => s.Allele == SelectedSpecies).Count();
-                                    frequency = spec / alleles.Count;
-
-                                    sampleSize = alleles.Select(a => a.Mouse).Distinct().Count();
-                                }
-
-                                return new Frequency
-                                {
-                                    Locality = l,
-                                    SampleSize = sampleSize,
-                                    Value = frequency
-                                };
-                            })
-                            .Where(r => r.SampleSize > 0)
-                            .ToList();
-
-                            var n = frequencies.Sum(f => f.SampleSize);
-                            var Hs = frequencies.Sum(f => f.SampleSize * 2 * f.Value * (1 - f.Value)) / n;
-                            var pt = frequencies.Sum(f => f.SampleSize * f.Value) / n;
-                            var Ht = 2 * pt * (1 - pt);
-
-                            var result = new FstAnalysis();
-                            result.Analyzed = DateTime.Now;
-                            result.Name = AnalysisName;
-                            result.Fst = (Ht - Hs) / Ht;
-                            return result;
+                            Genes = Genes.Where(g => g.Selected).Select(g => g.Gene).ToList(),
+                            Species = SelectedSpecies
                         });
 
-                        context.FstAnalysis.Add(analysis);
+                        var context = new GenesisContext();
+                        var result = await Task.Run(() => currentAnalysis.Analyse(context));
+                        context.FstAnalysis.Add(result);
                         context.SaveChanges();
-                        analyzing = false;
-                        Refresh.Execute(null);
-                        
-                    });
+                    }, () => currentAnalysis == null || currentAnalysis.Done);
                 }
 
                 return analyze;
             }
         }
+
+        private FstAnalyzer currentAnalysis { get; set; }
     }
 }

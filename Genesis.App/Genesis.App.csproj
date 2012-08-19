@@ -16,6 +16,7 @@
     <WarningLevel>4</WarningLevel>
     <IsWebBootstrapper>true</IsWebBootstrapper>
     <Utf8Output>true</Utf8Output>
+    <ExpressionBlendVersion>5.2.30810.0</ExpressionBlendVersion>
     <PublishUrl>D:\dev\Genesis\Genesis.App\deploy\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
@@ -31,7 +32,7 @@
     <PublisherName>Ondřej Piálek</PublisherName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>index.html</WebPage>
-    <ApplicationRevision>4</ApplicationRevision>
+    <ApplicationRevision>8</ApplicationRevision>
     <ApplicationVersion>0.1.1.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -180,6 +181,9 @@
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Compile Include="Analysis\Analyzer.cs" />
+    <Compile Include="Analysis\FrequencyAnalyzer.cs" />
+    <Compile Include="Analysis\FstAnalyzer.cs" />
     <Compile Include="Data\AlleleRecord.cs" />
     <Compile Include="Data\FstAnalysis.cs" />
     <Compile Include="Data\Frequency.cs" />
@@ -279,6 +283,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Resources\Icons.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\Analyze.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -329,6 +337,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <Resource Include="Resources\Entypo.ttf" />
     <None Include="Resources\Layers\10m_ocean.dbf" />
     <None Include="Resources\Layers\10m_ocean.prj" />
     <None Include="Resources\Layers\10m_ocean.sbn" />
@@ -403,6 +412,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="ico.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Entypo-license.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

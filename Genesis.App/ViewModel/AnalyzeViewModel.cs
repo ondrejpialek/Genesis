@@ -8,6 +8,7 @@ using System.Reactive.Concurrency;
 using System.Linq;
 using System;
 using System.Data.Entity;
+using Genesis.Analysis;
 
 namespace Genesis.ViewModel
 {
@@ -43,7 +44,6 @@ namespace Genesis.ViewModel
         }
 
         private GenesisContext context;
-        private bool analyzing;
 
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
@@ -107,10 +107,7 @@ namespace Genesis.ViewModel
                 if (refresh == null)
                 {
                     refresh = new RelayCommand(() =>
-                    {
-                        if (analyzing)
-                            return;
-                        
+                    {                        
                         if (context != null)
                             context.Dispose();
 
@@ -155,7 +152,6 @@ namespace Genesis.ViewModel
                 {
                     deleteAnalysis = new RelayCommand<FrequencyAnalysis>((a) =>
                     {
-                        //a.Frequencies.ToList(); // bug in EF, need to load all to delete
                         FrequencyAnalysis.Remove(a);
                         context.SaveChanges();
                     });
@@ -186,55 +182,26 @@ namespace Genesis.ViewModel
             {
                 if (analyze == null)
                 {
-                    analyze = new RelayCommand(() =>
+                    analyze = new RelayCommand(async () =>
                     {
-                        analyzing = true;
-
-                        var selectedGenes = Genes.Where(g => g.Selected).Select(g => g.Gene).ToList();
-
-                        var analysis = new FrequencyAnalysis();
-                        analysis.Analyzed = DateTime.Now;
-                        analysis.Name = AnalysisName;
-
-                        context.Localities.ToObservable(new NewThreadScheduler()).Select(l =>
+                        currentAnalysis = new FrequencyAnalyzer(AnalysisName, new FrequencyAnalyzer.Settings()
                         {
-                            var alleles = (from mouse in l.Mice
-                                           from record in mouse.Alleles
-                                           where selectedGenes.Contains(record.Allele.Gene)
-                                           select new { Mouse = mouse, Allele = record.Allele.Species}).ToList();
-
-                            double frequency = 0;
-                            int sampleSize = 0;
-                            if (alleles.Count > 0)
-                            {
-                                double spec = alleles.Where(s => s.Allele == SelectedSpecies).Count();
-                                frequency = spec / alleles.Count;
-
-                                sampleSize = alleles.Select(a => a.Mouse).Distinct().Count();
-                            }
-
-                            return new Frequency {
-                                Locality = l,
-                                SampleSize = sampleSize,
-                                Value = frequency };
-                        })
-                        .Where(r => r.SampleSize > 0)  
-                        .ObserveOn(DispatcherScheduler.Instance)                    
-                        .Subscribe(f =>
-                        {
-                            analysis.Frequencies.Add(f);
-                        }, () =>
-                        {
-                            context.FrequencyAnalysis.Add(analysis);
-                            context.SaveChanges();
-                            analyzing = false;
-                            Refresh.Execute(null);
+                            Genes = Genes.Where(g => g.Selected).Select(g => g.Gene).ToList(),
+                            Species = SelectedSpecies
                         });
-                    });
+
+                        var context = new GenesisContext();
+                        var result = await Task.Run(() => currentAnalysis.Analyse(context));
+                        context.FrequencyAnalysis.Add(result);
+                        context.SaveChanges();
+                        Refresh.Execute(null);
+                    }, () => currentAnalysis == null || currentAnalysis.Done);
                 }
 
                 return analyze;
             }
         }
+
+        private FrequencyAnalyzer currentAnalysis { get; set; }
     }
 }
