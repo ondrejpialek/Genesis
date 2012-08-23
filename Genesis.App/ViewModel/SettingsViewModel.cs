@@ -234,6 +234,9 @@ namespace Genesis.ViewModel
         {
             get
             {
+                if (context == null)
+                    return null;
+
                 return context.Species.Local;
             }
         }

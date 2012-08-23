@@ -8,6 +8,8 @@
         <ResourceDictionary>   
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="/Genesis;component/Resources/Glyphs.xaml"/>
+				<ResourceDictionary Source="CustomStyles.xaml"/>
+				<ResourceDictionary Source="Resources/Icons.xaml" />
 			</ResourceDictionary.MergedDictionaries>        
             <vm:Locator x:Key="Locator"/>
             <Thickness x:Key="DefaultMargin">6</Thickness>

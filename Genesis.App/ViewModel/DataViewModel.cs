@@ -1,21 +1,19 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using DotSpatial.Controls;
+using DotSpatial.Data;
+using DotSpatial.Data.Forms;
+using DotSpatial.Projections;
+using DotSpatial.Topology;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using Microsoft.Maps.MapControl.WPF;
-using System.Linq;
-using DotSpatial.Symbology;
-using DotSpatial.Controls;
-using DotSpatial.Data;
-using DotSpatial.Topology;
-using DotSpatial.Projections;
-using System.Data;
 using GalaSoft.MvvmLight.Messaging;
-using Genesis.Views;
+using Genesis;
+using Microsoft.Win32;
+using System;
+using System.Collections.ObjectModel;
+using System.Data;
 using System.Data.Entity;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Genesis.ViewModel
 {
@@ -202,17 +200,17 @@ namespace Genesis.ViewModel
             }
         }
 
-        private RelayCommand<DotSpatial.Controls.Map> spatialMapLoaded;
-        public RelayCommand<DotSpatial.Controls.Map> SpatialMapLoaded
+        private RelayCommand<Map> spatialMapLoaded;
+        public RelayCommand<Map> SpatialMapLoaded
         {
             get
             {
-                return spatialMapLoaded ?? (spatialMapLoaded = new RelayCommand<DotSpatial.Controls.Map>(map => InitGisMap(map)));
+                return spatialMapLoaded ?? (spatialMapLoaded = new RelayCommand<Map>(map => InitGisMap(map)));
             }
         }
 
-        DotSpatial.Controls.Map spatialMap = null;
-        private void InitGisMap(DotSpatial.Controls.Map map)
+        Map spatialMap = null;
+        private void InitGisMap(Map map)
         {
             if (spatialMap == null)
             {
@@ -222,7 +220,7 @@ namespace Genesis.ViewModel
                     spatialMap.Legend = spatialMaplegend;
                 }
 
-                spatialMap.FunctionMode = DotSpatial.Controls.FunctionMode.Pan;
+                spatialMap.FunctionMode = FunctionMode.Pan;
 
                 UpdateGisData();
             }
@@ -233,25 +231,30 @@ namespace Genesis.ViewModel
         {
             if (spatialMap != null)
             {
-                if (spatialDataLayer != null)
+                IFeatureSet dataset;
+                if (spatialDataLayer == null)
                 {
-                    spatialMap.Layers.Remove(spatialDataLayer);
-                    spatialDataLayer.Dispose();
-                }
-                /*
-                if (spatialDataLayer != null)
-                {
-                    spatialDataLayer.DataSet.Features.Clear();
-                    spatialDataLayer.DataSet.DataTable.Clear();
-                }*/
+                    dataset = new FeatureSet(FeatureType.Point);
+                    
+                    dataset.Projection = KnownCoordinateSystems.Geographic.World.WGS1984;
 
-                dataset = new FeatureSet(FeatureType.Point);
-                dataset.Projection = KnownCoordinateSystems.Geographic.World.WGS1984;
+                    dataset.DataTable.BeginInit();
+                    dataset.DataTable.Columns.Add(new DataColumn("Code", typeof(string)));
+                    spatialDataLayer = spatialMap.Layers.Add(dataset);
+                } else {
+                    dataset = spatialDataLayer.DataSet;
+                    spatialDataLayer.DataSet.DataTable.BeginInit();
+                    dataset.Features.Clear();
+                    dataset.DataTable.Clear();
+                }             
 
-                dataset.DataTable.Columns.Add(new DataColumn("Code", typeof(string)));
+                
 
                 if (View == MapView.Localities)
                 {
+                    if (dataset.DataTable.Columns.Count == 2)
+                        dataset.DataTable.Columns.RemoveAt(1);
+
                     foreach (var locality in context.Localities)
                     {
                         if (string.IsNullOrEmpty(locality.Code) || locality.Location == null)
@@ -265,7 +268,9 @@ namespace Genesis.ViewModel
                 }
                 else
                 {
-                    dataset.DataTable.Columns.Add(new DataColumn("Frequency", typeof(double)));
+                    if (dataset.DataTable.Columns.Count == 1)
+                        dataset.DataTable.Columns.Add(new DataColumn("Frequency", typeof(double)));
+
                     if (selectedAnalysis != null)
                     {
                         foreach (var frequency in selectedAnalysis.Frequencies)
@@ -281,11 +286,12 @@ namespace Genesis.ViewModel
                     }
                 }
 
-                spatialDataLayer = spatialMap.Layers.Add(dataset);
+                dataset.DataTable.EndLoadData();
+                dataset.InvalidateVertices();
             }
         }
 
-        DotSpatial.Controls.Legend spatialMaplegend = null;
+        Legend spatialMaplegend = null;
         private RelayCommand<Legend> spatialMapLegendLoaded;
         public RelayCommand<Legend> SpatialMapLegendLoaded
         {
@@ -310,7 +316,14 @@ namespace Genesis.ViewModel
         {
             get
             {
-                return addLayer ?? (addLayer = new RelayCommand(() => { spatialMap.AddLayer(); }));
+                return addLayer ?? (addLayer = new RelayCommand(() => {
+                    var files = DataManager.DefaultDataManager.OpenFiles();
+
+                    foreach (var file in files)
+                    {
+                        spatialMap.Layers.Insert(spatialMap.Layers.Count - 1, file);
+                    }
+                }));
             }
         }
 
@@ -319,7 +332,40 @@ namespace Genesis.ViewModel
         {
             get
             {
-                return clearLayers ?? (clearLayers = new RelayCommand(() => { spatialMap.ClearLayers(); }));
+                return clearLayers ?? (clearLayers = new RelayCommand(() => {
+                    spatialMap.ClearLayers();
+                    if (spatialDataLayer != null)
+                    {
+                        spatialDataLayer.Dispose();
+                        spatialDataLayer = null;
+                    }
+                }));
+            }
+        }
+
+        private RelayCommand saveImage;
+        public RelayCommand SaveImage
+        {
+            get
+            {
+                return saveImage ?? (saveImage = new RelayCommand(() =>
+                  {
+                      SaveFileDialog dlg = new SaveFileDialog();
+                      dlg.FileName = "map";
+                      dlg.DefaultExt = ".png";
+                      dlg.Filter = "PNG files (.png)|*.png";
+
+                      if (dlg.ShowDialog() == true)
+                      {
+                          var image = new Bitmap(3000, 3000);
+
+                          var graphics = Graphics.FromImage(image);
+                          spatialMap.Print(graphics, new Rectangle(0, 0, 3000, 3000));
+                          graphics.Flush();
+                          image.Save(dlg.FileName, ImageFormat.Png);
+                      }
+
+                  }, () => spatialMap != null));
             }
         }
 

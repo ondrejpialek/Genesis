@@ -9,11 +9,19 @@
              xmlns:sp="clr-namespace:DotSpatial.Controls;assembly=DotSpatial.Controls"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:ee="http://schemas.microsoft.com/expression/2010/effects"  x:Class="Genesis.Views.Map"
-             mc:Ignorable="d"
-             
-             d:DesignHeight="300" d:DesignWidth="300">
+             mc:Ignorable="d" d:DesignWidth="533.353" d:DesignHeight="434.44"
+             >
     <UserControl.Resources>
-    	<Style TargetType="{x:Type m:Pushpin}">
+		<ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+            </ResourceDictionary.MergedDictionaries>      
+			<Style TargetType="{x:Type m:Pushpin}">
     		<Setter Property="Template">
     			<Setter.Value>
     				<ControlTemplate TargetType="{x:Type m:Pushpin}">
@@ -47,7 +55,9 @@
     		<Setter Property="Width" Value="0" />
     		<Setter Property="Height" Value="0"/>
     		<Setter Property="UseLayoutRounding" Value="True"/>
-    	</Style>
+    	</Style>      
+        </ResourceDictionary>
+    	
     </UserControl.Resources>
 	<UserControl.DataContext>
 		<Binding Path="Data" Source="{StaticResource Locator}"/>
@@ -58,6 +68,10 @@
     	</i:EventTrigger>
     </i:Interaction.Triggers>
 	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition />
+		</Grid.RowDefinitions>
 		<VisualStateManager.VisualStateGroups>
 			<VisualStateGroup x:Name="MapSelection" ei:ExtendedVisualStateManager.UseFluidLayout="True">
 				<VisualStateGroup.Transitions>
@@ -102,7 +116,23 @@
 		<VisualStateManager.CustomVisualStateManager>
 			<ei:ExtendedVisualStateManager/>
 		</VisualStateManager.CustomVisualStateManager>
-		<m:Map x:Name="map" CredentialsProvider="Aq150CT4Xwwr-FROJjj5Ieq5CCGQ5xaByYrxY58_XUaFvifqOshSEe1jyabmis33">
+		<Grid Grid.ColumnSpan="2">
+			<UniformGrid HorizontalAlignment="Left" Rows="1">
+				<Button Margin="{DynamicResource DefaultMargin}" Command="{Binding SaveImage}">
+					<StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
+						<Rectangle Width="32" Height="32">
+							<Rectangle.Fill>
+								<VisualBrush Visual="{StaticResource appbar_image}"/>
+							</Rectangle.Fill>
+						</Rectangle>
+						<TextBlock TextWrapping="Wrap" Text="SAVE TO FILE" VerticalAlignment="Center"/>
+					</StackPanel>
+				</Button>
+			</UniformGrid>
+		</Grid>
+
+        
+		<m:Map x:Name="map" CredentialsProvider="Aq150CT4Xwwr-FROJjj5Ieq5CCGQ5xaByYrxY58_XUaFvifqOshSEe1jyabmis33" Grid.Row="1" Margin="{DynamicResource DefaultMargin}">
 			<m:MapItemsControl x:Name="mapa" ItemsSource="{Binding Data}">
 				<m:MapItemsControl.ItemTemplate>
 					<DataTemplate>
@@ -114,7 +144,7 @@
 			</m:MapItemsControl>
 		</m:Map>
 
-		<WindowsFormsHost x:Name="windowsFormsHost">
+		<WindowsFormsHost x:Name="windowsFormsHost" Grid.Row="1" Margin="{DynamicResource DefaultMargin}">
 			<i:Interaction.Triggers>
 				<i:EventTrigger EventName="Loaded" >
 					<gc:EventToCommand Command="{Binding SpatialMapLoaded}" CommandParameter="{Binding ElementName=SpatialMap}" />
@@ -123,7 +153,7 @@
 			<sp:Map x:Name="SpatialMap"/>
 		</WindowsFormsHost>
 
-		<Grid Grid.Column="1" Width="150" Margin="5,0,0,0">
+		<Grid Grid.Column="1" Margin="{DynamicResource DefaultHorizontalMargin}" Grid.Row="1">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="Auto"/>
 				<RowDefinition Height="Auto"/>
@@ -133,25 +163,29 @@
 			</Grid.RowDefinitions>
 			<StackPanel>
 				<Label Content="Select map type"/>
-				<RadioButton GroupName="MapType" Content="Bing">
-					<i:Interaction.Triggers>
-						<i:EventTrigger EventName="Checked">
-							<ei:GoToStateAction StateName="Bing"/>
-						</i:EventTrigger>
-					</i:Interaction.Triggers>
-				</RadioButton>
-				<RadioButton GroupName="MapType" Content="GIS">
-					<i:Interaction.Triggers>
-						<i:EventTrigger EventName="Checked">
-							<ei:GoToStateAction StateName="GIS"/>
-						</i:EventTrigger>
-					</i:Interaction.Triggers>
-				</RadioButton>
+				<UniformGrid Rows="1">
+					<RadioButton GroupName="MapType" Content="Bing">
+						<i:Interaction.Triggers>
+							<i:EventTrigger EventName="Checked">
+								<ei:GoToStateAction StateName="Bing"/>
+							</i:EventTrigger>
+						</i:Interaction.Triggers>
+					</RadioButton>
+					<RadioButton GroupName="MapType" Content="GIS">
+						<i:Interaction.Triggers>
+							<i:EventTrigger EventName="Checked">
+								<ei:GoToStateAction StateName="GIS"/>
+							</i:EventTrigger>
+						</i:Interaction.Triggers>
+					</RadioButton>
+				</UniformGrid>
 			</StackPanel>
 			<StackPanel Grid.Row="1">
 				<Label Content="Select data"/>
-				<RadioButton GroupName="ViewType" Command="{Binding ChangeView}" CommandParameter="Localities" Content="Localities"/>
-				<RadioButton GroupName="ViewType" Command="{Binding ChangeView}" CommandParameter="Frequencies" Content="Frequencies:"/>
+				<UniformGrid Rows="1">
+					<RadioButton GroupName="ViewType" Command="{Binding ChangeView}" CommandParameter="Localities" Content="Localities"/>
+					<RadioButton GroupName="ViewType" Command="{Binding ChangeView}" CommandParameter="Frequencies" Content="Frequencies:"/>
+				</UniformGrid>
 			</StackPanel>
             <ListBox Grid.Row="2" ItemsSource="{Binding FrequencyAnalysis}" SelectedItem="{Binding SelectedAnalysis, Mode=TwoWay}" Margin="0,5,0,0">
                 <ListBox.ItemTemplate>
@@ -162,7 +196,7 @@
             </ListBox>
             <GridSplitter HorizontalAlignment="Stretch" Grid.Row="3" Height="5" ResizeDirection="Rows"/>
 
-			<Grid x:Name="grid" Grid.Row="4" d:LayoutOverrides="GridBox">
+			<Grid x:Name="grid" Grid.Row="4" d:LayoutOverrides="GridBox" Margin="{DynamicResource DefaultVerticalMargin}">
 				<Grid.RowDefinitions>
 					<RowDefinition Height="Auto" />
 					<RowDefinition />
