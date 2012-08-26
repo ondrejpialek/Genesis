@@ -122,7 +122,7 @@
 					<StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
 						<Rectangle Width="32" Height="32">
 							<Rectangle.Fill>
-								<VisualBrush Visual="{StaticResource appbar_image}"/>
+								<VisualBrush Visual="{StaticResource appbar_image}" Stretch="Uniform"/>
 							</Rectangle.Fill>
 						</Rectangle>
 						<TextBlock TextWrapping="Wrap" Text="SAVE TO FILE" VerticalAlignment="Center"/>

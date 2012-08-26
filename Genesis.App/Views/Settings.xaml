@@ -97,9 +97,9 @@
         <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="{DynamicResource DefaultMargin}">
             <Button HorizontalAlignment="Right" Command="{Binding Save}">
             	<StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
-            		<Rectangle Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center">
+            		<Rectangle Width="32" Height="32">
             			<Rectangle.Fill>
-            				<VisualBrush Visual="{StaticResource appbar_save}"/>
+            				<VisualBrush Visual="{StaticResource appbar_save}" Stretch="Uniform"/>
             			</Rectangle.Fill>
             		</Rectangle>
             		<TextBlock TextWrapping="Wrap" Text="SAVE" HorizontalAlignment="Center"/>

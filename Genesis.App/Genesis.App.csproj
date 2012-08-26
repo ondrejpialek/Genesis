@@ -185,6 +185,8 @@
     <Compile Include="Analysis\Analyzer.cs" />
     <Compile Include="Analysis\FrequencyAnalyzer.cs" />
     <Compile Include="Analysis\FstAnalyzer.cs" />
+    <Compile Include="Behaviours\SynchronizeSelectedItems.cs" />
+    <Compile Include="Behaviours\WeakEventHandler.cs" />
     <Compile Include="Data\AlleleRecord.cs" />
     <Compile Include="Data\FstAnalysis.cs" />
     <Compile Include="Data\Frequency.cs" />
@@ -224,6 +226,7 @@
     <Compile Include="Excel\RowApplicator.cs" />
     <Compile Include="Excel\RowReader.cs" />
     <Compile Include="Excel\WorksheetReader.cs" />
+    <Compile Include="Extensions\StreamWriterExtensions.cs" />
     <Compile Include="ViewModel\ColumnViewModel.cs" />
     <Compile Include="ViewModel\AnalyzeViewModel.cs" />
     <Compile Include="ViewModel\FstViewModel.cs" />

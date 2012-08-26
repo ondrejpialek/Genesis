@@ -9,6 +9,10 @@ using System.Linq;
 using System;
 using System.Data.Entity;
 using Genesis.Analysis;
+using System.IO;
+using Microsoft.Win32;
+using Genesis.Extensions;
+using System.Text;
 
 namespace Genesis.ViewModel
 {
@@ -51,6 +55,8 @@ namespace Genesis.ViewModel
         public AnalyzeViewModel()
         {
             Genes = new ObservableCollection<GeneViewModel>();
+            SelectedAnalysis = new ObservableCollection<FrequencyAnalysis>();
+
         }
 
         public ObservableCollection<FrequencyAnalysis> FrequencyAnalysis
@@ -203,5 +209,85 @@ namespace Genesis.ViewModel
         }
 
         private FrequencyAnalyzer currentAnalysis { get; set; }
+
+        public ObservableCollection<FrequencyAnalysis> SelectedAnalysis { get; protected set; }
+
+        private float progress = 0;
+        public float Progress
+        {
+            get
+            {
+                return progress;
+            }
+            set
+            {
+                Set(() => Progress, ref progress, value);
+            }
+        }
+
+        public bool exporting;
+
+        private RelayCommand export;
+        public RelayCommand Export
+        {
+            get
+            {
+                return export ?? (export = new RelayCommand(async () =>
+                {
+                    exporting = true;
+                    try
+                    {
+                        var dialog = new SaveFileDialog();
+                        if (dialog.ShowDialog() == true)
+                        {
+                            StreamWriter sw = new StreamWriter(dialog.FileName, false);
+
+                            var selectedAnalysis = SelectedAnalysis.ToList();
+
+                            var cols = new string[] { "Code", "Latitude", "Longitude" }.Union(selectedAnalysis.Select(a => "\"" + a.Name + "\"")).ToArray();
+                            await sw.WriteCSVLineAsync(cols);
+
+                            var localities = selectedAnalysis.SelectMany(a => a.Frequencies).Select(f => f.Locality).Distinct().OrderBy(l => l.Code).ToList();
+                            var step = 1.0f / localities.Count;
+                            Progress = 0;
+
+                            var enumerators = selectedAnalysis.Select(a => a.Frequencies.OrderBy(f => f.Locality.Code).GetEnumerator()).ToArray();
+                            var hasElements = enumerators.Select(e => e.MoveNext()).ToArray();
+
+                            foreach (var l in localities)
+                            {
+                                Progress += step;
+                                StringBuilder sb = new StringBuilder();
+                                sb.Append(string.Join(",", l.Code, l.Location == null ? string.Empty : l.Location.Latitude.ToString(), l.Location == null ? string.Empty : l.Location.Longitude.ToString()));
+                                sb.Append(",");
+                                for (var i = 0; i < enumerators.Length; i++)
+                                {
+                                    if (hasElements[i] && enumerators[i].Current.Locality == l)
+                                    {
+                                        sb.Append(enumerators[i].Current.Value.ToString());
+                                        hasElements[i] = enumerators[i].MoveNext();
+                                    }
+                                    if (i < enumerators.Length - 1)
+                                        sb.Append(",");
+                                }
+                                await sw.WriteLineAsync(sb.ToString());
+                                await Task.Delay(1);
+                            }
+
+                            sw.Flush();
+                            sw.Close();
+
+                            Progress = 1;
+                        }
+                    }
+                    finally
+                    {
+                        exporting = false;
+                    }
+                }, () => !exporting && SelectedAnalysis.Count > 0));
+            }
+        }
+
+
     }
 }
