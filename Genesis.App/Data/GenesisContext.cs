@@ -26,6 +26,7 @@ namespace Genesis
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<FrequencyAnalysis>().HasMany(f => f.Frequencies).WithRequired().WillCascadeOnDelete();
+            modelBuilder.Entity<Mouse>().HasMany(m => m.Alleles).WithRequired().WillCascadeOnDelete();
         }
 
     }

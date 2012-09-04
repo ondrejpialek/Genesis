@@ -94,17 +94,37 @@
                     </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
-        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="{DynamicResource DefaultMargin}">
-            <Button HorizontalAlignment="Right" Command="{Binding Save}">
-            	<StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
-            		<Rectangle Width="32" Height="32">
-            			<Rectangle.Fill>
-            				<VisualBrush Visual="{StaticResource appbar_save}" Stretch="Uniform"/>
-            			</Rectangle.Fill>
-            		</Rectangle>
-            		<TextBlock TextWrapping="Wrap" Text="SAVE" HorizontalAlignment="Center"/>
-            	</StackPanel>
-        </Button>
-        </StackPanel>
+        <UniformGrid Grid.Row="1" Grid.ColumnSpan="2" Margin="{DynamicResource DefaultVerticalMargin}" Rows="1" HorizontalAlignment="Right">
+        	<Button Command="{Binding Recreate}" Margin="{DynamicResource DefaultHorizontalMargin}">
+        		<StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
+        			<Rectangle Width="32" Height="32">
+        				<Rectangle.Fill>
+        					<VisualBrush Visual="{StaticResource appbar_explosion}" Stretch="Uniform"/>
+        				</Rectangle.Fill>
+        			</Rectangle>
+        			<TextBlock TextWrapping="Wrap" Text="RECREATE DB" HorizontalAlignment="Center"/>
+        		</StackPanel>
+        	</Button>
+        	<Button Command="{Binding Reset}" Margin="{DynamicResource DefaultHorizontalMargin}">
+        		<StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
+        			<Rectangle Width="32" Height="32">
+        				<Rectangle.Fill>
+        					<VisualBrush Visual="{StaticResource appbar_reset}" Stretch="Uniform"/>
+        				</Rectangle.Fill>
+        			</Rectangle>
+        			<TextBlock TextWrapping="Wrap" Text="DELETE DATA" HorizontalAlignment="Center"/>
+        		</StackPanel>
+        	</Button>
+        	<Button Command="{Binding Save}" Margin="{DynamicResource DefaultHorizontalMargin}">
+        		<StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
+        			<Rectangle Width="32" Height="32">
+        				<Rectangle.Fill>
+        					<VisualBrush Visual="{StaticResource appbar_save}" Stretch="Uniform"/>
+        				</Rectangle.Fill>
+        			</Rectangle>
+        			<TextBlock TextWrapping="Wrap" Text="SAVE" HorizontalAlignment="Center"/>
+        		</StackPanel>
+        	</Button>
+        </UniformGrid>
     </Grid>
 </UserControl>

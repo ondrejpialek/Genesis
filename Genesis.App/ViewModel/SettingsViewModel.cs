@@ -268,6 +268,35 @@ namespace Genesis.ViewModel
             }
         }
 
+        private RelayCommand recreate;
+        public RelayCommand Recreate
+        {
+            get
+            {
+                return recreate ?? (recreate = new RelayCommand(() =>
+                {
+                    context.Database.Delete();
+                    Refresh();
+                }));
+            }
+        }
+
+        private RelayCommand reset;
+        public RelayCommand Reset
+        {
+            get
+            {
+                return reset ?? (reset = new RelayCommand(() =>
+                {
+                    var localities = context.Localities.ToList();
+                    foreach (var l in localities)
+                        context.Localities.Remove(l);
+                    context.SaveChanges();
+                    Refresh();
+                }));
+            }
+        }
+
         private RelayCommand save;
         public RelayCommand Save
         {
