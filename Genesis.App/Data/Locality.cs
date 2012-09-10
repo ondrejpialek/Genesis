@@ -22,5 +22,10 @@ namespace Genesis
         {
             Mice = new List<Mouse>();
         }
+
+        public override string ToString()
+        {
+            return "Locality " + (string.IsNullOrEmpty(Code) ? "Unknown" : Code);
+        }
     }
 }

@@ -248,6 +248,12 @@ namespace Genesis.ViewModel
             {
                 MessageBox.Show("Import cancelled.");
             };
+
+            excelImport.Error += (o, e) =>
+            {
+                MessageBox.Show("ERROR!\n\n" + e.Error);
+            };
+
             excelImport.Start(importArgs);
         }
 
@@ -269,9 +275,16 @@ namespace Genesis.ViewModel
                 Progress = excelImport.Progress * 100;
             });
 
-            //excelImport.Started += new EventHandler(import_Started);
-            //excelImport.Saved += new EventHandler();
-            //excelImport.Cancelled += new EventHandler(import_Finished);
+            excelImport.Cancelled += (o, e) =>
+            {
+                MessageBox.Show("Import cancelled.");
+            };
+
+            excelImport.Error += (o, e) =>
+            {
+                MessageBox.Show("ERROR!\n\n" + e.Error);
+            };
+
             excelImport.Finished += new EventHandler((o, e) =>
             {
                 excelImport.Save();

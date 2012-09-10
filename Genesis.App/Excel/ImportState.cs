@@ -7,6 +7,6 @@ namespace Genesis.Excel
 {
     public enum ImportState
     {
-        Created, Running, Done, Cancelled, Saved
+        Created, Running, Done, Cancelled, Saved, Error
     }
 }

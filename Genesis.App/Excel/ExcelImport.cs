@@ -6,6 +6,18 @@ using Genesis;
 
 namespace Genesis.Excel
 {
+    public class ExcelImportErrorEventArgs: EventArgs {
+        private string error;
+
+        public ExcelImportErrorEventArgs(string error) {
+            this.error = error;
+        }
+
+        public string Error {
+            get { return error; }
+        }
+    }
+
     public class ExcelImport<TEntity> : IImport<ImportArgs<TEntity>>
         where TEntity : class, new()
     {
@@ -27,6 +39,8 @@ namespace Genesis.Excel
         public event EventHandler Saved;
 
         public event EventHandler Cancelled;
+
+        public event EventHandler<ExcelImportErrorEventArgs> Error;
 
         ///TODO: concurrent dictionary on errors
         //http://msdn.microsoft.com/en-us/library/ee378677.aspx
@@ -69,6 +83,7 @@ namespace Genesis.Excel
             importer.ProgressUpdate = step => Progress += step;
             importer.CompletedAction = OnFinished;
             importer.CancelledAction = OnCancelled;
+            importer.ErrorAction = OnError;
             importer.Start(parser);
         }
 
@@ -85,6 +100,13 @@ namespace Genesis.Excel
             State = ImportState.Done;
             if (Finished != null)
                 Finished(this, EventArgs.Empty);
+        }
+
+        protected virtual void OnError(string error)
+        {
+            State = ImportState.Error;
+            if (Error != null)
+                Error(this, new ExcelImportErrorEventArgs(error));
         }
 
         public void Save()

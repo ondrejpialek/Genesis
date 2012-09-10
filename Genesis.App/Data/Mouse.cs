@@ -22,5 +22,10 @@ namespace Genesis
         {
             Alleles = new List<AlleleRecord>();
         }
+
+        public override string ToString()
+        {
+            return "Mouse " + (string.IsNullOrEmpty(Name) ? "Unknown" : Name);
+        }
     }
 }
