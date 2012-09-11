@@ -15,6 +15,8 @@ namespace Genesis
         [Required]
         public virtual Chromosome Chromosome { get; set; }
 
+        public virtual int StartBasePair { get; set; }
+
         public virtual ICollection<Allele> Alleles { get; private set; }
 
         public Gene()

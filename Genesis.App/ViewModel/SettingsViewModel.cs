@@ -77,6 +77,20 @@ namespace Genesis.ViewModel
                 }
             }
 
+            public int StartBasePair
+            {
+                get
+                {
+                    return gene.StartBasePair;
+                }
+                set
+                {
+                    RaisePropertyChanging(() => StartBasePair);
+                    gene.StartBasePair = value;
+                    RaisePropertyChanged(() => StartBasePair);
+                }
+            }
+
             public ObservableCollection<AlleleViewModel> Alleles { get; protected set; }
 
             public GeneViewModel(Gene g, GenesisContext context)

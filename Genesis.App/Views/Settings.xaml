@@ -27,7 +27,7 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TreeView ItemsSource="{Binding Chromosomes}" HorizontalContentAlignment="Stretch" Margin="{DynamicResource DefaultMargin}">
+        <TreeView ItemsSource="{Binding Chromosomes}" HorizontalContentAlignment="Stretch" Margin="{DynamicResource DefaultMargin}" Grid.IsSharedSizeScope="True">
 			<TreeView.Resources>
 				<Style TargetType="TreeViewItem"> 
 					<Setter Property="IsExpanded" Value="True" /> 
@@ -52,7 +52,11 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Text="{Binding Name}" />
+								<StackPanel Orientation="Horizontal">
+	                                <TextBox Text="{Binding Name}" MinWidth="100"/>
+									<TextBlock VerticalAlignment="Center"> start base pair: </TextBlock>
+									<TextBox Text="{Binding StartBasePair}" MinWidth="100" />								
+								</StackPanel>
                                 <Button Command="{Binding Path=DataContext.RemoveTrait, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}, AncestorLevel=2}}" CommandParameter="{Binding}" Grid.Column="1">Remove trait</Button>
                                 <Button Command="{Binding Path=AddAllele}" CommandParameter="{Binding}" Grid.Column="2">Add allele</Button>
                             </Grid>
@@ -61,10 +65,10 @@
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition></ColumnDefinition>
-                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" SharedSizeGroup="SpeciesSelection" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBox Text="{Binding Value}" />
+                                        <TextBox Text="{Binding Value}" MinWidth="100" />
                                         <ComboBox Grid.Column="1" ItemsSource="{Binding Source={StaticResource Locator}, Path=Settings.Species}" DisplayMemberPath="Name" SelectedItem="{Binding Species, Mode=TwoWay}"/>
                                         <Button Grid.Column="2" Command="{Binding Path=DataContext.RemoveAllele, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}, AncestorLevel=2}}" CommandParameter="{Binding}">Remove allele</Button>
                                     </Grid>

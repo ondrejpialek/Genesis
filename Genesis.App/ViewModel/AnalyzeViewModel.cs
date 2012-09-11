@@ -85,7 +85,7 @@ namespace Genesis.ViewModel
                 if (context != null)
                 {
 
-                    context.Species.Load();
+                    context.Species.OrderByDescending(s => s.Id).Load();
                     return context.Species.Local;
                 }
                 return null;
@@ -120,7 +120,7 @@ namespace Genesis.ViewModel
                         context = new GenesisContext();
 
                         Genes.Clear();
-                        foreach (var gene in context.Genes)
+                        foreach (var gene in context.Genes.OrderBy(g => g.StartBasePair))
                         {
                             Genes.Add(new GeneViewModel(gene));
                         }

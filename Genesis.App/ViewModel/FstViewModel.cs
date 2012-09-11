@@ -77,7 +77,7 @@ namespace Genesis.ViewModel
             {
                 if (context != null)
                 {
-                    context.Species.ToList();
+                    context.Species.OrderByDescending(s => s.Id).ToList();
                     return context.Species.Local;
                 }
                 return null;
