@@ -22,6 +22,7 @@ namespace Genesis.ViewModel
     public class DataViewModel : ViewModelBase
     {
         public enum MapView { Localities, Frequencies };
+        public enum Unit { cm, px };
         
         public class PushpinViewModel : ViewModelBase
         {
@@ -216,6 +217,9 @@ namespace Genesis.ViewModel
             if (spatialMap == null)
             {
                 spatialMap = map;
+
+                spatialMap.Resize += spatialMap_Resize;
+
                 if (spatialMaplegend != null)
                 {
                     spatialMap.Legend = spatialMaplegend;
@@ -225,6 +229,12 @@ namespace Genesis.ViewModel
 
                 UpdateGisData();
             }
+        }
+
+        void spatialMap_Resize(object sender, EventArgs e)
+        {
+            Width = SelectedUnit == Unit.px ? spatialMap.Width : (double)spatialMap.Width / (double)resolution * CM_PER_INCH;
+            Height = SelectedUnit == Unit.px ? spatialMap.Height : (double)spatialMap.Height / (double)resolution * CM_PER_INCH;
         }
 
         IMapFeatureLayer spatialDataLayer = null;
@@ -354,22 +364,122 @@ namespace Genesis.ViewModel
                       SaveFileDialog dlg = new SaveFileDialog();
                       dlg.FileName = "map";
                       dlg.DefaultExt = ".png";
-                      dlg.Filter = "PNG files (.png)|*.png";
+                      dlg.Filter = "PNG files|*.png|JPEG files|*.jpg;*.jpeg|BMP files|*.bmp|GIF files|*.gif|TIFF file|*.tiff";
 
                       if (dlg.ShowDialog() == true)
                       {
-                          var image = new Bitmap(3000, 3000);
+                          int w = 0, h = 0;
+                          switch (SelectedUnit)
+                          {
+                              case Unit.cm:
+                                  w = (int)(Width / CM_PER_INCH * resolution);
+                                  h = (int)(Height / CM_PER_INCH * resolution);
+                                  break;
+                              case Unit.px:
+                                  w = (int)Width;
+                                  h = (int)Height;
+                                  break;
+                          }
+
+                          var image = new Bitmap(w, h);
+                          image.SetResolution(resolution, resolution);
 
                           var graphics = Graphics.FromImage(image);
-                          spatialMap.Print(graphics, new Rectangle(0, 0, 3000, 3000));
+                          spatialMap.Print(graphics, new Rectangle(0, 0, w, h));
                           graphics.Flush();
-                          image.Save(dlg.FileName, ImageFormat.Png);
+                          
+                          image.Save(dlg.FileName, ImageFormat);
                       }
 
                   }, () => spatialMap != null));
             }
         }
 
-        public FeatureSet dataset { get; set; }
+        private Unit[] units = new Unit[] { Unit.cm, Unit.px };
+        public Unit[] Units
+        {
+            get
+            {
+                return units;
+            }
+        }
+
+        private Unit selectedUnit = Unit.px;
+        public Unit SelectedUnit
+        {
+            get
+            {
+                return selectedUnit;
+            }
+            set
+            {
+                Set(() => SelectedUnit, ref selectedUnit, value);
+            }
+        }
+
+        private ImageFormat[] formats = new ImageFormat[] { ImageFormat.Bmp, ImageFormat.Jpeg, ImageFormat.Png, ImageFormat.Gif, ImageFormat.Tiff};
+        public ImageFormat[] Formats
+        {
+            get
+            {
+                return formats;
+            }
+        }
+
+        private ImageFormat imageFormat = ImageFormat.Png;
+        public ImageFormat ImageFormat
+        {
+            get
+            {
+                return imageFormat;
+            }
+            set
+            {
+                Set(() => ImageFormat, ref imageFormat, value);
+            }
+        }
+
+        private int resolution = 300;
+        public int Resolution
+        {
+            get
+            {
+                return resolution;
+            }
+            set
+            {
+                Set(() => Resolution, ref resolution, value);
+            }
+        }
+        
+        private double height = 600;
+        public double Height
+        {
+            get
+            {
+                return height;
+            }
+            set
+            {
+                value = SelectedUnit == Unit.px ? Math.Round(value) : Math.Round(value, 2);
+                Set(() => Height, ref height, value);
+            }
+        }
+
+        private const double CM_PER_INCH = 2.54;
+
+        private double width = 800;
+        public double Width
+        {
+            get
+            {
+                return width;
+            }
+            set
+            {
+                value = SelectedUnit == Unit.px ? Math.Round(value) : Math.Round(value, 2);
+                Set(() => Width, ref width, value);
+            }
+        }
     }
 }
