@@ -22,9 +22,12 @@ namespace Genesis.Excel
                 {
                     try
                     {
+                        double sign = 1;
                         double deg = int.Parse(args[0].Substring(0, args[0].Length - 1));
-                        double min = int.Parse(args[1].Substring(0, args[1].Length - 1));
-                        double sec = int.Parse(args[2].Substring(0, args[2].Length - 1));
+                        if (deg < 0)
+                            sign = -1;
+                        double min = int.Parse(args[1].Substring(0, args[1].Length - 1)) * sign;
+                        double sec = int.Parse(args[2].Substring(0, args[2].Length - 1)) * sign;
 
                         value = deg + min / 60 + sec / (60 * 60);
                     }
