@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Spatial;
 using System.Linq;
 using System.Text;
 using Genesis;
 using Microsoft.SqlServer.Types;
+using System.Data.Entity.Spatial;
 
 namespace Genesis.Excel
 {
