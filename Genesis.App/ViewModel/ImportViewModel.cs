@@ -135,9 +135,15 @@ namespace Genesis.ViewModel
                         if (result)
                         {
                             Filename = dialog.FileName;
+                            if (excelFile != null)
+                            {
+                                excelFile.Dispose();
+                                excelFile = null;
+                            }
                             excelFile = excelService.Open(filename);
                             Sheets.Clear();
-                            foreach (var sheet in excelFile.Worksheets)
+                            var worksheets = excelFile.Worksheets;
+                            foreach (var sheet in worksheets)
                             {
                                 Sheets.Add(sheet.Name);
                             }
@@ -164,7 +170,8 @@ namespace Genesis.ViewModel
                 int index = Sheets.IndexOf(value);
                 if ((excelFile != null) && index > -1)
                 {
-                    worksheet = excelFile.Worksheets[Sheets.IndexOf(value)];
+                    var worksheets = excelFile.Worksheets;
+                    worksheet = worksheets[Sheets.IndexOf(value)];
                     LoadColumns();
                 }
             }
@@ -291,6 +298,15 @@ namespace Genesis.ViewModel
                 MessageBox.Show("Import complete");
             });
             excelImport.Start(importArgs);
+        }
+
+        public override void Cleanup()
+        {
+            if (excelFile != null)
+            {
+                excelFile.Dispose();
+                excelFile = null;
+            }
         }
     }
 }

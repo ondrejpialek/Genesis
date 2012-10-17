@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Genesis.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -12,5 +13,12 @@ namespace Genesis.App
     /// </summary>
     public partial class App : Application
     {
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+            var l = this.Resources["Locator"] as Locator;
+                l.Cleanup();
+        }
     }
 }

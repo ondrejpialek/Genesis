@@ -62,7 +62,8 @@ namespace Genesis.Excel
             if (!File.Exists(Filename))
                 throw new ArgumentException("The filename must exist.");
             application = new Application();
-            workbook = application.Workbooks.Open(Filename);
+            var workbooks = application.Workbooks;
+            workbook = workbooks.Open(Filename);
         }
 
         public void Dispose()

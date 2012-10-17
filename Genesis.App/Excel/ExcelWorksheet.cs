@@ -35,7 +35,8 @@ namespace Genesis.Excel
 
         public string GetCellValueAsString(string range)
         {
-            dynamic value = worksheet.get_Range(range).Value;
+            Range r = worksheet.get_Range(range);
+            dynamic value = r.Value;
             if (value == null)
                 return string.Empty;
             else
@@ -49,12 +50,16 @@ namespace Genesis.Excel
 
         public int GetRowCount()
         {
-            return worksheet.UsedRange.Rows.Count;
+            var range = worksheet.UsedRange;
+            var rows = range.Rows;
+            return rows.Count;
         }
 
         public int GetColCount()
         {
-            return worksheet.UsedRange.Columns.Count;
+            var range = worksheet.UsedRange;
+            var cols = range.Columns;
+            return cols.Count;
         }
 
         public void Activate() {

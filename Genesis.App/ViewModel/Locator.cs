@@ -83,5 +83,10 @@ namespace Genesis.ViewModel
                 return ServiceLocator.Current.GetInstance<MiceViewModel>();
             }
         }
+
+        public void Cleanup()
+        {
+            Import.Cleanup();
+        }
     }
 }
