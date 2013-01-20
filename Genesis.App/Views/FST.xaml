@@ -6,11 +6,11 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:gc="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
+             xmlns:command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF45"
              DataContext="{Binding Source={StaticResource Locator}, Path=Fst}">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded" >
-            <gc:EventToCommand Command="{Binding Refresh}" />
+            <command:EventToCommand Command="{Binding Refresh}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <UserControl.Resources>

@@ -25,7 +25,8 @@ namespace Genesis.Excel
             }
 
             var newAlleles = (from str in value.Split('/')
-                              join allele in Gene.Alleles on str equals allele.Value
+                              let s = str.Trim().ToLowerInvariant()
+                              join allele in Gene.Alleles on s equals allele.Value.ToLowerInvariant()
                               select allele).ToList();
 
             foreach(var allele in newAlleles)

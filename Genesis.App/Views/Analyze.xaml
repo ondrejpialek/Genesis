@@ -4,8 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:gc="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
-             xmlns:Behaviours="clr-namespace:Genesis.Behaviours" x:Class="Genesis.Views.Analyze" 
+            
+             xmlns:Behaviours="clr-namespace:Genesis.Behaviours"
+             xmlns:command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF45"
+             x:Class="Genesis.Views.Analyze" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              >
@@ -56,7 +58,7 @@
 	</UserControl.DataContext>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded" >
-            <gc:EventToCommand Command="{Binding Refresh}" />
+            <command:EventToCommand Command="{Binding Refresh}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid>

@@ -5,8 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
                      xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:gc="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF4"
-            DataContext="{Binding Source={StaticResource Locator}, Path=Mice}"
+       
+             xmlns:command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF45"
+             DataContext="{Binding Source={StaticResource Locator}, Path=Mice}"
              
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
@@ -18,7 +19,7 @@
         <DataGrid ItemsSource="{Binding Mice}" AutoGenerateColumns="False" VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="Loaded" >
-                    <gc:EventToCommand Command="{Binding DataGridLoaded}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}" />
+                    <command:EventToCommand Command="{Binding DataGridLoaded}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type DataGrid}}}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
             <DataGrid.Columns>
@@ -34,10 +35,10 @@
                     <CheckBox Content="{Binding Name}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="Checked">
-                                <gc:EventToCommand Command="{Binding DataContext.AddColumn, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" CommandParameter="{Binding}" />
+                                <command:EventToCommand Command="{Binding DataContext.AddColumn, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" CommandParameter="{Binding}" />
                             </i:EventTrigger>
                             <i:EventTrigger EventName="Unchecked">
-                                <gc:EventToCommand Command="{Binding DataContext.RemoveColumn, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" CommandParameter="{Binding}" />
+                                <command:EventToCommand Command="{Binding DataContext.RemoveColumn, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}" CommandParameter="{Binding}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </CheckBox>
