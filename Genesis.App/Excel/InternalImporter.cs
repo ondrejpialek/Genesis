@@ -65,14 +65,15 @@ namespace Genesis.Excel
                     worksheetReader = new WorksheetReader<TEntity>(excelWorksheet, rowReader);
                     try
                     {
-                        Task.Factory
-                            .StartNew(Import, cancellationToken)
-                            .ContinueWith(x =>
+                        var import = Task.Factory.StartNew(Import, cancellationToken);
+
+                        var cont = import.ContinueWith(x =>
                             {
                                 if (CompletedAction != null)
                                     CompletedAction.Invoke();
-                            }, CancellationToken.None, TaskContinuationOptions.OnlyOnRanToCompletion, synchronizedScheduler)
-                            .Wait();
+                            }, CancellationToken.None, TaskContinuationOptions.OnlyOnRanToCompletion, synchronizedScheduler);
+                        
+                        cont.Wait();
                     }
                     catch (AggregateException ae)
                     {

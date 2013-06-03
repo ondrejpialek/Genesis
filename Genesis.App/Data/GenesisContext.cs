@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using Genesis.App.Data;
+using Genesis.Migrations;
 
 namespace Genesis
 {
@@ -11,7 +12,7 @@ namespace Genesis
     {
         static GenesisContext()
         {
-            Database.SetInitializer<GenesisContext>(new DataInitializer());
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<GenesisContext, Configuration>());
         }
 
         public DbSet<Allele> Alleles { get; set; }
@@ -26,7 +27,6 @@ namespace Genesis
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<FrequencyAnalysis>().HasMany(f => f.Frequencies).WithRequired().WillCascadeOnDelete();
-            modelBuilder.Entity<Mouse>().HasMany(m => m.Alleles).WithRequired().WillCascadeOnDelete();
         }
 
     }
