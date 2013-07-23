@@ -1,4 +1,12 @@
-﻿using DotSpatial.Controls;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Data.Entity;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Windows.Input;
+using DotSpatial.Controls;
 using DotSpatial.Data;
 using DotSpatial.Data.Forms;
 using DotSpatial.Projections;
@@ -6,63 +14,53 @@ using DotSpatial.Topology;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
-using Genesis;
 using Microsoft.Win32;
-using System;
-using System.Collections.ObjectModel;
-using System.Data;
-using System.Data.Entity;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
+using Location = Microsoft.Maps.MapControl.WPF.Location;
+using Map = DotSpatial.Controls.Map;
+using Point = DotSpatial.Topology.Point;
 
 namespace Genesis.ViewModel
 {
-
     public class DataViewModel : ViewModelBase
     {
-        public enum MapView { Localities, Frequencies };
-        public enum Unit { cm, px };
-        
-        public class PushpinViewModel : ViewModelBase
+        public enum MapView
         {
-            private Locality locality;
+            Localities,
+            Frequencies
+        };
 
-            public PushpinViewModel(Locality locality, string label)
-            {
-                this.locality = locality;
-                this.label = label;
-            }
+        public enum Unit
+        {
+            cm,
+            px
+        };
 
-            public Microsoft.Maps.MapControl.WPF.Location Location
-            {
-                get
-                {
-                    if (locality.Location == null)
-                        return null;
-
-                    return new Microsoft.Maps.MapControl.WPF.Location(locality.Location.Latitude.Value, locality.Location.Longitude.Value);
-                }
-            }
-            
-            private string label;
-            public string Label
-            {
-                get
-                {
-                    return label;
-                }
-                set
-                {
-                    Set(() => Label, ref label, value);
-                }
-            }
-        }
+        private const double CM_PER_INCH = 2.54;
+        private readonly ImageFormat[] formats = new[] {ImageFormat.Bmp, ImageFormat.Jpeg, ImageFormat.Png, ImageFormat.Gif, ImageFormat.Tiff};
+        private readonly Unit[] units = new[] {Unit.cm, Unit.px};
+        private RelayCommand addLayer;
+        private ICommand addPolyline;
+        private RelayCommand<string> changeView;
+        private RelayCommand clearLayers;
 
         private GenesisContext context;
+        private double height = 600;
+        private ImageFormat imageFormat = ImageFormat.Png;
+        private int resolution = 300;
+        private RelayCommand saveImage;
+
+        private FrequencyAnalysis selectedAnalysis;
+        private Unit selectedUnit = Unit.px;
+        private IMapFeatureLayer spatialDataLayer;
+        private Map spatialMap;
+        private RelayCommand<Legend> spatialMapLegendLoaded;
+        private RelayCommand<Map> spatialMapLoaded;
+        private Legend spatialMaplegend;
+        private MapView view = MapView.Localities;
+        private double width = 800;
 
         /// <summary>
-        /// Initializes a new instance of the MainViewModel class.
+        ///   Initializes a new instance of the MainViewModel class.
         /// </summary>
         public DataViewModel()
         {
@@ -82,7 +80,6 @@ namespace Genesis.ViewModel
             });
         }
 
-        private FrequencyAnalysis selectedAnalysis = null;
         public FrequencyAnalysis SelectedAnalysis
         {
             get
@@ -122,14 +119,9 @@ namespace Genesis.ViewModel
             }
         }
 
-        public ObservableCollection<PushpinViewModel> Data
-        {
-            get;
-            protected set;
-        }
+        public ObservableCollection<PushpinViewModel> Data { get; protected set; }
 
 
-        private MapView view = MapView.Localities;
         public MapView View
         {
             get
@@ -143,20 +135,218 @@ namespace Genesis.ViewModel
             }
         }
 
-        private RelayCommand<string> changeView;
         public RelayCommand<string> ChangeView
         {
             get
             {
                 return changeView ?? (changeView = new RelayCommand<string>(
-                p =>
+                                                       p =>
+                                                       {
+                                                           View = (MapView) Enum.Parse(typeof (MapView), p);
+                                                       }));
+            }
+        }
+
+        public RelayCommand<Map> SpatialMapLoaded
+        {
+            get
+            {
+                return spatialMapLoaded ?? (spatialMapLoaded = new RelayCommand<Map>(map => InitGisMap(map)));
+            }
+        }
+
+        public RelayCommand<Legend> SpatialMapLegendLoaded
+        {
+            get
+            {
+                return spatialMapLegendLoaded ?? (spatialMapLegendLoaded = new RelayCommand<Legend>(legend =>
                 {
-                    View = (MapView)Enum.Parse(typeof(MapView), p);
+                    if (spatialMaplegend == null)
+                    {
+                        spatialMaplegend = legend;
+                        if (spatialMap != null)
+                        {
+                            spatialMap.Legend = spatialMaplegend;
+                        }
+                    }
                 }));
             }
         }
 
-        private void Refresh() {
+        public RelayCommand AddLayer
+        {
+            get
+            {
+                return addLayer ?? (addLayer = new RelayCommand(() =>
+                {
+                    List<IDataSet> files = DataManager.DefaultDataManager.OpenFiles();
+
+                    foreach (IDataSet file in files)
+                    {
+                        spatialMap.Layers.Insert(spatialMap.Layers.Count - 1, file);
+                    }
+                }));
+            }
+        }
+
+        public RelayCommand ClearLayers
+        {
+            get
+            {
+                return clearLayers ?? (clearLayers = new RelayCommand(() =>
+                {
+                    spatialMap.ClearLayers();
+                    if (spatialDataLayer != null)
+                    {
+                        spatialDataLayer.Dispose();
+                        spatialDataLayer = null;
+                    }
+                }));
+            }
+        }
+
+        public ICommand AddPolyline
+        {
+            get
+            {
+                return addPolyline ?? (addPolyline = new RelayCommand(() =>
+                {
+                    var layer = new MapLineLayer
+                    {
+                        Name = "Polyline",
+                        LegendText = "Polyline"
+                    };
+
+                    layer.SelectionChanged += (sender, args) =>
+                    {
+                        if (layer.IsSelected)
+                        {
+                        }
+                    };
+                    spatialMap.Layers.Add(layer);
+                }));
+            }
+        }
+
+        public RelayCommand SaveImage
+        {
+            get
+            {
+                return saveImage ?? (saveImage = new RelayCommand(() =>
+                {
+                    var dlg = new SaveFileDialog();
+                    dlg.FileName = "map";
+                    dlg.DefaultExt = ".png";
+                    dlg.Filter = "PNG files|*.png|JPEG files|*.jpg;*.jpeg|BMP files|*.bmp|GIF files|*.gif|TIFF file|*.tiff";
+
+                    if (dlg.ShowDialog() == true)
+                    {
+                        int w = 0, h = 0;
+                        switch (SelectedUnit)
+                        {
+                            case Unit.cm:
+                                w = (int) (Width/CM_PER_INCH*resolution);
+                                h = (int) (Height/CM_PER_INCH*resolution);
+                                break;
+                            case Unit.px:
+                                w = (int) Width;
+                                h = (int) Height;
+                                break;
+                        }
+
+                        var image = new Bitmap(w, h);
+                        image.SetResolution(resolution, resolution);
+
+                        Graphics graphics = Graphics.FromImage(image);
+                        spatialMap.Print(graphics, new Rectangle(0, 0, w, h));
+                        graphics.Flush();
+
+                        image.Save(dlg.FileName, ImageFormat);
+                    }
+                }, () => spatialMap != null));
+            }
+        }
+
+        public Unit[] Units
+        {
+            get
+            {
+                return units;
+            }
+        }
+
+        public Unit SelectedUnit
+        {
+            get
+            {
+                return selectedUnit;
+            }
+            set
+            {
+                Set(() => SelectedUnit, ref selectedUnit, value);
+            }
+        }
+
+        public ImageFormat[] Formats
+        {
+            get
+            {
+                return formats;
+            }
+        }
+
+        public ImageFormat ImageFormat
+        {
+            get
+            {
+                return imageFormat;
+            }
+            set
+            {
+                Set(() => ImageFormat, ref imageFormat, value);
+            }
+        }
+
+        public int Resolution
+        {
+            get
+            {
+                return resolution;
+            }
+            set
+            {
+                Set(() => Resolution, ref resolution, value);
+            }
+        }
+
+        public double Height
+        {
+            get
+            {
+                return height;
+            }
+            set
+            {
+                value = SelectedUnit == Unit.px ? Math.Round(value) : Math.Round(value, 2);
+                Set(() => Height, ref height, value);
+            }
+        }
+
+        public double Width
+        {
+            get
+            {
+                return width;
+            }
+            set
+            {
+                value = SelectedUnit == Unit.px ? Math.Round(value) : Math.Round(value, 2);
+                Set(() => Width, ref width, value);
+            }
+        }
+
+        private void Refresh()
+        {
             if (context != null)
                 context.Dispose();
             context = new GenesisContext();
@@ -178,7 +368,7 @@ namespace Genesis.ViewModel
             Data.Clear();
             if (View == MapView.Localities)
             {
-                foreach (var locality in context.Localities)
+                foreach (Locality locality in context.Localities)
                 {
                     if (string.IsNullOrEmpty(locality.Code) || locality.Location == null)
                         continue;
@@ -190,28 +380,18 @@ namespace Genesis.ViewModel
             {
                 if (selectedAnalysis != null)
                 {
-                    foreach (var frequency in selectedAnalysis.Frequencies)
+                    foreach (Frequency frequency in selectedAnalysis.Frequencies)
                     {
                         if (string.IsNullOrEmpty(frequency.Locality.Code) || frequency.Locality.Location == null)
                             continue;
 
                         Data.Add(new PushpinViewModel(frequency.Locality,
-                            string.Format("{0} {1:F2} ({2})", frequency.Locality.Code, frequency.Value, frequency.SampleSize)));
+                                                      string.Format("{0} {1:F2} ({2})", frequency.Locality.Code, frequency.Value, frequency.SampleSize)));
                     }
                 }
             }
         }
 
-        private RelayCommand<Map> spatialMapLoaded;
-        public RelayCommand<Map> SpatialMapLoaded
-        {
-            get
-            {
-                return spatialMapLoaded ?? (spatialMapLoaded = new RelayCommand<Map>(map => InitGisMap(map)));
-            }
-        }
-
-        Map spatialMap = null;
         private void InitGisMap(Map map)
         {
             if (spatialMap == null)
@@ -231,13 +411,12 @@ namespace Genesis.ViewModel
             }
         }
 
-        void spatialMap_Resize(object sender, EventArgs e)
+        private void spatialMap_Resize(object sender, EventArgs e)
         {
-            Width = SelectedUnit == Unit.px ? spatialMap.Width : (double)spatialMap.Width / (double)resolution * CM_PER_INCH;
-            Height = SelectedUnit == Unit.px ? spatialMap.Height : (double)spatialMap.Height / (double)resolution * CM_PER_INCH;
+            Width = SelectedUnit == Unit.px ? spatialMap.Width : spatialMap.Width/(double) resolution*CM_PER_INCH;
+            Height = SelectedUnit == Unit.px ? spatialMap.Height : spatialMap.Height/(double) resolution*CM_PER_INCH;
         }
 
-        IMapFeatureLayer spatialDataLayer = null;
         private void UpdateGisData()
         {
             if (spatialMap != null)
@@ -246,33 +425,34 @@ namespace Genesis.ViewModel
                 if (spatialDataLayer == null)
                 {
                     dataset = new FeatureSet(FeatureType.Point);
-                    
+
                     dataset.Projection = KnownCoordinateSystems.Geographic.World.WGS1984;
 
                     dataset.DataTable.BeginInit();
-                    dataset.DataTable.Columns.Add(new DataColumn("Code", typeof(string)));
+                    dataset.DataTable.Columns.Add(new DataColumn("Code", typeof (string)));
                     spatialDataLayer = spatialMap.Layers.Add(dataset);
-                } else {
+                }
+                else
+                {
                     dataset = spatialDataLayer.DataSet;
                     spatialDataLayer.DataSet.DataTable.BeginInit();
                     dataset.Features.Clear();
                     dataset.DataTable.Clear();
-                }             
+                }
 
-                
 
                 if (View == MapView.Localities)
                 {
                     if (dataset.DataTable.Columns.Count == 2)
                         dataset.DataTable.Columns.RemoveAt(1);
 
-                    foreach (var locality in context.Localities)
+                    foreach (Locality locality in context.Localities)
                     {
                         if (string.IsNullOrEmpty(locality.Code) || locality.Location == null)
                             continue;
 
-                        Coordinate coord = new Coordinate(locality.Location.Longitude ?? 0, locality.Location.Latitude ?? 0);
-                        var feature = dataset.AddFeature(new DotSpatial.Topology.Point(coord));
+                        var coord = new Coordinate(locality.Location.Longitude ?? 0, locality.Location.Latitude ?? 0);
+                        IFeature feature = dataset.AddFeature(new Point(coord));
 
                         feature.DataRow["Code"] = locality.Code;
                     }
@@ -280,17 +460,17 @@ namespace Genesis.ViewModel
                 else
                 {
                     if (dataset.DataTable.Columns.Count == 1)
-                        dataset.DataTable.Columns.Add(new DataColumn("Frequency", typeof(double)));
+                        dataset.DataTable.Columns.Add(new DataColumn("Frequency", typeof (double)));
 
                     if (selectedAnalysis != null)
                     {
-                        foreach (var frequency in selectedAnalysis.Frequencies)
+                        foreach (Frequency frequency in selectedAnalysis.Frequencies)
                         {
                             if (string.IsNullOrEmpty(frequency.Locality.Code) || frequency.Locality.Location == null)
                                 continue;
 
-                            Coordinate coord = new Coordinate(frequency.Locality.Location.Longitude ?? 0, frequency.Locality.Location.Latitude ?? 0);
-                            var feature = dataset.AddFeature(new DotSpatial.Topology.Point(coord));
+                            var coord = new Coordinate(frequency.Locality.Location.Longitude ?? 0, frequency.Locality.Location.Latitude ?? 0);
+                            IFeature feature = dataset.AddFeature(new Point(coord));
                             feature.DataRow["Frequency"] = frequency.Value;
                             feature.DataRow["Code"] = frequency.Locality.Code;
                         }
@@ -302,183 +482,38 @@ namespace Genesis.ViewModel
             }
         }
 
-        Legend spatialMaplegend = null;
-        private RelayCommand<Legend> spatialMapLegendLoaded;
-        public RelayCommand<Legend> SpatialMapLegendLoaded
+        public class PushpinViewModel : ViewModelBase
         {
-            get
+            private readonly Locality locality;
+            private string label;
+
+            public PushpinViewModel(Locality locality, string label)
             {
-                return spatialMapLegendLoaded ?? (spatialMapLegendLoaded = new RelayCommand<Legend>(legend =>
+                this.locality = locality;
+                this.label = label;
+            }
+
+            public Location Location
+            {
+                get
                 {
-                    if (spatialMaplegend == null)
-                    {
-                        spatialMaplegend = legend;
-                        if (spatialMap != null)
-                        {
-                            spatialMap.Legend = spatialMaplegend;
-                        }
-                    }
-                }));
-            }
-        }
+                    if (locality.Location == null)
+                        return null;
 
-        private RelayCommand addLayer;
-        public RelayCommand AddLayer
-        {
-            get
-            {
-                return addLayer ?? (addLayer = new RelayCommand(() => {
-                    var files = DataManager.DefaultDataManager.OpenFiles();
-
-                    foreach (var file in files)
-                    {
-                        spatialMap.Layers.Insert(spatialMap.Layers.Count - 1, file);
-                    }
-                }));
+                    return new Location(locality.Location.Latitude.Value, locality.Location.Longitude.Value);
+                }
             }
-        }
 
-        private RelayCommand clearLayers;
-        public RelayCommand ClearLayers
-        {
-            get
+            public string Label
             {
-                return clearLayers ?? (clearLayers = new RelayCommand(() => {
-                    spatialMap.ClearLayers();
-                    if (spatialDataLayer != null)
-                    {
-                        spatialDataLayer.Dispose();
-                        spatialDataLayer = null;
-                    }
-                }));
-            }
-        }
-
-        private RelayCommand saveImage;
-        public RelayCommand SaveImage
-        {
-            get
-            {
-                return saveImage ?? (saveImage = new RelayCommand(() =>
-                  {
-                      SaveFileDialog dlg = new SaveFileDialog();
-                      dlg.FileName = "map";
-                      dlg.DefaultExt = ".png";
-                      dlg.Filter = "PNG files|*.png|JPEG files|*.jpg;*.jpeg|BMP files|*.bmp|GIF files|*.gif|TIFF file|*.tiff";
-
-                      if (dlg.ShowDialog() == true)
-                      {
-                          int w = 0, h = 0;
-                          switch (SelectedUnit)
-                          {
-                              case Unit.cm:
-                                  w = (int)(Width / CM_PER_INCH * resolution);
-                                  h = (int)(Height / CM_PER_INCH * resolution);
-                                  break;
-                              case Unit.px:
-                                  w = (int)Width;
-                                  h = (int)Height;
-                                  break;
-                          }
-
-                          var image = new Bitmap(w, h);
-                          image.SetResolution(resolution, resolution);
-
-                          var graphics = Graphics.FromImage(image);
-                          spatialMap.Print(graphics, new Rectangle(0, 0, w, h));
-                          graphics.Flush();
-                          
-                          image.Save(dlg.FileName, ImageFormat);
-                      }
-
-                  }, () => spatialMap != null));
-            }
-        }
-
-        private Unit[] units = new Unit[] { Unit.cm, Unit.px };
-        public Unit[] Units
-        {
-            get
-            {
-                return units;
-            }
-        }
-
-        private Unit selectedUnit = Unit.px;
-        public Unit SelectedUnit
-        {
-            get
-            {
-                return selectedUnit;
-            }
-            set
-            {
-                Set(() => SelectedUnit, ref selectedUnit, value);
-            }
-        }
-
-        private ImageFormat[] formats = new ImageFormat[] { ImageFormat.Bmp, ImageFormat.Jpeg, ImageFormat.Png, ImageFormat.Gif, ImageFormat.Tiff};
-        public ImageFormat[] Formats
-        {
-            get
-            {
-                return formats;
-            }
-        }
-
-        private ImageFormat imageFormat = ImageFormat.Png;
-        public ImageFormat ImageFormat
-        {
-            get
-            {
-                return imageFormat;
-            }
-            set
-            {
-                Set(() => ImageFormat, ref imageFormat, value);
-            }
-        }
-
-        private int resolution = 300;
-        public int Resolution
-        {
-            get
-            {
-                return resolution;
-            }
-            set
-            {
-                Set(() => Resolution, ref resolution, value);
-            }
-        }
-        
-        private double height = 600;
-        public double Height
-        {
-            get
-            {
-                return height;
-            }
-            set
-            {
-                value = SelectedUnit == Unit.px ? Math.Round(value) : Math.Round(value, 2);
-                Set(() => Height, ref height, value);
-            }
-        }
-
-        private const double CM_PER_INCH = 2.54;
-
-        private double width = 800;
-        public double Width
-        {
-            get
-            {
-                return width;
-            }
-            set
-            {
-                value = SelectedUnit == Unit.px ? Math.Round(value) : Math.Round(value, 2);
-                Set(() => Width, ref width, value);
+                get
+                {
+                    return label;
+                }
+                set
+                {
+                    Set(() => Label, ref label, value);
+                }
             }
         }
     }

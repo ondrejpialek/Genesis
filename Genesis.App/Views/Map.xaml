@@ -5,8 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:m="clr-namespace:Microsoft.Maps.MapControl.WPF;assembly=Microsoft.Maps.MapControl.WPF" 
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-            
-            
              xmlns:sp="clr-namespace:DotSpatial.Controls;assembly=DotSpatial.Controls"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
              xmlns:ee="http://schemas.microsoft.com/expression/2010/effects"  xmlns:System="clr-namespace:System;assembly=mscorlib"
@@ -160,20 +158,30 @@
 		</VisualStateManager.CustomVisualStateManager>
 		<Grid Grid.ColumnSpan="2">
 			<UniformGrid HorizontalAlignment="Left" Rows="1">
-				<ToggleButton Margin="{DynamicResource DefaultMargin}">
-					<i:Interaction.Behaviors>
-						<ei:DataStateBehavior Binding="{Binding IsChecked, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}" Value="True" TrueState="ExportVisible" FalseState="ExportHidden"/>
-					</i:Interaction.Behaviors>
-					<StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
-						<Rectangle Width="32" Height="32">
-							<Rectangle.Fill>
-								<VisualBrush Visual="{StaticResource appbar_image}" Stretch="Uniform"/>
-							</Rectangle.Fill>
-						</Rectangle>
-						<TextBlock TextWrapping="Wrap" Text="SAVE TO FILE" VerticalAlignment="Center"/>
-					</StackPanel>
-				</ToggleButton>
-			</UniformGrid>
+                <ToggleButton Margin="{DynamicResource DefaultMargin}">
+                    <i:Interaction.Behaviors>
+                        <ei:DataStateBehavior Binding="{Binding IsChecked, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}" Value="True" TrueState="ExportVisible" FalseState="ExportHidden"/>
+                    </i:Interaction.Behaviors>
+                    <StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
+                        <Rectangle Width="32" Height="32">
+                            <Rectangle.Fill>
+                                <VisualBrush Visual="{StaticResource appbar_image}" Stretch="Uniform"/>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                        <TextBlock TextWrapping="Wrap" Text="SAVE TO FILE" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </ToggleButton>
+                <Button Margin="{DynamicResource DefaultMargin}" Command="{Binding AddPolyline}">
+                    <StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
+                        <Rectangle Width="32" Height="32">
+                            <Rectangle.Fill>
+                                <VisualBrush Visual="{StaticResource appbar_vector_line}" Stretch="Uniform"/>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                        <TextBlock TextWrapping="Wrap" Text="ADD POLYLINE" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </UniformGrid>
 		</Grid>
 
         
