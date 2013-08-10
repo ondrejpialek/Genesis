@@ -18,13 +18,10 @@ namespace Genesis.ViewModels
 
             /*
                 = new ObservableCollection<SectionViewModel>() {
-                new SectionViewModel("Localities", () => new Genesis.Views.Data()),
-                new SectionViewModel("Map", () => new Map()),
                 new SectionViewModel("Mice", () => new Mice()),
                 new SectionViewModel("Frequencies", () => new Analyze()),
                 new SectionViewModel("Fst", () => new Fst()),
                 new SectionViewModel("Genetics", () => new Settings()),
-                new SectionViewModel("Import", () => new Import()),
             };       */
         }
 

@@ -266,6 +266,7 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ViewModels\AnalyzeViewModel.cs" />
     <Compile Include="ViewModels\ColumnViewModel.cs" />
+    <Compile Include="ViewModels\LocalitiesSectionViewModel.cs" />
     <Compile Include="ViewModels\MapSectionViewModel.cs" />
     <Compile Include="ViewModels\FstViewModel.cs" />
     <Compile Include="ViewModels\ImportSectionViewModel.cs" />
@@ -291,8 +292,8 @@
     <Compile Include="Views\ImportSectionView.xaml.cs">
       <DependentUpon>ImportSectionView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Data.xaml.cs">
-      <DependentUpon>Data.xaml</DependentUpon>
+    <Compile Include="Views\LocalitiesSectionView.xaml.cs">
+      <DependentUpon>LocalitiesSectionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MouseToAllelesConverter.cs" />
     <Compile Include="Views\Settings.xaml.cs">
@@ -341,8 +342,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Data.xaml">
+    <Page Include="Views\LocalitiesSectionView.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Settings.xaml">
       <Generator>MSBuild:Compile</Generator>
