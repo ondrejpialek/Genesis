@@ -17,6 +17,8 @@
     <IsWebBootstrapper>true</IsWebBootstrapper>
     <Utf8Output>true</Utf8Output>
     <ExpressionBlendVersion>5.2.30810.0</ExpressionBlendVersion>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
     <PublishUrl>D:\dev\Genesis\Genesis.App\deploy\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
@@ -76,6 +78,15 @@
     <ApplicationIcon>ico.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Caliburn.Micro">
+      <HintPath>..\packages\Caliburn.Micro.1.5.2\lib\net45\Caliburn.Micro.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Core">
+      <HintPath>..\packages\Castle.Core.3.2.0\lib\net45\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Windsor">
+      <HintPath>..\packages\Castle.Windsor.3.2.1\lib\net45\Castle.Windsor.dll</HintPath>
+    </Reference>
     <Reference Include="DotSpatial.Controls, Version=1.5.0.0, Culture=neutral, PublicKeyToken=4d9e49339a7d240c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\DotSpatial.Controls.1.5.1\lib\net40\DotSpatial.Controls.dll</HintPath>
@@ -176,7 +187,7 @@
     <Reference Include="System.Windows.Controls.Ribbon" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\MvvmLightLibs.4.1.27.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <HintPath>..\packages\Caliburn.Micro.1.5.2\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -200,6 +211,8 @@
     <Compile Include="Analysis\FstAnalyzer.cs" />
     <Compile Include="Behaviours\SynchronizeSelectedItems.cs" />
     <Compile Include="Behaviours\WeakEventHandler.cs" />
+    <Compile Include="Bootstrap\AppBootstrapper.cs" />
+    <Compile Include="Bootstrap\EventRegistrationFacility.cs" />
     <Compile Include="Data\AlleleRecord.cs" />
     <Compile Include="Data\FstAnalysis.cs" />
     <Compile Include="Data\Frequency.cs" />
@@ -239,6 +252,7 @@
     <Compile Include="Excel\RowApplicator.cs" />
     <Compile Include="Excel\RowReader.cs" />
     <Compile Include="Excel\WorksheetReader.cs" />
+    <Compile Include="Extensions\MVVMExtensions.cs" />
     <Compile Include="Extensions\StreamWriterExtensions.cs" />
     <Compile Include="Migrations\201209111926526_InitialCreate.cs" />
     <Compile Include="Migrations\201209111926526_InitialCreate.Designer.cs">
@@ -249,19 +263,19 @@
       <DependentUpon>201306021340169_FixAlleleRecordFKs.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="ViewModel\ColumnViewModel.cs" />
-    <Compile Include="ViewModel\AnalyzeViewModel.cs" />
-    <Compile Include="ViewModel\FstViewModel.cs" />
-    <Compile Include="ViewModel\ImportViewModel.cs" />
-    <Compile Include="ViewModel\DataViewModel.cs" />
-    <Compile Include="ViewModel\LocalityViewModel.cs" />
-    <Compile Include="ViewModel\Locator.cs" />
-    <Compile Include="ViewModel\MainViewModel.cs" />
-    <Compile Include="ViewModel\Messages.cs" />
-    <Compile Include="ViewModel\MiceViewModel.cs" />
-    <Compile Include="ViewModel\MouseViewModel.cs" />
-    <Compile Include="ViewModel\SectionViewModel.cs" />
-    <Compile Include="ViewModel\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\AnalyzeViewModel.cs" />
+    <Compile Include="ViewModels\ColumnViewModel.cs" />
+    <Compile Include="ViewModels\DataViewModel.cs" />
+    <Compile Include="ViewModels\FstViewModel.cs" />
+    <Compile Include="ViewModels\ImportViewModel.cs" />
+    <Compile Include="ViewModels\LocalityViewModel.cs" />
+    <Compile Include="ViewModels\Locator.cs" />
+    <Compile Include="ViewModels\Messages.cs" />
+    <Compile Include="ViewModels\MiceViewModel.cs" />
+    <Compile Include="ViewModels\MouseViewModel.cs" />
+    <Compile Include="ViewModels\SectionViewModel.cs" />
+    <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="Views\Analyze.xaml.cs">
       <DependentUpon>Analyze.xaml</DependentUpon>
     </Compile>
@@ -289,10 +303,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -306,10 +316,6 @@
     <Compile Include="Data\Mouse.cs" />
     <Compile Include="Data\Sex.cs" />
     <Compile Include="Data\Species.cs" />
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
     <Page Include="Resources\Glyphs.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -339,6 +345,10 @@
     </Page>
     <Page Include="Views\Settings.xaml">
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ShellView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -449,6 +459,7 @@
     <Resource Include="Resources\Entypo-license.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

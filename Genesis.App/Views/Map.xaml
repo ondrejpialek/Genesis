@@ -7,7 +7,7 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:sp="clr-namespace:DotSpatial.Controls;assembly=DotSpatial.Controls"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
-             xmlns:ee="http://schemas.microsoft.com/expression/2010/effects"  xmlns:System="clr-namespace:System;assembly=mscorlib"
+             xmlns:ee="http://schemas.microsoft.com/expression/2010/effects"  xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF45"
              x:Class="Genesis.Views.Map"
              mc:Ignorable="d" d:DesignWidth="533.353" d:DesignHeight="434.44"
@@ -312,9 +312,9 @@
 			<TextBlock Text="resolution" Grid.Row="5" Style="{DynamicResource LabelStyle}"/>
 			<Border Grid.Row="6" Grid.ColumnSpan="2" Margin="{DynamicResource DefaultHorizontalMargin}" Background="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" >
 				<ComboBox SelectedValue="{Binding Resolution}" IsEditable="True" MinHeight="26" Height="26">
-					<System:Int32>300</System:Int32>
-					<System:Int32>600</System:Int32>
-					<System:Int32>1200</System:Int32>
+					<system:Int32>300</system:Int32>
+					<system:Int32>600</system:Int32>
+					<system:Int32>1200</system:Int32>
 				</ComboBox>
 			</Border>
 			<Button Content="SAVE" VerticalAlignment="Bottom" Grid.Row="7" Margin="{DynamicResource DefaultMargin}" Grid.ColumnSpan="2" Command="{Binding SaveImage, Mode=OneWay}"/>

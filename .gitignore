@@ -5,3 +5,5 @@ obj
 *.psess
 *.vsp
 deploy
+/.nuget/NuGet.exe
+/packages
