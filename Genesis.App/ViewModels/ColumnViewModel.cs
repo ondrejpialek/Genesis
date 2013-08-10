@@ -22,7 +22,7 @@ namespace Genesis.ViewModels
             }
             set
             {
-                Set(() => Key, ref key, value);
+                this.Set(() => Key, ref key, value);
             }
         }
 
@@ -36,7 +36,7 @@ namespace Genesis.ViewModels
             }
             set
             {
-                Set(() => Name, ref name, value);
+                this.Set(() => Name, ref name, value);
             }
         }
 
@@ -53,7 +53,7 @@ namespace Genesis.ViewModels
                     value = new TraitColumn();
                 }
 
-                Set(() => Column, ref column, value);
+                this.Set(() => Column, ref column, value);
                 RaisePropertyChanged(() => IsTraitCol);
             }
         }

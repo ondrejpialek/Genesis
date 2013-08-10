@@ -8,11 +8,13 @@ namespace Genesis.ViewModels
 {
     public interface IShellViewModel {}
 
-    public class ShellViewModel : Conductor<ISectionViewModel>.Collection.OneActive, IShellViewModel
+    public class ShellViewModel : Conductor<ISectionViewModel>.Collection.AllActive, IShellViewModel
     {
-        public ShellViewModel()
+        public ShellViewModel(IEnumerable<ISectionViewModel> sectionViewModels)
         {
             DisplayName = "Genesis";
+
+            Items.AddRange(sectionViewModels);
 
             /*
                 = new ObservableCollection<SectionViewModel>() {
@@ -28,7 +30,7 @@ namespace Genesis.ViewModels
 
         protected override void OnActivate()
         {
-            ActivateItem(Items.First(i => i is ImportSectionViewModel));
+            ActivateItem(Items.First(i => i is MapSectionViewModel));
         }
     }
 

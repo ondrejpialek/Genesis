@@ -38,7 +38,7 @@ namespace Genesis.ViewModels
                 }
                 set
                 {
-                    Set(() => Selected, ref selected, value);
+                    this.Set(() => Selected, ref selected, value);
                 }
             }
         }
@@ -97,7 +97,7 @@ namespace Genesis.ViewModels
             }
             set
             {
-                Set(() => SelectedSpecies, ref selectedSpecies, value);
+                this.Set(() => SelectedSpecies, ref selectedSpecies, value);
             }
         }
 
@@ -141,7 +141,7 @@ namespace Genesis.ViewModels
             }
             set
             {
-                Set(() => SelectedFrequencyAnalysis, ref selectedFrequencyAnalysis, value);
+                this.Set(() => SelectedFrequencyAnalysis, ref selectedFrequencyAnalysis, value);
             }
         }
 
@@ -173,7 +173,7 @@ namespace Genesis.ViewModels
             }
             set
             {
-                Set(() => AnalysisName, ref analysisName, value);
+                this.Set(() => AnalysisName, ref analysisName, value);
             }
         }
 
@@ -217,7 +217,7 @@ namespace Genesis.ViewModels
             }
             set
             {
-                Set(() => Progress, ref progress, value);
+                this.Set(() => Progress, ref progress, value);
             }
         }
 

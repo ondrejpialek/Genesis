@@ -6,6 +6,7 @@ using System.Data.Entity;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Input;
+using Caliburn.Micro;
 using DotSpatial.Controls;
 using DotSpatial.Data;
 using DotSpatial.Data.Forms;
@@ -20,7 +21,7 @@ using Point = DotSpatial.Topology.Point;
 
 namespace Genesis.ViewModels
 {
-    public class DataViewModel : ViewModelBase
+    public class MapSectionViewModel : Screen, ISectionViewModel
     {
         public enum MapView
         {
@@ -61,22 +62,11 @@ namespace Genesis.ViewModels
         /// <summary>
         ///   Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public DataViewModel()
+        public MapSectionViewModel()
         {
+            DisplayName = "Map";
+
             Data = new ObservableCollection<PushpinViewModel>();
-
-            Messenger.Default.Register<GenericMessage<Message>>(this, m =>
-            {
-                if (m.Target != this)
-                    return;
-
-                switch (m.Content)
-                {
-                    case Message.Refresh:
-                        Refresh();
-                        break;
-                }
-            });
         }
 
         public FrequencyAnalysis SelectedAnalysis
@@ -87,7 +77,7 @@ namespace Genesis.ViewModels
             }
             set
             {
-                Set(() => SelectedAnalysis, ref selectedAnalysis, value);
+                this.Set(() => SelectedAnalysis, ref selectedAnalysis, value);
                 UpdateData();
             }
         }
@@ -129,7 +119,7 @@ namespace Genesis.ViewModels
             }
             set
             {
-                Set(() => View, ref view, value);
+                this.Set(() => View, ref view, value);
                 UpdateData();
             }
         }
@@ -282,7 +272,7 @@ namespace Genesis.ViewModels
             }
             set
             {
-                Set(() => SelectedUnit, ref selectedUnit, value);
+                this.Set(() => SelectedUnit, ref selectedUnit, value);
             }
         }
 
@@ -302,7 +292,7 @@ namespace Genesis.ViewModels
             }
             set
             {
-                Set(() => ImageFormat, ref imageFormat, value);
+                this.Set(() => ImageFormat, ref imageFormat, value);
             }
         }
 
@@ -314,7 +304,7 @@ namespace Genesis.ViewModels
             }
             set
             {
-                Set(() => Resolution, ref resolution, value);
+                this.Set(() => Resolution, ref resolution, value);
             }
         }
 
@@ -327,7 +317,7 @@ namespace Genesis.ViewModels
             set
             {
                 value = SelectedUnit == Unit.px ? Math.Round(value) : Math.Round(value, 2);
-                Set(() => Height, ref height, value);
+                this.Set(() => Height, ref height, value);
             }
         }
 
@@ -340,18 +330,20 @@ namespace Genesis.ViewModels
             set
             {
                 value = SelectedUnit == Unit.px ? Math.Round(value) : Math.Round(value, 2);
-                Set(() => Width, ref width, value);
+                this.Set(() => Width, ref width, value);
             }
         }
 
-        private void Refresh()
+        protected override void OnActivate()
         {
+            base.OnActivate();
+
             if (context != null)
                 context.Dispose();
             context = new GenesisContext();
 
-            RaisePropertyChanged(() => FrequencyAnalysis);
-            RaisePropertyChanged(() => Localities);
+            NotifyOfPropertyChange(() => FrequencyAnalysis);
+            NotifyOfPropertyChange(() => Localities);
 
             UpdateData();
         }
@@ -511,7 +503,7 @@ namespace Genesis.ViewModels
                 }
                 set
                 {
-                    Set(() => Label, ref label, value);
+                    this.Set(() => Label, ref label, value);
                 }
             }
         }

@@ -3,7 +3,7 @@
     xmlns:p1="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:vm="clr-namespace:Genesis.ViewModels" xmlns:local="clr-namespace:Genesis.Bootstrap">
+    xmlns:local="clr-namespace:Genesis.Bootstrap">
     <Application.Resources>
         <ResourceDictionary>   
 			<ResourceDictionary.MergedDictionaries>
@@ -15,7 +15,6 @@
 				<ResourceDictionary Source="CustomStyles.xaml"/>
 				<ResourceDictionary Source="Resources/Icons.xaml" />
 			</ResourceDictionary.MergedDictionaries>        
-            <vm:Locator x:Key="Locator"/>
             <Thickness x:Key="DefaultMargin">6</Thickness>
             <Thickness x:Key="DefaultVerticalMargin">0,6</Thickness>
         </ResourceDictionary>

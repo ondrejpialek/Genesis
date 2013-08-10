@@ -21,7 +21,7 @@ namespace Genesis.ViewModels
             }
             protected set
             {
-                Set(() => Locality, ref locality, value);
+                this.Set(() => Locality, ref locality, value);
             }
         }
 
@@ -100,7 +100,7 @@ namespace Genesis.ViewModels
 
             protected set
             {
-                Set(() => Frequency, ref frequency, value);
+                this.Set(() => Frequency, ref frequency, value);
             }
         }
 

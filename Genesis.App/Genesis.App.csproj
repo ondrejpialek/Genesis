@@ -266,11 +266,10 @@
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ViewModels\AnalyzeViewModel.cs" />
     <Compile Include="ViewModels\ColumnViewModel.cs" />
-    <Compile Include="ViewModels\DataViewModel.cs" />
+    <Compile Include="ViewModels\MapSectionViewModel.cs" />
     <Compile Include="ViewModels\FstViewModel.cs" />
     <Compile Include="ViewModels\ImportSectionViewModel.cs" />
     <Compile Include="ViewModels\LocalityViewModel.cs" />
-    <Compile Include="ViewModels\Locator.cs" />
     <Compile Include="ViewModels\Messages.cs" />
     <Compile Include="ViewModels\MiceViewModel.cs" />
     <Compile Include="ViewModels\MouseViewModel.cs" />
@@ -283,8 +282,8 @@
       <DependentUpon>FST.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ItsEventToCommand.cs" />
-    <Compile Include="Views\Map.xaml.cs">
-      <DependentUpon>Map.xaml</DependentUpon>
+    <Compile Include="Views\MapSectionView.xaml.cs">
+      <DependentUpon>MapSectionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Mice.xaml.cs">
       <DependentUpon>Mice.xaml</DependentUpon>
@@ -331,8 +330,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Map.xaml">
+    <Page Include="Views\MapSectionView.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Mice.xaml">
       <Generator>MSBuild:Compile</Generator>
