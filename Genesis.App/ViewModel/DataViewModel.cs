@@ -65,6 +65,7 @@ namespace Genesis.ViewModel
         public DataViewModel()
         {
             Data = new ObservableCollection<PushpinViewModel>();
+            Points = new ObservableCollection<Point>();
 
             Messenger.Default.Register<GenericMessage<Message>>(this, m =>
             {
@@ -78,6 +79,8 @@ namespace Genesis.ViewModel
                         break;
                 }
             });
+
+
         }
 
         public FrequencyAnalysis SelectedAnalysis
@@ -121,6 +124,9 @@ namespace Genesis.ViewModel
 
         public ObservableCollection<PushpinViewModel> Data { get; protected set; }
 
+        public ObservableCollection<Point> Points;
+        private MapLineLayer layerBeingEdited;
+        private RelayCommand addPoint;
 
         public MapView View
         {
@@ -181,6 +187,9 @@ namespace Genesis.ViewModel
                 {
                     List<IDataSet> files = DataManager.DefaultDataManager.OpenFiles();
 
+                    if (files == null)
+                        return;
+
                     foreach (IDataSet file in files)
                     {
                         spatialMap.Layers.Insert(spatialMap.Layers.Count - 1, file);
@@ -217,14 +226,53 @@ namespace Genesis.ViewModel
                         LegendText = "Polyline"
                     };
 
-                    layer.SelectionChanged += (sender, args) =>
+                    spatialMaplegend.MouseDown += (sender, args) =>
                     {
                         if (layer.IsSelected)
                         {
+                            layerBeingEdited = layer;
+                            RaisePropertyChanged(() => AddPoint);
+
+                            Points.Clear();
+
+                            for (int i = 0; i < layer.DataSet.DataTable.Rows.Count; i++)
+                            {
+                                var point = layer.DataSet.GetFeature(i).BasicGeometry as Point;
+
+                                Points.Add(point);
+
+                            }
                         }
                     };
+
+
+                    var dataset =  new FeatureSet(FeatureType.Point);
+
+                    dataset.Projection = KnownCoordinateSystems.Geographic.World.WGS1984;
+
+                    dataset.DataTable.BeginInit();
+                    //dataset.DataTable.Columns.Add(new DataColumn("Code", typeof (string)));
+                        layer.DataSet = dataset;
+
+                    dataset.DataTable.EndLoadData();
+                    dataset.InvalidateVertices();
+
                     spatialMap.Layers.Add(layer);
                 }));
+            }
+        }
+
+        public RelayCommand AddPoint
+        {
+            get
+            {
+                return addPoint ?? (addPoint = new RelayCommand(() =>
+                {
+
+                    var point = new Point(spatialMap.ViewExtents.Center);
+                    IFeature feature = layerBeingEdited.DataSet.AddFeature(point);
+                    Points.Add(point);
+                }, () => layerBeingEdited != null));
             }
         }
 
@@ -406,7 +454,6 @@ namespace Genesis.ViewModel
                 }
 
                 spatialMap.FunctionMode = FunctionMode.Pan;
-
                 UpdateGisData();
             }
         }
