@@ -213,6 +213,7 @@
     <Compile Include="Behaviours\WeakEventHandler.cs" />
     <Compile Include="Bootstrap\AppBootstrapper.cs" />
     <Compile Include="Bootstrap\EventRegistrationFacility.cs" />
+    <Compile Include="Bootstrap\ExcelInstaller.cs" />
     <Compile Include="Data\AlleleRecord.cs" />
     <Compile Include="Data\FstAnalysis.cs" />
     <Compile Include="Data\Frequency.cs" />
@@ -267,13 +268,12 @@
     <Compile Include="ViewModels\ColumnViewModel.cs" />
     <Compile Include="ViewModels\DataViewModel.cs" />
     <Compile Include="ViewModels\FstViewModel.cs" />
-    <Compile Include="ViewModels\ImportViewModel.cs" />
+    <Compile Include="ViewModels\ImportSectionViewModel.cs" />
     <Compile Include="ViewModels\LocalityViewModel.cs" />
     <Compile Include="ViewModels\Locator.cs" />
     <Compile Include="ViewModels\Messages.cs" />
     <Compile Include="ViewModels\MiceViewModel.cs" />
     <Compile Include="ViewModels\MouseViewModel.cs" />
-    <Compile Include="ViewModels\SectionViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="Views\Analyze.xaml.cs">
@@ -289,8 +289,8 @@
     <Compile Include="Views\Mice.xaml.cs">
       <DependentUpon>Mice.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Import.xaml.cs">
-      <DependentUpon>Import.xaml</DependentUpon>
+    <Compile Include="Views\ImportSectionView.xaml.cs">
+      <DependentUpon>ImportSectionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Data.xaml.cs">
       <DependentUpon>Data.xaml</DependentUpon>
@@ -337,8 +337,9 @@
     <Page Include="Views\Mice.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Import.xaml">
+    <Page Include="Views\ImportSectionView.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\Data.xaml">
       <Generator>MSBuild:Compile</Generator>

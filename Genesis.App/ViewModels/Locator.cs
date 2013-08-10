@@ -12,7 +12,6 @@ namespace Genesis.ViewModels
             SimpleIoc.Default.Register<SettingsViewModel>();
             SimpleIoc.Default.Register<DataViewModel>();
             SimpleIoc.Default.Register<MiceViewModel>();
-            SimpleIoc.Default.Register<ImportViewModel>();
             SimpleIoc.Default.Register<AnalyzeViewModel>();
             SimpleIoc.Default.Register<FstViewModel>();
             SimpleIoc.Default.Register<IExcelService, ExcelService>();
@@ -42,14 +41,6 @@ namespace Genesis.ViewModels
             }
         }
 
-        public ImportViewModel Import
-        {
-            get
-            {
-                return ServiceLocator.Current.GetInstance<ImportViewModel>();
-            }
-        }
-
         public FstViewModel Fst
         {
             get
@@ -64,11 +55,6 @@ namespace Genesis.ViewModels
             {
                 return ServiceLocator.Current.GetInstance<MiceViewModel>();
             }
-        }
-
-        public void Cleanup()
-        {
-            Import.Cleanup();
         }
     }
 }

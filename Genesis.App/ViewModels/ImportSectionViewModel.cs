@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using GalaSoft.MvvmLight;
+using Caliburn.Micro;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using Genesis.Excel;
@@ -12,7 +12,7 @@ using Microsoft.Win32;
 namespace Genesis.ViewModels
 {
 
-    public class ImportViewModel : ViewModelBase
+    public class ImportSectionViewModel : Screen, ISectionViewModel
     {
         public enum ImportType { Localities, Data };
         private static IEnumerable<ImportType> importTypes = new ImportType[] { ImportType.Localities, ImportType.Data };
@@ -40,8 +40,10 @@ namespace Genesis.ViewModels
         private readonly IEnumerable<ICellReader<Locality>> localityFields = new List<ICellReader<Locality>> { new CodeColumn(), new LatitudeColumn(), new LongitudeColumn(), new LocalityNameColumn() };
         private readonly ICollection<ICellReader<Mouse>> miceFields = new List<ICellReader<Mouse>> { new PINColumn(), new TraitColumn(), new SexColumn()};
 
-        public ImportViewModel(IExcelService excelService)
+        public ImportSectionViewModel(IExcelService excelService)
         {
+            DisplayName = "Import";
+
             context = new GenesisContext();
             this.excelService = excelService;
 
@@ -63,7 +65,7 @@ namespace Genesis.ViewModels
             Refresh();
         }
 
-        private void Refresh()
+        protected override void OnActivate()
         {
             if (context != null)
             {
@@ -71,7 +73,7 @@ namespace Genesis.ViewModels
                 context = new GenesisContext();
             }
 
-            RaisePropertyChanged(() => Genes);
+            NotifyOfPropertyChange(() => Genes);
 
             ReloadFields();
         }
@@ -87,7 +89,8 @@ namespace Genesis.ViewModels
                 Fields = new ObservableCollection<ICellReader>(miceFields);
                 Fields.Add(new MouseLocalityColumn(context.Localities));
             }
-            RaisePropertyChanged(() => Fields);
+
+            NotifyOfPropertyChange(() => Fields);
         }
 
         private ImportType selectedImport = ImportType.Localities;
@@ -99,7 +102,7 @@ namespace Genesis.ViewModels
             }
             set
             {
-                Set(() => SelectedImport, ref selectedImport, value);
+                this.Set(() => SelectedImport, ref selectedImport, value);
                 ReloadFields();
             }
         }
@@ -113,7 +116,7 @@ namespace Genesis.ViewModels
             }
             set
             {
-                Set(() => Filename, ref filename, value);
+                this.Set(() => Filename, ref filename, value);
             }
         }
 
@@ -166,7 +169,7 @@ namespace Genesis.ViewModels
             }
             set
             {
-                Set(() => Sheet, ref sheet, value);
+                this.Set(() => Sheet, ref sheet, value);
                 int index = Sheets.IndexOf(value);
                 if ((excelFile != null) && index > -1)
                 {
@@ -200,7 +203,7 @@ namespace Genesis.ViewModels
             }
             set
             {
-                Set(() => Progress, ref progress, value);
+                this.Set(() => Progress, ref progress, value);
             }
         }
 
@@ -300,12 +303,17 @@ namespace Genesis.ViewModels
             excelImport.Start(importArgs);
         }
 
-        public override void Cleanup()
+        protected override void OnDeactivate(bool close)
         {
-            if (excelFile != null)
+            base.OnDeactivate(close);
+
+            if (close)
             {
-                excelFile.Dispose();
-                excelFile = null;
+                if (excelFile != null)
+                {
+                    excelFile.Dispose();
+                    excelFile = null;
+                } 
             }
         }
     }

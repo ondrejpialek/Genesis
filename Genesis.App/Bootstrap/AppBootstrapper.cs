@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Caliburn.Micro;
 using Castle.MicroKernel.Registration;
+using Castle.MicroKernel.Resolvers.SpecializedResolvers;
 using Castle.Windsor;
+using Castle.Windsor.Installer;
 using Genesis.ViewModels;
 
 namespace Genesis.Bootstrap
@@ -17,6 +19,7 @@ namespace Genesis.Bootstrap
             container = new WindsorContainer();
 
             container.AddFacility<EventRegistrationFacility>();
+            container.Kernel.Resolver.AddSubResolver(new CollectionResolver(container.Kernel));
 
             container.Register(
                 Component.For<IWindowManager>().ImplementedBy<WindowManager>().LifestyleSingleton(),
@@ -24,6 +27,8 @@ namespace Genesis.Bootstrap
                 Classes.FromThisAssembly().InSameNamespaceAs<IShellViewModel>()
                        .If(t => t.GetInterfaces().Any(i => i == typeof (IScreen))).WithServiceDefaultInterfaces().LifestyleTransient()
                 );
+
+            container.Install(FromAssembly.This());
         }
 
         protected override object GetInstance(Type serviceType, string key)

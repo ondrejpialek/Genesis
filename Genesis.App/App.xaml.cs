@@ -9,11 +9,5 @@ namespace Genesis.App
     public partial class App : Application
     {
 
-        protected override void OnExit(ExitEventArgs e)
-        {
-            base.OnExit(e);
-            var l = this.Resources["Locator"] as Locator;
-                l.Cleanup();
-        }
     }
 }
