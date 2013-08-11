@@ -21,7 +21,7 @@ using Point = DotSpatial.Topology.Point;
 
 namespace Genesis.ViewModels
 {
-    public class LocalitiesSectionViewModel : Screen, ISectionViewModel
+    public class LocalitiesSectionViewModel : SectionViewModel
     {
         private GenesisContext context;
 
@@ -31,9 +31,11 @@ namespace Genesis.ViewModels
         public LocalitiesSectionViewModel()
         {
             DisplayName = "Localities";
+            Order = 5;
 
             Localities = new BindableCollection<Locality>();
         }
+
 
         public BindableCollection<Locality> Localities { get; protected set; }
 

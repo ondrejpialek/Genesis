@@ -9,7 +9,7 @@ using Genesis.Analysis;
 namespace Genesis.ViewModels
 {
 
-    public class FstSectionViewModel : Screen, ISectionViewModel
+    public class FstSectionViewModel : SectionViewModel
     {      
         public class GeneViewModel : ViewModelBase {
             public GeneViewModel(Gene gene) {
@@ -47,6 +47,7 @@ namespace Genesis.ViewModels
         public FstSectionViewModel()
         {
             DisplayName = "Fst";
+            Order = 30;
             Genes = new ObservableCollection<GeneViewModel>();
         }
 

@@ -21,7 +21,7 @@ using Point = DotSpatial.Topology.Point;
 
 namespace Genesis.ViewModels
 {
-    public class MapSectionViewModel : Screen, ISectionViewModel
+    public class MapSectionViewModel : SectionViewModel
     {
         public enum MapView
         {
@@ -65,6 +65,7 @@ namespace Genesis.ViewModels
         public MapSectionViewModel()
         {
             DisplayName = "Map";
+            Order = 10;
 
             Data = new ObservableCollection<PushpinViewModel>();
         }

@@ -11,13 +11,14 @@ using Genesis.Views;
 
 namespace Genesis.ViewModels
 {
-    public class MiceSectionViewModel : Screen, ISectionViewModel
+    public class MiceSectionViewModel : SectionViewModel
     {
         private GenesisContext context;
 
         public MiceSectionViewModel()
         {
             DisplayName = "Data";
+            Order = 0;
         }
 
         protected override void OnActivate()

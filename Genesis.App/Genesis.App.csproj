@@ -274,6 +274,7 @@
     <Compile Include="ViewModels\Messages.cs" />
     <Compile Include="ViewModels\MiceSectionViewModel.cs" />
     <Compile Include="ViewModels\MouseViewModel.cs" />
+    <Compile Include="ViewModels\SectionViewModel.cs" />
     <Compile Include="ViewModels\SettingsSectionViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="Views\FrequenciesSectionView.xaml.cs">

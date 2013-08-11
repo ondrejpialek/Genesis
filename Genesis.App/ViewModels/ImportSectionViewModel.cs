@@ -12,7 +12,7 @@ using Microsoft.Win32;
 namespace Genesis.ViewModels
 {
 
-    public class ImportSectionViewModel : Screen, ISectionViewModel
+    public class ImportSectionViewModel : SectionViewModel
     {
         public enum ImportType { Localities, Data };
         private static IEnumerable<ImportType> importTypes = new ImportType[] { ImportType.Localities, ImportType.Data };
@@ -43,6 +43,7 @@ namespace Genesis.ViewModels
         public ImportSectionViewModel(IExcelService excelService)
         {
             DisplayName = "Import";
+            Order = 50;
 
             context = new GenesisContext();
             this.excelService = excelService;

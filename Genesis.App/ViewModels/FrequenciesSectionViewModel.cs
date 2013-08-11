@@ -14,7 +14,7 @@ using Microsoft.Win32;
 namespace Genesis.ViewModels
 {
 
-    public class FrequenciesSectionViewModel : Screen, ISectionViewModel
+    public class FrequenciesSectionViewModel : SectionViewModel
     {      
         public class GeneViewModel : PropertyChangedBase {
             public GeneViewModel(Gene gene) {
@@ -52,6 +52,7 @@ namespace Genesis.ViewModels
         public FrequenciesSectionViewModel()
         {
             DisplayName = "Frequencies";
+            Order = 20;
             
             Genes = new ObservableCollection<GeneViewModel>();
             SelectedAnalysis = new ObservableCollection<FrequencyAnalysis>();
@@ -280,7 +281,5 @@ namespace Genesis.ViewModels
                 }, () => !exporting && SelectedAnalysis.Count > 0));
             }
         }
-
-
     }
 }

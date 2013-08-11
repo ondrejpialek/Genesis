@@ -53,11 +53,6 @@
 			</DataTemplate>
 		</ResourceDictionary>
     </UserControl.Resources>
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded" >
-            <command:EventToCommand Command="{Binding Refresh}" />
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
     <Grid>
     	<Grid.RowDefinitions>
     		<RowDefinition Height="Auto"/>

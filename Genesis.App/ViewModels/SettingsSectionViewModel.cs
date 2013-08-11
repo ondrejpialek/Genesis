@@ -11,12 +11,13 @@ using GalaSoft.MvvmLight.Messaging;
 namespace Genesis.ViewModels
 {
 
-    public class SettingsSectionViewModel : Screen, ISectionViewModel
+    public class SettingsSectionViewModel : SectionViewModel
     {                   
 
         public SettingsSectionViewModel()
         {
             DisplayName = "Settings";
+            Order = 100;
         }
 
         #region tree view models
