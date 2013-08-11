@@ -264,30 +264,30 @@
       <DependentUpon>201306021340169_FixAlleleRecordFKs.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="ViewModels\AnalyzeViewModel.cs" />
+    <Compile Include="ViewModels\FrequenciesSectionViewModel.cs" />
     <Compile Include="ViewModels\ColumnViewModel.cs" />
     <Compile Include="ViewModels\LocalitiesSectionViewModel.cs" />
     <Compile Include="ViewModels\MapSectionViewModel.cs" />
-    <Compile Include="ViewModels\FstViewModel.cs" />
+    <Compile Include="ViewModels\FstSectionViewModel.cs" />
     <Compile Include="ViewModels\ImportSectionViewModel.cs" />
     <Compile Include="ViewModels\LocalityViewModel.cs" />
     <Compile Include="ViewModels\Messages.cs" />
-    <Compile Include="ViewModels\MiceViewModel.cs" />
+    <Compile Include="ViewModels\MiceSectionViewModel.cs" />
     <Compile Include="ViewModels\MouseViewModel.cs" />
-    <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\SettingsSectionViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
-    <Compile Include="Views\Analyze.xaml.cs">
-      <DependentUpon>Analyze.xaml</DependentUpon>
+    <Compile Include="Views\FrequenciesSectionView.xaml.cs">
+      <DependentUpon>FrequenciesSectionView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\FST.xaml.cs">
-      <DependentUpon>FST.xaml</DependentUpon>
+    <Compile Include="Views\FstSectionView.xaml.cs">
+      <DependentUpon>FstSectionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ItsEventToCommand.cs" />
     <Compile Include="Views\MapSectionView.xaml.cs">
       <DependentUpon>MapSectionView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Mice.xaml.cs">
-      <DependentUpon>Mice.xaml</DependentUpon>
+    <Compile Include="Views\MiceSectionView.xaml.cs">
+      <DependentUpon>MiceSectionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ImportSectionView.xaml.cs">
       <DependentUpon>ImportSectionView.xaml</DependentUpon>
@@ -296,8 +296,8 @@
       <DependentUpon>LocalitiesSectionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MouseToAllelesConverter.cs" />
-    <Compile Include="Views\Settings.xaml.cs">
-      <DependentUpon>Settings.xaml</DependentUpon>
+    <Compile Include="Views\SettingsSectionView.xaml.cs">
+      <DependentUpon>SettingsSectionView.xaml</DependentUpon>
     </Compile>
     <Page Include="CustomStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -324,10 +324,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Analyze.xaml">
+    <Page Include="Views\FrequenciesSectionView.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\FST.xaml">
+    <Page Include="Views\FstSectionView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -335,8 +336,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Mice.xaml">
+    <Page Include="Views\MiceSectionView.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\ImportSectionView.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -346,8 +348,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Settings.xaml">
+    <Page Include="Views\SettingsSectionView.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\ShellView.xaml">
       <Generator>MSBuild:Compile</Generator>

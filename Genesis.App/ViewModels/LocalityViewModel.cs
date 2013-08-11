@@ -1,11 +1,12 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Caliburn.Micro;
 using GalaSoft.MvvmLight;
 using Microsoft.Maps.MapControl.WPF;
 
 namespace Genesis.ViewModels
 {
-    public class LocalityViewModel : ViewModelBase
+    public class LocalityViewModel : PropertyChangedBase
     {
   
         public LocalityViewModel(Locality locality) {
@@ -47,7 +48,7 @@ namespace Genesis.ViewModels
             set
             {
                 locality.Name = value;
-                RaisePropertyChanged(() => Name);
+                NotifyOfPropertyChange(() => Name);
             }
         }
 
@@ -60,7 +61,7 @@ namespace Genesis.ViewModels
             set
             {
                 locality.Code = value;
-                RaisePropertyChanged(() => Code);
+                NotifyOfPropertyChange(() => Code);
             }
         }
 

@@ -3,6 +3,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Caliburn.Micro;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
@@ -10,34 +11,25 @@ using Genesis.Views;
 
 namespace Genesis.ViewModels
 {
-    public class MiceViewModel : ViewModelBase
+    public class MiceSectionViewModel : Screen, ISectionViewModel
     {
         private GenesisContext context;
 
-        public MiceViewModel()
+        public MiceSectionViewModel()
         {
-            Messenger.Default.Register<GenericMessage<Message>>(this, m =>
-            {
-                if (m.Target != this)
-                    return;
-
-                switch (m.Content)
-                {
-                    case Message.Refresh:
-                        Refresh();
-                        break;
-                }
-            });
+            DisplayName = "Data";
         }
 
-        private void Refresh()
+        protected override void OnActivate()
         {
+            base.OnActivate();
+
             if (context != null)
                 context.Dispose();
             context = new GenesisContext();
 
-            RaisePropertyChanged(() => Mice);
-            RaisePropertyChanged(() => Genes);
+            NotifyOfPropertyChange(() => Mice);
+            NotifyOfPropertyChange(() => Genes);
         }
 
         public ObservableCollection<Mouse> Mice

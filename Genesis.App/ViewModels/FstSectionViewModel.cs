@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Caliburn.Micro;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Genesis.Analysis;
@@ -8,7 +9,7 @@ using Genesis.Analysis;
 namespace Genesis.ViewModels
 {
 
-    public class FstViewModel : ViewModelBase
+    public class FstSectionViewModel : Screen, ISectionViewModel
     {      
         public class GeneViewModel : ViewModelBase {
             public GeneViewModel(Gene gene) {
@@ -43,8 +44,9 @@ namespace Genesis.ViewModels
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public FstViewModel()
+        public FstSectionViewModel()
         {
+            DisplayName = "Fst";
             Genes = new ObservableCollection<GeneViewModel>();
         }
 
@@ -114,8 +116,8 @@ namespace Genesis.ViewModels
                         }
 
 
-                        RaisePropertyChanged(() => FstAnalysis);
-                        RaisePropertyChanged(() => Species);
+                        NotifyOfPropertyChange(() => FstAnalysis);
+                        NotifyOfPropertyChange(() => Species);
                         SelectedSpecies = Species.FirstOrDefault();
                     });
                 }

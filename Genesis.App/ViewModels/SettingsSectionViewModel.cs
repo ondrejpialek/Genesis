@@ -11,12 +11,17 @@ using GalaSoft.MvvmLight.Messaging;
 namespace Genesis.ViewModels
 {
 
-    public class SettingsViewModel : ViewModelBase
-    {
+    public class SettingsSectionViewModel : Screen, ISectionViewModel
+    {                   
+
+        public SettingsSectionViewModel()
+        {
+            DisplayName = "Settings";
+        }
 
         #region tree view models
 
-        public class AlleleViewModel : ViewModelBase
+        public class AlleleViewModel : PropertyChangedBase
         {
             private Allele a;
 
@@ -28,9 +33,8 @@ namespace Genesis.ViewModels
                 }
                 set
                 {
-                    RaisePropertyChanging(() => Value);
                     a.Value = value;
-                    RaisePropertyChanged(() => Value);
+                    NotifyOfPropertyChange(() => Value);
                 }
             }
 
@@ -42,9 +46,8 @@ namespace Genesis.ViewModels
                 }
                 set
                 {
-                    RaisePropertyChanging(() => Species);
                     a.Species = value;
-                    RaisePropertyChanged(() => Species);
+                    NotifyOfPropertyChange(() => Species);
                 }
             }
 
@@ -59,7 +62,7 @@ namespace Genesis.ViewModels
             }
         }
 
-        public class GeneViewModel : ViewModelBase
+        public class GeneViewModel : PropertyChangedBase
         {
             private GenesisContext context;
             private Gene gene;
@@ -72,9 +75,8 @@ namespace Genesis.ViewModels
                 }
                 set
                 {
-                    RaisePropertyChanging(() => Name);
                     gene.Name = value;
-                    RaisePropertyChanged(() => Name);
+                    NotifyOfPropertyChange(() => Name);
                 }
             }
 
@@ -86,9 +88,8 @@ namespace Genesis.ViewModels
                 }
                 set
                 {
-                    RaisePropertyChanging(() => StartBasePair);
                     gene.StartBasePair = value;
-                    RaisePropertyChanged(() => StartBasePair);
+                    NotifyOfPropertyChange(() => StartBasePair);
                 }
             }
 
@@ -118,18 +119,11 @@ namespace Genesis.ViewModels
                 }
             }
 
-            private RelayCommand<AlleleViewModel> removeAllele;
-            public RelayCommand<AlleleViewModel> RemoveAllele
+            public void RemoveAllele(AlleleViewModel allele)
             {
-                get
-                {
-                    return removeAllele ?? (removeAllele = new RelayCommand<AlleleViewModel>(a =>
-                    {
-                        Alleles.Remove(a);
-                        gene.Alleles.Remove(a.GetAllele());
-                        context.Alleles.Remove(a.GetAllele());
-                    }));
-                }
+                Alleles.Remove(allele);
+                gene.Alleles.Remove(allele.GetAllele());
+                context.Alleles.Remove(allele.GetAllele());
             }
 
             public Gene GetGene()
@@ -138,7 +132,7 @@ namespace Genesis.ViewModels
             }
         }
 
-        public class ChromosomeViewModel : ViewModelBase
+        public class ChromosomeViewModel : PropertyChangedBase
         {
             private GenesisContext context;
             private Chromosome chromosome;
@@ -160,9 +154,8 @@ namespace Genesis.ViewModels
                 }
                 set
                 {
-                    RaisePropertyChanging(() => Name);
                     chromosome.Name = value;
-                    RaisePropertyChanged(() => Name);
+                    NotifyOfPropertyChange(() => Name);
                 }
             }
 
@@ -203,35 +196,18 @@ namespace Genesis.ViewModels
 
         private GenesisContext context;
 
-        /// <summary>
-        /// Initializes a new instance of the MainViewModel class.
-        /// </summary>
-        public SettingsViewModel()
+        protected override void OnActivate()
         {
-            MessengerInstance.Register<GenericMessage<Message>>(this, m =>
-            {
-                if (m.Target != this)
-                    return;
-
-                switch (m.Content)
-                {
-                    case Message.Refresh:
-                        Refresh();
-                        break;
-                }
-            });            
-        }
-
-        private void Refresh()
-        {
+            base.OnActivate();
+            
             if (context != null)
                 context.Dispose();
             context = new GenesisContext();
 
             context.Species.Load();
 
-            RaisePropertyChanged(() => Chromosomes);
-            RaisePropertyChanged(() => Species);
+            NotifyOfPropertyChange(() => Chromosomes);
+            NotifyOfPropertyChange(() => Species);
         }
 
         public ObservableCollection<ChromosomeViewModel> Chromosomes

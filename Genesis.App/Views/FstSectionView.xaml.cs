@@ -15,9 +15,9 @@ using System.Windows.Shapes;
 namespace Genesis.Views
 {
 
-    public partial class Fst : UserControl
+    public partial class FstSectionView : UserControl
     {
-        public Fst()
+        public FstSectionView()
         {
             InitializeComponent();
         }

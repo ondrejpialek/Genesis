@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Caliburn.Micro;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Genesis.Analysis;
@@ -13,9 +14,9 @@ using Microsoft.Win32;
 namespace Genesis.ViewModels
 {
 
-    public class AnalyzeViewModel : ViewModelBase
+    public class FrequenciesSectionViewModel : Screen, ISectionViewModel
     {      
-        public class GeneViewModel : ViewModelBase {
+        public class GeneViewModel : PropertyChangedBase {
             public GeneViewModel(Gene gene) {
                 this.gene = gene;
             }
@@ -48,11 +49,12 @@ namespace Genesis.ViewModels
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public AnalyzeViewModel()
+        public FrequenciesSectionViewModel()
         {
+            DisplayName = "Frequencies";
+            
             Genes = new ObservableCollection<GeneViewModel>();
             SelectedAnalysis = new ObservableCollection<FrequencyAnalysis>();
-
         }
 
         public ObservableCollection<FrequencyAnalysis> FrequencyAnalysis
@@ -101,34 +103,11 @@ namespace Genesis.ViewModels
             }
         }
 
-        private RelayCommand refresh;
-        public RelayCommand Refresh
+
+        protected override void OnActivate()
         {
-            get
-            {
-                if (refresh == null)
-                {
-                    refresh = new RelayCommand(() =>
-                    {                        
-                        if (context != null)
-                            context.Dispose();
-
-                        context = new GenesisContext();
-
-                        Genes.Clear();
-                        foreach (var gene in context.Genes.OrderBy(g => g.StartBasePair))
-                        {
-                            Genes.Add(new GeneViewModel(gene));
-                        }
-
-                        RaisePropertyChanged(() => FrequencyAnalysis);
-                        RaisePropertyChanged(() => Species);
-                        SelectedSpecies = Species.FirstOrDefault();
-                    });
-                }
-
-                return refresh;
-            }
+            base.OnActivate();
+            ReloadData(); 
         }
 
 
@@ -196,12 +175,30 @@ namespace Genesis.ViewModels
                         var result = await Task.Run(() => currentAnalysis.Analyse(context));
                         context.FrequencyAnalysis.Add(result);
                         context.SaveChanges();
-                        Refresh.Execute(null);
+                        ReloadData();
                     }, () => currentAnalysis == null || currentAnalysis.Done);
                 }
 
                 return analyze;
             }
+        }
+
+        private void ReloadData()
+        {
+            if (context != null)
+                context.Dispose();
+
+            context = new GenesisContext();
+
+            Genes.Clear();
+            foreach (var gene in context.Genes.OrderBy(g => g.StartBasePair))
+            {
+                Genes.Add(new GeneViewModel(gene));
+            }
+
+            NotifyOfPropertyChange(() => FrequencyAnalysis);
+            NotifyOfPropertyChange(() => Species);
+            SelectedSpecies = Species.FirstOrDefault();
         }
 
         private FrequencyAnalyzer currentAnalysis { get; set; }

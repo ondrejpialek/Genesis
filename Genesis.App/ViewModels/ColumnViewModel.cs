@@ -1,9 +1,10 @@
+using Caliburn.Micro;
 using GalaSoft.MvvmLight;
 using Genesis.Excel;
 
 namespace Genesis.ViewModels
 {
-    public class ColumnViewModel : ViewModelBase
+    public class ColumnViewModel : PropertyChangedBase
     {
 
         public ColumnViewModel(string key, string name)
@@ -54,7 +55,7 @@ namespace Genesis.ViewModels
                 }
 
                 this.Set(() => Column, ref column, value);
-                RaisePropertyChanged(() => IsTraitCol);
+                NotifyOfPropertyChange(() => IsTraitCol);
             }
         }
 
@@ -82,7 +83,7 @@ namespace Genesis.ViewModels
                 if (traitCol != null)
                 {
                     traitCol.Gene = value;
-                    RaisePropertyChanged(() => Gene);
+                    NotifyOfPropertyChange(() => Gene);
                 }
             }
         }
