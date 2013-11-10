@@ -85,7 +85,7 @@ namespace Genesis.ViewModel
             else
             {
                 Fields = new ObservableCollection<ICellReader>(miceFields);
-                Fields.Add(new MouseLocalityColumn(context.Localities));
+                Fields.Add(new MouseLocalityColumn(context.Localities.ToList()));
             }
             RaisePropertyChanged(() => Fields);
         }

@@ -18,14 +18,16 @@ namespace Genesis.Excel
 
         protected override void Apply(Mouse entity, string value)
         {
-            var locality = localities.FirstOrDefault(l => string.Equals(l.Code, value, StringComparison.InvariantCultureIgnoreCase));
-            if (locality != null) {
-                if (entity.Locality != null)
-                {
-                    entity.Locality.Mice.Remove(entity);
-                }
-                locality.Mice.Add(entity);
+            if (entity.Locality != null)
+            {
+                if (entity.Locality.Code.Equals(value,StringComparison.InvariantCultureIgnoreCase))
+                    return;
+
+                entity.Locality.Mice.Remove(entity);
             }
+
+            var locality = localities.First(l => string.Equals(l.Code, value, StringComparison.InvariantCultureIgnoreCase));
+            locality.Mice.Add(entity);
             entity.Locality = locality;
         }
     }
