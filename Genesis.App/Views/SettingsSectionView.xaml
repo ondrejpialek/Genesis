@@ -3,9 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:cal="clr-namespace:Caliburn.Micro;assembly=Caliburn.Micro"
+             xmlns:cal="clr-namespace:Caliburn.Micro;assembly=Caliburn.Micro" xmlns:views="clr-namespace:Genesis.Views"
+             xmlns:designTimeSupport="clr-namespace:Caliburn.Micro.DesignTimeSupport;assembly=Caliburn.Micro.Contrib"
+             xmlns:viewModels="clr-namespace:Genesis.ViewModels"
              mc:Ignorable="d" 
-             d:DesignWidth="494.773" d:DesignHeight="420.56">
+             d:DesignWidth="494.773" d:DesignHeight="420.56" cal:Bind.AtDesignTime="True" d:DataContext="{d:DesignInstance viewModels:SettingsSectionViewModel, IsDesignTimeCreatable=True}"
+             >
 	<UserControl.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
@@ -18,7 +21,7 @@
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</UserControl.Resources>
-		
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.7*" />
@@ -28,7 +31,7 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TreeView ItemsSource="{Binding Chromosomes}" HorizontalContentAlignment="Stretch" Margin="{DynamicResource DefaultMargin}" Grid.IsSharedSizeScope="True">
+        <TreeView  x:Name="Chromosomes" HorizontalContentAlignment="Stretch" Margin="{DynamicResource DefaultMargin}" Grid.IsSharedSizeScope="True">
 			<TreeView.Resources>
 				<Style TargetType="TreeViewItem"> 
 					<Setter Property="IsExpanded" Value="True" /> 
@@ -37,13 +40,13 @@
 
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Genes}">
-                    <Grid>
+                    <Grid cal:Bind.ModelWithoutContext="{Binding}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Label Content="{Binding Name}"/>
-                        <Button Grid.Column="1" Command="{Binding AddTrait}" CommandParameter="{Binding}">Add trait</Button>
+                        <Button Grid.Column="1" x:Name="AddTrait">Add trait</Button>
                     </Grid>
                     <HierarchicalDataTemplate.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Alleles}">
@@ -59,19 +62,19 @@
 									<TextBox Text="{Binding StartBasePair}" MinWidth="100" />								
 								</StackPanel>
                                 <Button Command="{Binding Path=DataContext.RemoveTrait, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}, AncestorLevel=2}}" CommandParameter="{Binding}" Grid.Column="1">Remove trait</Button>
-                                <Button Command="{Binding Path=AddAllele}" CommandParameter="{Binding}" Grid.Column="2">Add allele</Button>
+                                <Button x:Name="AddAllele" Grid.Column="2">Add allele</Button>
                             </Grid>
                             <HierarchicalDataTemplate.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid cal:Bind.ModelWithoutContext="{Binding}" >
+                                    <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition></ColumnDefinition>
                                             <ColumnDefinition Width="Auto" SharedSizeGroup="SpeciesSelection" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         <TextBox Text="{Binding Value}" MinWidth="100" />
-                                        <ComboBox Grid.Column="1" ItemsSource="{Binding Species}" DisplayMemberPath="Name" SelectedItem="{Binding Species, Mode=TwoWay}"/>
-                                        <Button Grid.Column="2" cal:Message.Attach="RemoveAllele($dataContext)" CommandParameter="{Binding}">Remove allele</Button>
+                                        <ComboBox Grid.Column="1" SelectedItem="{Binding Species, Mode=TwoWay}" ItemsSource="{Binding Path=DataContext.Species, RelativeSource={RelativeSource AncestorType={x:Type views:SettingsSectionView}}}" DisplayMemberPath="Name" />
+                                        <Button Grid.Column="2" cal:Message.Attach="RemoveAllele($dataContext)">Remove allele</Button>
                                     </Grid>
                                 </DataTemplate>
                             </HierarchicalDataTemplate.ItemTemplate>
@@ -90,6 +93,7 @@
             <StackPanel Grid.Row="1" Orientation="Horizontal">
                 <Button Command="{Binding AddSpecies}">Add</Button>
                 <Button Command="{Binding RemoveSpecies}" CommandParameter="{Binding SelectedItem, ElementName=speciesBox}">Remove</Button>
+                <TextBox x:Name="DisplayName"></TextBox>
             </StackPanel>
             <ListBox x:Name="speciesBox" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding Species}">
                 <ListBox.ItemTemplate>

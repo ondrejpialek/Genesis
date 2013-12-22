@@ -125,25 +125,12 @@ namespace Genesis.ViewModels
             }
         }
 
-        private RelayCommand<FrequencyAnalysis> deleteAnalysis;
-        public RelayCommand<FrequencyAnalysis> DeleteAnalysis
+        public void DeleteAnalysis(FrequencyAnalysis analysis)
         {
-            get
-            {
-                if (deleteAnalysis == null)
-                {
-                    deleteAnalysis = new RelayCommand<FrequencyAnalysis>((a) =>
-                    {
-                        FrequencyAnalysis.Remove(a);
-                        context.SaveChanges();
-                    });
-                }
-
-                return deleteAnalysis;
-            }
+            FrequencyAnalysis.Remove(analysis);
+            context.SaveChanges();
         }
 
-        
         private string analysisName;
         public string AnalysisName
         {

@@ -5,7 +5,7 @@ namespace Genesis.Migrations
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<Genesis.GenesisContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<GenesisContext>
     {
         public Configuration()
         {
@@ -13,7 +13,7 @@ namespace Genesis.Migrations
             ContextKey = "Genesis.GenesisContext";
         }
 
-        protected override void Seed(Genesis.GenesisContext context)
+        protected override void Seed(GenesisContext context)
         {
             //  This method will be called after migrating to the latest version.
 

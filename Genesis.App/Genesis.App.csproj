@@ -81,11 +81,17 @@
     <Reference Include="Caliburn.Micro">
       <HintPath>..\packages\Caliburn.Micro.1.5.2\lib\net45\Caliburn.Micro.dll</HintPath>
     </Reference>
+    <Reference Include="Caliburn.Micro.Contrib">
+      <HintPath>..\packages\Caliburn.Micro-Contrib.1.0.2\lib\Net40\Caliburn.Micro.Contrib.dll</HintPath>
+    </Reference>
     <Reference Include="Castle.Core">
       <HintPath>..\packages\Castle.Core.3.2.0\lib\net45\Castle.Core.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Windsor">
       <HintPath>..\packages\Castle.Windsor.3.2.1\lib\net45\Castle.Windsor.dll</HintPath>
+    </Reference>
+    <Reference Include="DesignTimeProperties.WPF">
+      <HintPath>..\packages\Caliburn.Micro-Contrib.1.0.2\lib\Net40\DesignTimeProperties.WPF.dll</HintPath>
     </Reference>
     <Reference Include="DotSpatial.Controls, Version=1.5.0.0, Culture=neutral, PublicKeyToken=4d9e49339a7d240c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -136,11 +142,11 @@
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\EntityFramework.6.0.0-beta1-20601\lib\net45\EntityFramework.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.0.1-alpha1-20811\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\EntityFramework.6.0.0-beta1-20601\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+      <HintPath>..\packages\EntityFramework.6.0.1-alpha1-20811\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="GalaSoft.MvvmLight.Extras.WPF45, Version=4.1.27.22784, Culture=neutral, PublicKeyToken=0e27b6f8be9b2ef7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -150,9 +156,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MvvmLightLibs.4.1.27.0\lib\net45\GalaSoft.MvvmLight.WPF45.dll</HintPath>
     </Reference>
-    <Reference Include="MahApps.Metro, Version=0.9.0.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
+    <Reference Include="MahApps.Metro, Version=0.11.0.38, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MahApps.Metro.0.10.0.0\lib\net40\MahApps.Metro.dll</HintPath>
+      <HintPath>..\packages\MahApps.Metro.0.11.0.38-ALPHA\lib\net45\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro.Resources">
       <HintPath>..\lib\MahApps.Metro\MahApps.Metro.Resources.dll</HintPath>
@@ -175,7 +181,9 @@
       <HintPath>C:\Program Files (x86)\Microsoft SQL Server\110\SDK\Assemblies\Microsoft.SqlServer.Types.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Reactive">
@@ -187,7 +195,7 @@
     <Reference Include="System.Windows.Controls.Ribbon" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Caliburn.Micro.1.5.2\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <HintPath>..\packages\MahApps.Metro.0.11.0.38-ALPHA\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -262,6 +270,10 @@
     <Compile Include="Migrations\201306021340169_FixAlleleRecordFKs.cs" />
     <Compile Include="Migrations\201306021340169_FixAlleleRecordFKs.Designer.cs">
       <DependentUpon>201306021340169_FixAlleleRecordFKs.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201308112151461_Diff.cs" />
+    <Compile Include="Migrations\201308112151461_Diff.Designer.cs">
+      <DependentUpon>201308112151461_Diff.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ViewModels\FrequenciesSectionViewModel.cs" />
@@ -377,6 +389,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201306021340169_FixAlleleRecordFKs.resx">
       <DependentUpon>201306021340169_FixAlleleRecordFKs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201308112151461_Diff.resx">
+      <DependentUpon>201308112151461_Diff.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

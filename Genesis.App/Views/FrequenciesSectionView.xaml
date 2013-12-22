@@ -4,9 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-            
-             xmlns:Behaviours="clr-namespace:Genesis.Behaviours"
-             xmlns:command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF45"
+             xmlns:Behaviours="clr-namespace:Genesis.Behaviours" xmlns:cal="http://www.caliburnproject.org"
              x:Class="Genesis.Views.FrequenciesSectionView" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
@@ -46,7 +44,7 @@
             			<Label Content="{Binding Analyzed}"/>
             			<Label Content=")"/>
             		</StackPanel>
-            		<Button Grid.Column="1" Width="20" Command="{Binding Analyze.DeleteAnalysis, Source={StaticResource Locator}}" CommandParameter="{Binding}">
+            		<Button Grid.Column="1" Width="20" cal:Message.Attach="DeleteAnalysis($dataContext)" CommandParameter="{Binding}">
             			<Path Style="{StaticResource DeleteGlyph}" Margin="1,1,1,1" />
             		</Button>
 				</Grid>
@@ -87,12 +85,8 @@
         		<RowDefinition/>
         		<RowDefinition Height="Auto"/>
         	</Grid.RowDefinitions>
-        	<ListView ItemsSource="{Binding FrequencyAnalysis}" ItemTemplate="{DynamicResource AnalysisDataTemplate}" Margin="{DynamicResource DefaultMargin}">
-        		<i:Interaction.Behaviors>
-        			<Behaviours:SynchronizeSelectedItems Selections="{Binding SelectedAnalysis}"/>
-        		</i:Interaction.Behaviors>
-        	</ListView>
-        	<UniformGrid HorizontalAlignment="Right" Rows="1" Grid.Row="1">
+        	<ListBox x:Name="FrequencyAnalysis" ItemTemplate="{DynamicResource AnalysisDataTemplate}" Margin="{DynamicResource DefaultMargin}" />
+            <UniformGrid HorizontalAlignment="Right" Rows="1" Grid.Row="1">
         		<Button Margin="{DynamicResource DefaultMargin}" Command="{Binding Export}">
         			<StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
         				<Rectangle Width="32" Height="32">

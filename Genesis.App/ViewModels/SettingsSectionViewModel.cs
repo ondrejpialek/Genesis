@@ -18,6 +18,12 @@ namespace Genesis.ViewModels
         {
             DisplayName = "Settings";
             Order = 100;
+
+            if (Execute.InDesignMode)
+            {
+                context = new GenesisContext();
+                context.Species.Load();
+            }
         }
 
         #region tree view models
@@ -103,21 +109,14 @@ namespace Genesis.ViewModels
                 Alleles = new ObservableCollection<AlleleViewModel>(g.Alleles.Select(a => new AlleleViewModel(a)));
             }
 
-            private RelayCommand addAllele;
-            public RelayCommand AddAllele
+            public void AddAllele()
             {
-                get
+                var allele = new Allele()
                 {
-                    return addAllele ?? (addAllele = new RelayCommand(() =>
-                    {
-                        var allele = new Allele()
-                        {
-                            Value = "NEW ALLELE"
-                        };
-                        gene.Alleles.Add(allele);
-                        Alleles.Add(new AlleleViewModel(allele));
-                    }));
-                }
+                    Value = "NEW ALLELE"
+                };
+                gene.Alleles.Add(allele);
+                Alleles.Add(new AlleleViewModel(allele)); 
             }
 
             public void RemoveAllele(AlleleViewModel allele)
@@ -160,22 +159,16 @@ namespace Genesis.ViewModels
                 }
             }
 
-            private RelayCommand addTrait;
-            public RelayCommand AddTrait
+            public void AddTrait()
             {
-                get
+                var gene = new Gene()
                 {
-                    return addTrait ?? (addTrait = new RelayCommand(() =>
-                    {
-                        var gene = new Gene()
-                        {
-                            Name = "NEW GENE"
-                        };
+                    Name = "NEW GENE"
+                };
                         
-                        chromosome.Genes.Add(gene);
-                        this.Genes.Add(new GeneViewModel(gene, context));
-                    }));
-                }
+                chromosome.Genes.Add(gene);
+                this.Genes.Add(new GeneViewModel(gene, context));
+                context.Genes.Add(gene);
             }
 
             private RelayCommand<GeneViewModel> removeTrait;
@@ -183,7 +176,7 @@ namespace Genesis.ViewModels
             {
                 get
                 {
-                    return removeTrait ?? (removeTrait = new RelayCommand<GeneViewModel>((g) =>
+                    return removeTrait ?? (removeTrait = new RelayCommand<GeneViewModel>(g =>
                     {
                         chromosome.Genes.Remove(g.GetGene());
                         this.Genes.Remove(g);
