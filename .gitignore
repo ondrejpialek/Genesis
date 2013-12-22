@@ -5,3 +5,7 @@ obj
 *.psess
 *.vsp
 deploy
+/.nuget/NuGet.exe
+/packages
+/db/backups
+/assets/data

@@ -6,12 +6,13 @@ using System.Text;
 using Genesis.App.Data;
 using Genesis.Migrations;
 
+
 namespace Genesis
 {
     public class GenesisContext : DbContext
     {
         static GenesisContext()
-        {
+        {   
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<GenesisContext, Configuration>());
         }
 

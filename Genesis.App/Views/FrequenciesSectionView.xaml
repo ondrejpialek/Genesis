@@ -1,0 +1,103 @@
+﻿<UserControl
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:Behaviours="clr-namespace:Genesis.Behaviours" xmlns:cal="http://www.caliburnproject.org"
+             x:Class="Genesis.Views.FrequenciesSectionView" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+             >
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+				<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+			</ResourceDictionary.MergedDictionaries>
+			<DataTemplate x:Key="GeneDataTemplate">
+				<StackPanel Orientation="Horizontal">
+					<CheckBox IsChecked="{Binding Selected}" VerticalAlignment="Center"/>
+					<Label Content="{Binding Gene.Name}"/>
+				</StackPanel>
+			</DataTemplate>
+			<DataTemplate x:Key="SpeciesDataTemplate">
+				<Label Content="{Binding Name}"/>
+			</DataTemplate>
+			<DataTemplate x:Key="AnalysisDataTemplate">
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+            		<StackPanel Orientation="Horizontal">
+            			<CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay,
+      RelativeSource={RelativeSource FindAncestor, 
+      AncestorType={x:Type ListViewItem}}}"  
+								  Margin="0,0,6,0" VerticalAlignment="Center"/>
+            			<Label Content="{Binding Name}"/>
+            			<Label Content="("/>
+            			<Label Content="{Binding Analyzed}"/>
+            			<Label Content=")"/>
+            		</StackPanel>
+            		<Button Grid.Column="1" Width="20" cal:Message.Attach="DeleteAnalysis($dataContext)" CommandParameter="{Binding}">
+            			<Path Style="{StaticResource DeleteGlyph}" Margin="1,1,1,1" />
+            		</Button>
+				</Grid>
+			</DataTemplate>
+		</ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+    	<Grid.RowDefinitions>
+    		<RowDefinition Height="Auto"/>
+    		<RowDefinition/>
+    	</Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <ProgressBar Grid.ColumnSpan="2" VerticalAlignment="Top" Value="{Binding Progress}" Margin="{DynamicResource DefaultHorizontalMargin}" Maximum="1" SmallChange="0.01" LargeChange="0.1"/>
+        <Grid Margin="0,0,5,0" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Margin="{DynamicResource DefaultMargin}"><Run Text="Calculate frequencies of"/></TextBlock>
+            <ListView Grid.Row="2" ItemsSource="{Binding Genes}" ItemTemplate="{DynamicResource GeneDataTemplate}" Margin="{DynamicResource DefaultHorizontalMargin}"/>
+            <TextBlock Grid.Row="3" Margin="{DynamicResource DefaultMargin}"><Run Text="for species"/></TextBlock>
+            <ComboBox Grid.Row="4" Padding="4" ItemsSource="{Binding Species}" SelectedItem="{Binding SelectedSpecies, Mode=TwoWay}" ItemTemplate="{DynamicResource SpeciesDataTemplate}" Margin="{DynamicResource DefaultHorizontalMargin}"/>
+            <TextBlock Grid.Row="5" Margin="{DynamicResource DefaultMargin}"><Run Text="named"/></TextBlock>
+            <TextBox Grid.Row="6" Margin="6,0,6,6" Text="{Binding AnalysisName, Mode=TwoWay}"/>
+            <Button Grid.Row="7" Padding="4" Command="{Binding Analyze}" Margin="{DynamicResource DefaultMargin}" Content="Go"/>
+        </Grid>
+        <Grid Grid.Column="1" Grid.Row="1">
+        	<Grid.RowDefinitions>
+        		<RowDefinition/>
+        		<RowDefinition Height="Auto"/>
+        	</Grid.RowDefinitions>
+        	<ListBox x:Name="FrequencyAnalysis" ItemTemplate="{DynamicResource AnalysisDataTemplate}" Margin="{DynamicResource DefaultMargin}" />
+            <UniformGrid HorizontalAlignment="Right" Rows="1" Grid.Row="1">
+        		<Button Margin="{DynamicResource DefaultMargin}" Command="{Binding Export}">
+        			<StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
+        				<Rectangle Width="32" Height="32">
+        					<Rectangle.Fill>
+        						<VisualBrush Visual="{StaticResource appbar_page_excel}" Stretch="Uniform"/>
+        					</Rectangle.Fill>
+        				</Rectangle>
+        				<TextBlock TextWrapping="Wrap" Text="EXPORT" VerticalAlignment="Center"/>
+        			</StackPanel>
+        		</Button>
+        	</UniformGrid>
+        </Grid>
+    </Grid>
+</UserControl>
