@@ -234,7 +234,7 @@ namespace Genesis.ViewModels
                         if (layer.IsSelected)
                         {
                             layerBeingEdited = layer;
-                            RaisePropertyChanged(() => AddPoint);
+                            NotifyOfPropertyChange(() => AddPoint);
 
                             Points.Clear();
 
