@@ -14,14 +14,6 @@
              >
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
-            </ResourceDictionary.MergedDictionaries>
             <Style TargetType="{x:Type m:Pushpin}">
                 <Setter Property="Template">
                     <Setter.Value>
@@ -60,9 +52,6 @@
         </ResourceDictionary>
 
     </UserControl.Resources>
-    <UserControl.DataContext>
-        <Binding Path="Data" Source="{StaticResource Locator}"/>
-    </UserControl.DataContext>
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded" >
             <command:EventToCommand Command="{Binding Refresh}" />

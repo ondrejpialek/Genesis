@@ -25,7 +25,7 @@ namespace Genesis.Bootstrap
                 Component.For<IWindowManager>().ImplementedBy<WindowManager>().LifestyleSingleton(),
                 Component.For<IEventAggregator>().ImplementedBy<EventAggregator>().LifestyleSingleton(),
                 Classes.FromThisAssembly().InSameNamespaceAs<IShellViewModel>()
-                       .If(t => t.GetInterfaces().Any(i => i == typeof (IScreen))).WithServiceDefaultInterfaces().LifestyleTransient()
+                       .If(t => t.GetInterfaces().Any(i => i == typeof (IScreen))).WithServiceDefaultInterfaces().LifestyleSingleton()
                 );
 
             container.Install(FromAssembly.This());

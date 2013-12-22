@@ -6,7 +6,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF45">
+             xmlns:command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF45"
+             xmlns:cal="http://www.caliburnproject.org">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded" >
             <command:EventToCommand Command="{Binding Refresh}" />
@@ -34,7 +35,7 @@
                     <Label Content="{Binding Analyzed}"></Label>
                     <Label>)</Label>
                 </StackPanel>
-                <Button Grid.Column="1" Width="20" Command="{Binding Source={StaticResource Locator}, Path=Fst.DeleteAnalysis}" CommandParameter="{Binding}">
+                <Button Grid.Column="1" Width="20" cal:Message.Attach="DeleteAnalysis($datacontext)">
                     <Path Style="{StaticResource DeleteGlyph}" Margin="1,1,1,1" />
                 </Button>
             </Grid>
