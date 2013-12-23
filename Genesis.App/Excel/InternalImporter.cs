@@ -31,7 +31,8 @@ namespace Genesis.Excel
 
         private TaskScheduler synchronizedScheduler;
 
-        private DbSet<TEntity> repository;
+        private readonly Func<DbSet<TEntity>, IEnumerable<TEntity>> currentDataLoad;
+        private readonly Action<GenesisContext> warmupAction;
 
         private CancellationToken cancellationToken;
 
@@ -44,13 +45,16 @@ namespace Genesis.Excel
         private IEnumerable<TEntity> results;
 
         private WorksheetReader<TEntity> worksheetReader;
+        private GenesisContext context;
 
         #endregion
 
-        public InternalImporter(DbSet<TEntity> repository, TaskScheduler synchronizedScheduler, CancellationToken cancellationToken)
+        public InternalImporter(GenesisContext context, Func<DbSet<TEntity>, IEnumerable<TEntity>> currentDataLoad, Action<GenesisContext> warmupAction, TaskScheduler synchronizedScheduler, CancellationToken cancellationToken)
         {
             this.synchronizedScheduler = synchronizedScheduler;
-            this.repository = repository;
+            this.context = context;
+            this.currentDataLoad = currentDataLoad;
+            this.warmupAction = warmupAction;
             this.cancellationToken = cancellationToken;
         }
 
@@ -128,7 +132,13 @@ namespace Genesis.Excel
         {
             step = (double)1 / worksheetReader.GetRecordCount();
 
-            var records = repository.ToList();
+            warmupAction(context);
+            var repository = context.Set<TEntity>();
+            var records = currentDataLoad(repository).ToList();
+
+            context.Configuration.AutoDetectChangesEnabled = false;
+            context.Configuration.ValidateOnSaveEnabled = false;
+
             var imports = worksheetReader.Records;
 
             var o = Observable.Create<Tuple<RowApplicator<TEntity>, TEntity>>(observer => {

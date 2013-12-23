@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.Entity;
 using System.Linq;
 using System.Windows;
 using Caliburn.Micro;
@@ -244,7 +245,7 @@ namespace Genesis.ViewModels
                 importArgs.Columns.Add((ICellReader<Mouse>)columnViewModel.Column);
             }
 
-            var excelImport = new ExcelImport<Mouse>(context);
+            var excelImport = new ExcelImport<Mouse>(context, mice => mice.Include("Alleles.Allele").Include("Locality"), c => c.Localities.Include("Mice").Load());
             excelImport.ProgressChanged += new EventHandler((o, e) =>
             {
                 Progress = excelImport.Progress * 100;
@@ -280,7 +281,7 @@ namespace Genesis.ViewModels
                 importArgs.Columns.Add((ICellReader<Locality>)column.Column);
             }
 
-            var excelImport = new ExcelImport<Locality>(context);
+            var excelImport = new ExcelImport<Locality>(context, locality => locality, _ => { });
             excelImport.ProgressChanged += new EventHandler((o, e) =>
             {
                 Progress = excelImport.Progress * 100;

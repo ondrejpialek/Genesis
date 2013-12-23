@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,6 +24,8 @@ namespace Genesis.Excel
     {
 
         private GenesisContext context;
+        private readonly Func<DbSet<TEntity>, IEnumerable<TEntity>> currentDataLoad;
+        private readonly Action<GenesisContext> warmupAction;
 
         private DbSet<TEntity> repository;
 
@@ -45,10 +48,12 @@ namespace Genesis.Excel
         ///TODO: concurrent dictionary on errors
         //http://msdn.microsoft.com/en-us/library/ee378677.aspx
 
-        public ExcelImport(GenesisContext context)
+        public ExcelImport(GenesisContext context, Func<DbSet<TEntity>, IEnumerable<TEntity>> currentDataLoad, Action<GenesisContext> warmupAction)
             : base()
         {
             this.context = context;
+            this.currentDataLoad = currentDataLoad;
+            this.warmupAction = warmupAction;
             this.repository = context.Set<TEntity>();
 
             progress = 0;
@@ -79,7 +84,7 @@ namespace Genesis.Excel
 
             ArgsParser<TEntity> parser = new ArgsParser<TEntity>(args);
             cancellationTokenSource = new CancellationTokenSource();
-            importer = new InternalImporter<TEntity>(repository, TaskScheduler.FromCurrentSynchronizationContext(), cancellationTokenSource.Token);
+            importer = new InternalImporter<TEntity>(context, currentDataLoad, warmupAction, TaskScheduler.FromCurrentSynchronizationContext(), cancellationTokenSource.Token);
             importer.ProgressUpdate = step => Progress += step;
             importer.CompletedAction = OnFinished;
             importer.CancelledAction = OnCancelled;

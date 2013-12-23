@@ -4,7 +4,7 @@
         xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:behaviours="http://metro.mahapps.com/winfx/xaml/shared"
-        Title="Genesis" Height="350" Width="525">
+        Title="Genesis" Height="550" Width="825">
     <i:Interaction.Behaviors>
         <behaviours:BorderlessWindowBehavior ResizeWithGrip="True" AllowsTransparency="False" />
     </i:Interaction.Behaviors>

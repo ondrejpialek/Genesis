@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,7 +29,12 @@ namespace Genesis.Analysis
             analysis.Analyzed = DateTime.Now;
             analysis.Name = this.Title;
 
-            var localities = context.Localities.ToList();
+            //prepare context
+            context.Configuration.AutoDetectChangesEnabled = false;
+            context.Configuration.ValidateOnSaveEnabled = false;
+            context.Mice.Include(m => m.Alleles.Select(a => a.Allele)).Load();
+
+            var localities = context.Localities.Include(l => l.Mice).ToList();
             var recordCount = localities.Count;
   
             if (recordCount > 0)
