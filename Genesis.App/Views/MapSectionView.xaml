@@ -139,14 +139,14 @@
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="127*" />
-            <ColumnDefinition Width="222*"/>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <VisualStateManager.CustomVisualStateManager>
             <ei:ExtendedVisualStateManager/>
         </VisualStateManager.CustomVisualStateManager>
-        <Grid Grid.ColumnSpan="3">
+        <Grid x:Name="topBar" Grid.ColumnSpan="3">
             <UniformGrid HorizontalAlignment="Left" Rows="1">
                 <ToggleButton Margin="{DynamicResource DefaultMargin}">
                     <i:Interaction.Behaviors>
@@ -174,13 +174,13 @@
             </UniformGrid>
         </Grid>
 
-        <Grid Grid.Row="1">
+        <Grid x:Name="polylinePane" Grid.Row="1" Visibility="Collapsed">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"></RowDefinition>
                 <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
             <Button Margin="{StaticResource DefaultMargin}" Command="{Binding AddPoint}">Add point</Button>
-            <ListBox ItemsSource="{Binding Points}"/>
+            <ListBox Grid.Row="1" ItemsSource="{Binding Points}"/>
         </Grid>
         
 
