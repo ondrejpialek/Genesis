@@ -25,16 +25,21 @@ namespace Genesis.ViewModels
         public ObservableCollection<string> Sheets { get; private set; }
         public ObservableCollection<ColumnViewModel> Columns { get; protected set; }
         public ObservableCollection<ICellReader> Fields { get; protected set; }
-        
+
+        private ObservableCollection<Gene> genes;
         public ObservableCollection<Gene> Genes
         {
             get
             {
-                if (context != null) {
-                    context.Genes.ToList();
-                    return context.Genes.Local;
+                if (genes == null)
+                {
+                    if (context != null) {
+                        context.Genes.Load();
+                        genes = context.Genes.Local;
+                    }
                 }
-                return null;
+
+                return genes;
             }
         }
 
