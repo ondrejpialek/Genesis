@@ -81,7 +81,6 @@
             <StackPanel Grid.Row="1" Orientation="Horizontal">
                 <Button Command="{Binding AddSpecies}">Add</Button>
                 <Button Command="{Binding RemoveSpecies}" CommandParameter="{Binding SelectedItem, ElementName=speciesBox}">Remove</Button>
-                <TextBox x:Name="DisplayName"></TextBox>
             </StackPanel>
             <ListBox x:Name="speciesBox" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding Species}">
                 <ListBox.ItemTemplate>
