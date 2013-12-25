@@ -26,7 +26,9 @@ namespace Genesis.Excel
                 entity.Locality.Mice.Remove(entity);
             }
 
-            var locality = localities.First(l => string.Equals(l.Code, value, StringComparison.InvariantCultureIgnoreCase));
+            var locality = localities.FirstOrDefault(l => string.Equals(l.Code, value, StringComparison.InvariantCultureIgnoreCase));
+            if (locality == null)
+                throw new Exception("Cannot find locality " + value);
             locality.Mice.Add(entity);
             entity.Locality = locality;
         }

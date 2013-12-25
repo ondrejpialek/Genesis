@@ -120,7 +120,6 @@ namespace Genesis.Excel
             {
                 importer.Save();
                 importer = null;
-                context.SaveChanges();
                 OnSaved();
             }
         }

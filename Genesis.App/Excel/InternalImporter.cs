@@ -120,12 +120,10 @@ namespace Genesis.Excel
 
         public void Save()
         {
-            /*repository.
-            foreach (TEntity entity in results)
-            {
-                repository. (entity);
-            }*/
-            //repository.
+            context.ChangeTracker.DetectChanges();
+            context.SaveChanges();
+            context.Configuration.AutoDetectChangesEnabled = true;
+            context.Configuration.ValidateOnSaveEnabled = true;
         }
 
         private void Import()
@@ -166,7 +164,7 @@ namespace Genesis.Excel
                 return () => { };
             });
 
-            results = o.ObserveOn(Scheduler.TaskPool).Select(x => Update(x.Item1, x.Item2)).ToList().First();
+            results = o.ObserveOn(Scheduler.TaskPool).Select(x => Update(x.Item1, x.Item2)).ToList().Wait();
         }
 
         private TEntity Update(RowApplicator<TEntity> applicator, TEntity entity) {

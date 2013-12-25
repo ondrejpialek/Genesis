@@ -16,11 +16,11 @@ namespace Genesis
         public virtual String Code { get; set; }
         public virtual DbGeography Location { get; set; }
 
-        public virtual ICollection<Mouse> Mice { get; private set; }
-
-        public Locality()
+        private ICollection<Mouse> mice;
+        public virtual ICollection<Mouse> Mice
         {
-            Mice = new List<Mouse>();
+            get { return mice ?? (mice = new List<Mouse>()); }
+            set { mice = value; }
         }
 
         public override string ToString()

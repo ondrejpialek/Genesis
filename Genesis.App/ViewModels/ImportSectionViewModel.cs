@@ -94,10 +94,11 @@ namespace Genesis.ViewModels
             else
             {
                 Fields = new ObservableCollection<ICellReader>(miceFields);
-                Fields.Add(new MouseLocalityColumn(context.Localities.ToList()));
+                Fields.Add(new MouseLocalityColumn(context.Localities.Include(l => l.Mice).ToList()));
             }
 
             NotifyOfPropertyChange(() => Fields);
+            ApplyConventions();
         }
 
         private ImportType selectedImport = ImportType.Localities;
@@ -198,6 +199,23 @@ namespace Genesis.ViewModels
                 if (string.IsNullOrEmpty(column))
                     continue;
                 Columns.Add(new ColumnViewModel(letter, column));
+            }
+
+            ApplyConventions();
+        }
+
+        private void ApplyConventions()
+        {
+            foreach (var field in Fields)
+            {
+                foreach (var column in Columns)
+                {
+                    if (column.Name.Equals(field.Name, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        column.Column = field;
+                        break;
+                    }
+                }
             }
         }
 
