@@ -34,7 +34,7 @@ namespace Genesis.ViewModels
                 if (genes == null)
                 {
                     if (context != null) {
-                        context.Genes.Load();
+                        context.Genes.Include(g => g.Alleles).Include(g => g.Chromosome).Load();
                         genes = context.Genes.Local;
                     }
                 }
