@@ -5,8 +5,6 @@ using System.Data.Entity;
 using System.Linq;
 using System.Windows;
 using Caliburn.Micro;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
 using Genesis.Excel;
 using Microsoft.Win32;
 
@@ -56,20 +54,6 @@ namespace Genesis.ViewModels
 
             Sheets = new ObservableCollection<string>();
             Columns = new ObservableCollection<ColumnViewModel>();
-
-            Messenger.Default.Register<GenericMessage<Message>>(this, (m) =>
-            {
-                if (m.Target != this)
-
-                switch (m.Content)
-                {
-                    case Message.Refresh:
-                        Refresh();
-                        break;
-                }
-            });
-
-            Refresh();
         }
 
         protected override void OnActivate()
@@ -130,39 +114,27 @@ namespace Genesis.ViewModels
 
         private IExcelFile excelFile;
 
-        private RelayCommand browse;
-        public RelayCommand Browse
+        public void Browse()
         {
-            get
+            var dialog = new OpenFileDialog();
+            dialog.FileName = Filename;
+            dialog.Filter = null;
+            bool result = dialog.ShowDialog() ?? false;
+            if (result)
             {
-                if (browse == null)
+                Filename = dialog.FileName;
+                if (excelFile != null)
                 {
-                    browse = new RelayCommand(() =>
-                    {
-                        var dialog = new OpenFileDialog();
-                        dialog.FileName = Filename;
-                        dialog.Filter = null;
-                        bool result = dialog.ShowDialog() ?? false;
-                        if (result)
-                        {
-                            Filename = dialog.FileName;
-                            if (excelFile != null)
-                            {
-                                excelFile.Dispose();
-                                excelFile = null;
-                            }
-                            excelFile = excelService.Open(filename);
-                            Sheets.Clear();
-                            var worksheets = excelFile.Worksheets;
-                            foreach (var sheet in worksheets)
-                            {
-                                Sheets.Add(sheet.Name);
-                            }
-                        }
-                    });
+                    excelFile.Dispose();
+                    excelFile = null;
                 }
-
-                return browse;
+                excelFile = excelService.Open(filename);
+                Sheets.Clear();
+                var worksheets = excelFile.Worksheets;
+                foreach (var sheet in worksheets)
+                {
+                    Sheets.Add(sheet.Name);
+                }
             }
         }
 
@@ -232,33 +204,21 @@ namespace Genesis.ViewModels
             }
         }
 
-        private RelayCommand import;
-        public RelayCommand Import
+        public void Import()
         {
-            get
+            if (SelectedImport == ImportType.Localities)
             {
-                if (import == null)
-                {
-                    import = new RelayCommand(() =>
-                    {
-                        if (SelectedImport == ImportType.Localities)
-                        {
-                            DoImportLocalities();
-                        }
-                        else
-                        {
-                            DoImportData();
-                        }
-                    });
-                }
-
-                return import;
+                DoImportLocalities();
+            }
+            else
+            {
+                DoImportData();
             }
         }
 
         private void DoImportData()
         {
-            ImportArgs<Mouse> importArgs = new ImportArgs<Mouse>();
+            var importArgs = new ImportArgs<Mouse>();
             importArgs.Filename = filename;
             importArgs.WorkSheetName = sheet;
             importArgs.Columns.Clear();
@@ -294,7 +254,7 @@ namespace Genesis.ViewModels
 
         private void DoImportLocalities()
         {
-            ImportArgs<Locality> importArgs = new ImportArgs<Locality>();
+            var importArgs = new ImportArgs<Locality>();
             importArgs.Filename = filename;
             importArgs.WorkSheetName = sheet;
             importArgs.Columns.Clear();

@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Caliburn.Micro;
-using GalaSoft.MvvmLight;
 using Microsoft.Maps.MapControl.WPF;
 
 namespace Genesis.ViewModels

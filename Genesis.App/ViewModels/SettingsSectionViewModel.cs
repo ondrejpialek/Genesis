@@ -4,9 +4,6 @@ using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
 using Caliburn.Micro;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
 
 namespace Genesis.ViewModels
 {
@@ -171,18 +168,11 @@ namespace Genesis.ViewModels
                 context.Genes.Add(gene);
             }
 
-            private RelayCommand<GeneViewModel> removeTrait;
-            public RelayCommand<GeneViewModel> RemoveTrait
+            public void RemoveTrait(GeneViewModel geneViewModel)
             {
-                get
-                {
-                    return removeTrait ?? (removeTrait = new RelayCommand<GeneViewModel>(g =>
-                    {
-                        chromosome.Genes.Remove(g.GetGene());
-                        this.Genes.Remove(g);
-                        context.Genes.Remove(g.GetGene());
-                    }));
-                }
+                chromosome.Genes.Remove(geneViewModel.GetGene());
+                this.Genes.Remove(geneViewModel);
+                context.Genes.Remove(geneViewModel.GetGene());
             }
         }
 
@@ -226,90 +216,48 @@ namespace Genesis.ViewModels
             }
         }
 
-        private RelayCommand addSpecies;
-        public RelayCommand AddSpecies
+        public void AddSpecies()
         {
-            get
+            context.Species.Add(new Species()
             {
-                return addSpecies ?? (addSpecies = new RelayCommand(() =>
+                Name = "NEW SPECIES"
+            });
+        }
+
+        public void RemoveSpecies(Species species)
+        {
+            context.Species.Remove(species);
+        }
+
+        public void Recreate()
+        {
+            context.Database.Delete();
+        }
+
+        public void Reset()
+        {
+            var localities = context.Localities.ToList();
+            foreach (var l in localities)
+                context.Localities.Remove(l);
+            context.SaveChanges();
+        }
+
+        public void Save()
+        {
+            try
+            {
+                context.SaveChanges();
+            }
+            catch (DbEntityValidationException e)
+            {
+                foreach (var err in e.EntityValidationErrors)
                 {
-                    context.Species.Add(new Species()
+                    foreach (var msg in err.ValidationErrors)
                     {
-                        Name = "NEW SPECIES"
-                    });
-                }));
-            }
-        }
-
-        private RelayCommand<Species> removeSpecies;
-        public RelayCommand<Species> RemoveSpecies
-        {
-            get
-            {
-                return removeSpecies ?? (removeSpecies = new RelayCommand<Species>((s) =>
-                {
-                    context.Species.Remove(s);
-                }));
-            }
-        }
-
-        private RelayCommand recreate;
-        public RelayCommand Recreate
-        {
-            get
-            {
-                return recreate ?? (recreate = new RelayCommand(() =>
-                {
-                    context.Database.Delete();
-                    Refresh();
-                }));
-            }
-        }
-
-        private RelayCommand reset;
-        public RelayCommand Reset
-        {
-            get
-            {
-                return reset ?? (reset = new RelayCommand(() =>
-                {
-                    var localities = context.Localities.ToList();
-                    foreach (var l in localities)
-                        context.Localities.Remove(l);
-                    context.SaveChanges();
-                    Refresh();
-                }));
-            }
-        }
-
-        private RelayCommand save;
-        public RelayCommand Save
-        {
-            get
-            {
-                if (save == null)
-                {
-                    save = new RelayCommand(() =>
-                    {
-                        try
-                        {
-                            context.SaveChanges();
-                        }
-                        catch (DbEntityValidationException e)
-                        {
-                            foreach (var err in e.EntityValidationErrors)
-                            {
-                                foreach (var msg in err.ValidationErrors)
-                                {
-                                    Console.WriteLine("{1} ({0}): {2} - {3}", err.Entry.Entity.GetType(), err.Entry.Entity, msg.PropertyName, msg.ErrorMessage);
-                                }
-                            }
-                            throw;
-                        }
-                    });
+                        Console.WriteLine("{1} ({0}): {2} - {3}", err.Entry.Entity.GetType(), err.Entry.Entity, msg.PropertyName, msg.ErrorMessage);
+                    }
                 }
-
-                return save;
+                throw;
             }
         }
     }

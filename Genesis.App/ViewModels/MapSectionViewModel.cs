@@ -12,9 +12,6 @@ using DotSpatial.Data;
 using DotSpatial.Data.Forms;
 using DotSpatial.Projections;
 using DotSpatial.Topology;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Win32;
 using Location = Microsoft.Maps.MapControl.WPF.Location;
 using Point = DotSpatial.Topology.Point;
@@ -38,23 +35,17 @@ namespace Genesis.ViewModels
         private const double CM_PER_INCH = 2.54;
         private readonly ImageFormat[] formats = new[] {ImageFormat.Bmp, ImageFormat.Jpeg, ImageFormat.Png, ImageFormat.Gif, ImageFormat.Tiff};
         private readonly Unit[] units = new[] {Unit.cm, Unit.px};
-        private RelayCommand addLayer;
-        private ICommand addPolyline;
-        private RelayCommand<string> changeView;
-        private RelayCommand clearLayers;
 
         private GenesisContext context;
         private double height = 600;
         private ImageFormat imageFormat = ImageFormat.Png;
         private int resolution = 300;
-        private RelayCommand saveImage;
 
         private FrequencyAnalysis selectedAnalysis;
         private Unit selectedUnit = Unit.px;
         private IMapFeatureLayer spatialDataLayer;
         private Map spatialMap;
-        private RelayCommand<Legend> spatialMapLegendLoaded;
-        private RelayCommand<Map> spatialMapLoaded;
+
         private Legend spatialMaplegend;
         private MapView view = MapView.Localities;
         private double width = 800;
@@ -69,21 +60,6 @@ namespace Genesis.ViewModels
 
             Data = new ObservableCollection<PushpinViewModel>();
             Points = new ObservableCollection<Point>();
-
-            Messenger.Default.Register<GenericMessage<Message>>(this, m =>
-            {
-                if (m.Target != this)
-                    return;
-
-                switch (m.Content)
-                {
-                    case Message.Refresh:
-                        Refresh();
-                        break;
-                }
-            });
-
-
         }
 
         public FrequencyAnalysis SelectedAnalysis
@@ -129,7 +105,6 @@ namespace Genesis.ViewModels
 
         public ObservableCollection<Point> Points;
         private MapLineLayer layerBeingEdited;
-        private RelayCommand addPoint;
 
         public MapView View
         {
@@ -144,178 +119,142 @@ namespace Genesis.ViewModels
             }
         }
 
-        public RelayCommand<string> ChangeView
+        public void ChangeView(string view)
         {
-            get
-            {
-                return changeView ?? (changeView = new RelayCommand<string>(
-                                                       p =>
-                                                       {
-                                                           View = (MapView) Enum.Parse(typeof (MapView), p);
-                                                       }));
-            }
+            View = (MapView)Enum.Parse(typeof(MapView), view);
         }
 
-        public RelayCommand<Map> SpatialMapLoaded
+        public void SpatialMapLoaded(Map map)
         {
-            get
-            {
-                return spatialMapLoaded ?? (spatialMapLoaded = new RelayCommand<Map>(map => InitGisMap(map)));
-            }
+            InitGisMap(map);
         }
 
-        public RelayCommand<Legend> SpatialMapLegendLoaded
+        public void SpatialMapLegendLoaded(Legend legend)
         {
-            get
+            if (spatialMaplegend == null)
             {
-                return spatialMapLegendLoaded ?? (spatialMapLegendLoaded = new RelayCommand<Legend>(legend =>
+                spatialMaplegend = legend;
+                if (spatialMap != null)
                 {
-                    if (spatialMaplegend == null)
+                    spatialMap.Legend = spatialMaplegend;
+                }
+            }
+        }
+
+        public void AddLayer()
+        {
+            List<IDataSet> files = DataManager.DefaultDataManager.OpenFiles();
+
+            if (files == null)
+                return;
+
+            foreach (IDataSet file in files)
+            {
+                spatialMap.Layers.Insert(spatialMap.Layers.Count - 1, file);
+            }
+        }
+
+        public void ClearLayers()
+        {
+            spatialMap.ClearLayers();
+            if (spatialDataLayer != null)
+            {
+                spatialDataLayer.Dispose();
+                spatialDataLayer = null;
+            }
+        }
+
+        public void AddPolyline()
+        { 
+            var layer = new MapLineLayer
+            {
+                Name = "Polyline",
+                LegendText = "Polyline"
+            };
+
+            spatialMaplegend.MouseDown += (sender, args) =>
+            {
+                if (layer.IsSelected)
+                {
+                    layerBeingEdited = layer;
+                    
+                    Points.Clear();
+
+                    for (int i = 0; i < layer.DataSet.DataTable.Rows.Count; i++)
                     {
-                        spatialMaplegend = legend;
-                        if (spatialMap != null)
-                        {
-                            spatialMap.Legend = spatialMaplegend;
-                        }
+                        var point = layer.DataSet.GetFeature(i).BasicGeometry as Point;
+
+                        Points.Add(point);
                     }
-                }));
+                }
+            };
+
+
+            var dataset =  new FeatureSet(FeatureType.Point);
+
+            dataset.Projection = KnownCoordinateSystems.Geographic.World.WGS1984;
+
+            dataset.DataTable.BeginInit();
+            //dataset.DataTable.Columns.Add(new DataColumn("Code", typeof (string)));
+                layer.DataSet = dataset;
+
+            dataset.DataTable.EndLoadData();
+            dataset.InvalidateVertices();
+
+            spatialMap.Layers.Add(layer);
+
+        }
+
+        public void AddPoint()
+        {
+            var point = new Point(spatialMap.ViewExtents.Center);
+            IFeature feature = layerBeingEdited.DataSet.AddFeature(point);
+            Points.Add(point);
+        }
+
+        public bool CanAddPoint()
+        {
+            return layerBeingEdited != null;
+        }
+
+        public void SaveImage()
+        {
+            var dlg = new SaveFileDialog
+            {
+                FileName = "map",
+                DefaultExt = ".png",
+                Filter = "PNG files|*.png|JPEG files|*.jpg;*.jpeg|BMP files|*.bmp|GIF files|*.gif|TIFF file|*.tiff"
+            };
+
+            if (dlg.ShowDialog() == true)
+            {
+                int w = 0, h = 0;
+                switch (SelectedUnit)
+                {
+                    case Unit.cm:
+                        w = (int) (Width/CM_PER_INCH*resolution);
+                        h = (int) (Height/CM_PER_INCH*resolution);
+                        break;
+                    case Unit.px:
+                        w = (int) Width;
+                        h = (int) Height;
+                        break;
+                }
+
+                var image = new Bitmap(w, h);
+                image.SetResolution(resolution, resolution);
+
+                Graphics graphics = Graphics.FromImage(image);
+                spatialMap.Print(graphics, new Rectangle(0, 0, w, h));
+                graphics.Flush();
+
+                image.Save(dlg.FileName, ImageFormat);
             }
         }
 
-        public RelayCommand AddLayer
+        public bool CanSaveImage()
         {
-            get
-            {
-                return addLayer ?? (addLayer = new RelayCommand(() =>
-                {
-                    List<IDataSet> files = DataManager.DefaultDataManager.OpenFiles();
-
-                    if (files == null)
-                        return;
-
-                    foreach (IDataSet file in files)
-                    {
-                        spatialMap.Layers.Insert(spatialMap.Layers.Count - 1, file);
-                    }
-                }));
-            }
-        }
-
-        public RelayCommand ClearLayers
-        {
-            get
-            {
-                return clearLayers ?? (clearLayers = new RelayCommand(() =>
-                {
-                    spatialMap.ClearLayers();
-                    if (spatialDataLayer != null)
-                    {
-                        spatialDataLayer.Dispose();
-                        spatialDataLayer = null;
-                    }
-                }));
-            }
-        }
-
-        public ICommand AddPolyline
-        {
-            get
-            {
-                return addPolyline ?? (addPolyline = new RelayCommand(() =>
-                {
-                    var layer = new MapLineLayer
-                    {
-                        Name = "Polyline",
-                        LegendText = "Polyline"
-                    };
-
-                    spatialMaplegend.MouseDown += (sender, args) =>
-                    {
-                        if (layer.IsSelected)
-                        {
-                            layerBeingEdited = layer;
-                            NotifyOfPropertyChange(() => AddPoint);
-
-                            Points.Clear();
-
-                            for (int i = 0; i < layer.DataSet.DataTable.Rows.Count; i++)
-                            {
-                                var point = layer.DataSet.GetFeature(i).BasicGeometry as Point;
-
-                                Points.Add(point);
-
-                            }
-                        }
-                    };
-
-
-                    var dataset =  new FeatureSet(FeatureType.Point);
-
-                    dataset.Projection = KnownCoordinateSystems.Geographic.World.WGS1984;
-
-                    dataset.DataTable.BeginInit();
-                    //dataset.DataTable.Columns.Add(new DataColumn("Code", typeof (string)));
-                        layer.DataSet = dataset;
-
-                    dataset.DataTable.EndLoadData();
-                    dataset.InvalidateVertices();
-
-                    spatialMap.Layers.Add(layer);
-                }));
-            }
-        }
-
-        public RelayCommand AddPoint
-        {
-            get
-            {
-                return addPoint ?? (addPoint = new RelayCommand(() =>
-                {
-
-                    var point = new Point(spatialMap.ViewExtents.Center);
-                    IFeature feature = layerBeingEdited.DataSet.AddFeature(point);
-                    Points.Add(point);
-                }, () => layerBeingEdited != null));
-            }
-        }
-
-        public RelayCommand SaveImage
-        {
-            get
-            {
-                return saveImage ?? (saveImage = new RelayCommand(() =>
-                {
-                    var dlg = new SaveFileDialog();
-                    dlg.FileName = "map";
-                    dlg.DefaultExt = ".png";
-                    dlg.Filter = "PNG files|*.png|JPEG files|*.jpg;*.jpeg|BMP files|*.bmp|GIF files|*.gif|TIFF file|*.tiff";
-
-                    if (dlg.ShowDialog() == true)
-                    {
-                        int w = 0, h = 0;
-                        switch (SelectedUnit)
-                        {
-                            case Unit.cm:
-                                w = (int) (Width/CM_PER_INCH*resolution);
-                                h = (int) (Height/CM_PER_INCH*resolution);
-                                break;
-                            case Unit.px:
-                                w = (int) Width;
-                                h = (int) Height;
-                                break;
-                        }
-
-                        var image = new Bitmap(w, h);
-                        image.SetResolution(resolution, resolution);
-
-                        Graphics graphics = Graphics.FromImage(image);
-                        spatialMap.Print(graphics, new Rectangle(0, 0, w, h));
-                        graphics.Flush();
-
-                        image.Save(dlg.FileName, ImageFormat);
-                    }
-                }, () => spatialMap != null));
-            }
+            return spatialMap != null;
         }
 
         public Unit[] Units
@@ -534,7 +473,7 @@ namespace Genesis.ViewModels
             }
         }
 
-        public class PushpinViewModel : ViewModelBase
+        public class PushpinViewModel : PropertyChangedBase
         {
             private readonly Locality locality;
             private string label;

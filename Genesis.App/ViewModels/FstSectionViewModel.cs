@@ -2,8 +2,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Caliburn.Micro;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
 using Genesis.Analysis;
 
 namespace Genesis.ViewModels
@@ -11,7 +9,7 @@ namespace Genesis.ViewModels
 
     public class FstSectionViewModel : SectionViewModel
     {      
-        public class GeneViewModel : ViewModelBase {
+        public class GeneViewModel : PropertyChangedBase {
             public GeneViewModel(Gene gene) {
                 this.gene = gene;
             }
@@ -96,35 +94,22 @@ namespace Genesis.ViewModels
             }
         }
 
-        private RelayCommand refresh;
-        public RelayCommand Refresh
-        {
-            get
+        public void Refresh()
+        {    
+            if (context != null)
+                context.Dispose();
+
+            context = new GenesisContext();
+
+            Genes.Clear();
+            foreach (var gene in context.Genes)
             {
-                if (refresh == null)
-                {
-                    refresh = new RelayCommand(() =>
-                    {                       
-                        if (context != null)
-                            context.Dispose();
-
-                        context = new GenesisContext();
-
-                        Genes.Clear();
-                        foreach (var gene in context.Genes)
-                        {
-                            Genes.Add(new GeneViewModel(gene));
-                        }
-
-
-                        NotifyOfPropertyChange(() => FstAnalysis);
-                        NotifyOfPropertyChange(() => Species);
-                        SelectedSpecies = Species.FirstOrDefault();
-                    });
-                }
-
-                return refresh;
+                Genes.Add(new GeneViewModel(gene));
             }
+
+            NotifyOfPropertyChange(() => FstAnalysis);
+            NotifyOfPropertyChange(() => Species);
+            SelectedSpecies = Species.FirstOrDefault();
         }
 
 
@@ -141,24 +126,12 @@ namespace Genesis.ViewModels
             }
         }
 
-        private RelayCommand<FstAnalysis> deleteAnalysis;
-        public RelayCommand<FstAnalysis> DeleteAnalysis
+        public void DeleteAnalysis(FstAnalysis fstAnalysis)
         {
-            get
-            {
-                if (deleteAnalysis == null)
-                {
-                    deleteAnalysis = new RelayCommand<FstAnalysis>((a) =>
-                    {
-                        FstAnalysis.Remove(a);
-                        context.SaveChanges();
-                        if (SelectedFstAnalysis == a)
-                            SelectedFstAnalysis = FstAnalysis.FirstOrDefault();
-                    });
-                }
-
-                return deleteAnalysis;
-            }
+            FstAnalysis.Remove(fstAnalysis);
+            context.SaveChanges();
+            if (SelectedFstAnalysis == fstAnalysis)
+                SelectedFstAnalysis = FstAnalysis.FirstOrDefault();
         }
 
         
@@ -175,30 +148,23 @@ namespace Genesis.ViewModels
             }
         }
 
-        private RelayCommand analyze;
-        public RelayCommand Analyze
+        public async void Analyze()
         {
-            get
+            currentAnalysis = new FstAnalyzer(AnalysisName, new FstAnalyzer.Settings()
             {
-                if (analyze == null)
-                {
-                    analyze = new RelayCommand(async () =>
-                    {
-                        currentAnalysis = new FstAnalyzer(AnalysisName, new FstAnalyzer.Settings()
-                        {
-                            Genes = Genes.Where(g => g.Selected).Select(g => g.Gene).ToList(),
-                            Species = SelectedSpecies
-                        });
+                Genes = Genes.Where(g => g.Selected).Select(g => g.Gene).ToList(),
+                Species = SelectedSpecies
+            });
 
-                        var context = new GenesisContext();
-                        var result = await Task.Run(() => currentAnalysis.Analyse(context));
-                        context.FstAnalysis.Add(result);
-                        context.SaveChanges();
-                    }, () => currentAnalysis == null || currentAnalysis.Done);
-                }
+            var context = new GenesisContext();
+            var result = await Task.Run(() => currentAnalysis.Analyse(context));
+            context.FstAnalysis.Add(result);
+            context.SaveChanges();
+        }
 
-                return analyze;
-            }
+        public bool CanAnalyze()
+        {
+            return currentAnalysis == null || currentAnalysis.Done;
         }
 
         private FstAnalyzer currentAnalysis { get; set; }

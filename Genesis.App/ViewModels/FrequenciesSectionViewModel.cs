@@ -5,8 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Caliburn.Micro;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
 using Genesis.Analysis;
 using Genesis.Extensions;
 using Microsoft.Win32;
@@ -144,31 +142,24 @@ namespace Genesis.ViewModels
             }
         }
 
-        private RelayCommand analyze;
-        public RelayCommand Analyze
+        public async void Analyze()
         {
-            get
+            currentAnalysis = new FrequencyAnalyzer(AnalysisName, new FrequencyAnalyzer.Settings()
             {
-                if (analyze == null)
-                {
-                    analyze = new RelayCommand(async () =>
-                    {
-                        currentAnalysis = new FrequencyAnalyzer(AnalysisName, new FrequencyAnalyzer.Settings()
-                        {
-                            Genes = Genes.Where(g => g.Selected).Select(g => g.Gene).ToList(),
-                            Species = SelectedSpecies
-                        });
+                Genes = Genes.Where(g => g.Selected).Select(g => g.Gene).ToList(),
+                Species = SelectedSpecies
+            });
 
-                        var context = new GenesisContext();
-                        var result = await Task.Run(() => currentAnalysis.Analyse(context));
-                        context.FrequencyAnalysis.Add(result);
-                        context.SaveChanges();
-                        ReloadData();
-                    }, () => currentAnalysis == null || currentAnalysis.Done);
-                }
+            var context = new GenesisContext();
+            var result = await Task.Run(() => currentAnalysis.Analyse(context));
+            context.FrequencyAnalysis.Add(result);
+            context.SaveChanges();
+            ReloadData();
+        }
 
-                return analyze;
-            }
+        public bool CanAnalyze()
+        {
+            return currentAnalysis == null || currentAnalysis.Done;
         }
 
         private void ReloadData()
@@ -208,65 +199,63 @@ namespace Genesis.ViewModels
 
         public bool exporting;
 
-        private RelayCommand export;
-        public RelayCommand Export
+        public async void Export()
         {
-            get
+            exporting = true;
+            try
             {
-                return export ?? (export = new RelayCommand(async () =>
+                var dialog = new SaveFileDialog();
+                if (dialog.ShowDialog() == true)
                 {
-                    exporting = true;
-                    try
+                    StreamWriter sw = new StreamWriter(dialog.FileName, false);
+
+                    var selectedAnalysis = SelectedAnalysis.ToList();
+
+                    var cols = new string[] { "Code", "Latitude", "Longitude" }.Union(selectedAnalysis.Select(a => "\"" + a.Name + "\"")).ToArray();
+                    await sw.WriteCSVLineAsync(cols);
+
+                    var localities = selectedAnalysis.SelectMany(a => a.Frequencies).Select(f => f.Locality).Distinct().OrderBy(l => l.Code).ToList();
+                    var step = 1.0f / localities.Count;
+                    Progress = 0;
+
+                    var enumerators = selectedAnalysis.Select(a => a.Frequencies.OrderBy(f => f.Locality.Code).GetEnumerator()).ToArray();
+                    var hasElements = enumerators.Select(e => e.MoveNext()).ToArray();
+
+                    foreach (var l in localities)
                     {
-                        var dialog = new SaveFileDialog();
-                        if (dialog.ShowDialog() == true)
+                        Progress += step;
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append(string.Join(",", l.Code, l.Location == null ? string.Empty : l.Location.Latitude.ToString(), l.Location == null ? string.Empty : l.Location.Longitude.ToString()));
+                        sb.Append(",");
+                        for (var i = 0; i < enumerators.Length; i++)
                         {
-                            StreamWriter sw = new StreamWriter(dialog.FileName, false);
-
-                            var selectedAnalysis = SelectedAnalysis.ToList();
-
-                            var cols = new string[] { "Code", "Latitude", "Longitude" }.Union(selectedAnalysis.Select(a => "\"" + a.Name + "\"")).ToArray();
-                            await sw.WriteCSVLineAsync(cols);
-
-                            var localities = selectedAnalysis.SelectMany(a => a.Frequencies).Select(f => f.Locality).Distinct().OrderBy(l => l.Code).ToList();
-                            var step = 1.0f / localities.Count;
-                            Progress = 0;
-
-                            var enumerators = selectedAnalysis.Select(a => a.Frequencies.OrderBy(f => f.Locality.Code).GetEnumerator()).ToArray();
-                            var hasElements = enumerators.Select(e => e.MoveNext()).ToArray();
-
-                            foreach (var l in localities)
+                            if (hasElements[i] && enumerators[i].Current.Locality == l)
                             {
-                                Progress += step;
-                                StringBuilder sb = new StringBuilder();
-                                sb.Append(string.Join(",", l.Code, l.Location == null ? string.Empty : l.Location.Latitude.ToString(), l.Location == null ? string.Empty : l.Location.Longitude.ToString()));
-                                sb.Append(",");
-                                for (var i = 0; i < enumerators.Length; i++)
-                                {
-                                    if (hasElements[i] && enumerators[i].Current.Locality == l)
-                                    {
-                                        sb.Append(enumerators[i].Current.Value.ToString());
-                                        hasElements[i] = enumerators[i].MoveNext();
-                                    }
-                                    if (i < enumerators.Length - 1)
-                                        sb.Append(",");
-                                }
-                                await sw.WriteLineAsync(sb.ToString());
-                                await Task.Delay(1);
+                                sb.Append(enumerators[i].Current.Value.ToString());
+                                hasElements[i] = enumerators[i].MoveNext();
                             }
-
-                            sw.Flush();
-                            sw.Close();
-
-                            Progress = 1;
+                            if (i < enumerators.Length - 1)
+                                sb.Append(",");
                         }
+                        await sw.WriteLineAsync(sb.ToString());
+                        await Task.Delay(1);
                     }
-                    finally
-                    {
-                        exporting = false;
-                    }
-                }, () => !exporting && SelectedAnalysis.Count > 0));
+
+                    sw.Flush();
+                    sw.Close();
+
+                    Progress = 1;
+                }
             }
+            finally
+            {
+                exporting = false;
+            }
+        }
+
+        public bool CanExecute()
+        {
+            return !exporting && SelectedAnalysis.Count > 0;
         }
     }
 }

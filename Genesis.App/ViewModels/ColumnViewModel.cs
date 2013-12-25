@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Caliburn.Micro;
-using GalaSoft.MvvmLight;
 using Genesis.Excel;
 
 namespace Genesis.ViewModels

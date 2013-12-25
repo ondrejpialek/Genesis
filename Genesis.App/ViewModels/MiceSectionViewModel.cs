@@ -4,9 +4,6 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Data;
 using Caliburn.Micro;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
 using Genesis.Views;
 
 namespace Genesis.ViewModels
@@ -49,16 +46,9 @@ namespace Genesis.ViewModels
         }
 
         DataGrid grid;
-        private RelayCommand<DataGrid> dataGridLoaded;
-        public RelayCommand<DataGrid> DataGridLoaded
+        public void DataGridLoaded(DataGrid dataGrid)
         {
-            get
-            {
-                return dataGridLoaded ?? (dataGridLoaded = new RelayCommand<DataGrid>(g =>
-                {
-                    grid = g;
-                }));
-            }
+            grid = dataGrid;
         }
 
         public ObservableCollection<Gene> Genes
@@ -76,42 +66,28 @@ namespace Genesis.ViewModels
 
         private MouseToAllelesConverter mouseToAllelesConverter;
 
-        private RelayCommand<Gene> addGeneColumn;
-        public RelayCommand<Gene> AddColumn
+        public void AddColumn(Gene gene)
         {
-            get
+            if (grid != null)
             {
-                return addGeneColumn ?? (addGeneColumn = new RelayCommand<Gene>(gene =>
-                {
-                    if (grid != null)
-                    {
-                        var col = new DataGridTextColumn() { Header = gene.Name };
-                        grid.Columns.Add(col);
-                        var binding = new Binding();
-                        binding.Converter = mouseToAllelesConverter ?? (mouseToAllelesConverter = new MouseToAllelesConverter());
-                        binding.ConverterParameter = gene;
-                        col.Binding = binding;
-                    }
-                }));
+                var col = new DataGridTextColumn() { Header = gene.Name };
+                grid.Columns.Add(col);
+                var binding = new Binding();
+                binding.Converter = mouseToAllelesConverter ?? (mouseToAllelesConverter = new MouseToAllelesConverter());
+                binding.ConverterParameter = gene;
+                col.Binding = binding;
             }
         }
 
-        private RelayCommand<Gene> removeGeneColumn;
-        public RelayCommand<Gene> RemoveColumn
+        public void RemoveColumn(Gene gene)
         {
-            get
+            if (grid != null)
             {
-                return removeGeneColumn ?? (removeGeneColumn = new RelayCommand<Gene>(gene =>
+                var col = grid.Columns.Where(c => string.Equals(c.Header, gene.Name)).FirstOrDefault();
+                if (col != null)
                 {
-                    if (grid != null)
-                    {
-                        var col = grid.Columns.Where(c => string.Equals(c.Header, gene.Name)).FirstOrDefault();
-                        if (col != null)
-                        {
-                            grid.Columns.Remove(col);
-                        }
-                    }
-                }));
+                    grid.Columns.Remove(col);
+                }
             }
         }
     }
