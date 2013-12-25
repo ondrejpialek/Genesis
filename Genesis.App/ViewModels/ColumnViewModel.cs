@@ -1,3 +1,7 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Caliburn.Micro;
 using GalaSoft.MvvmLight;
 using Genesis.Excel;
@@ -6,9 +10,11 @@ namespace Genesis.ViewModels
 {
     public class ColumnViewModel : PropertyChangedBase
     {
+        private readonly IEnumerable<Gene> genes;
 
-        public ColumnViewModel(string key, string name)
+        public ColumnViewModel(string key, string name, IEnumerable<Gene> genes)
         {
+            this.genes = genes;
             Key = key;
             Name = name;
         }
@@ -52,6 +58,15 @@ namespace Genesis.ViewModels
                         return;
 
                     value = new TraitColumn();
+
+                    this.Set(() => Column, ref column, value);
+                    
+                    //preselect gene based on name
+                    var colName = Name.Substring(Name.IndexOf(":", StringComparison.InvariantCultureIgnoreCase) + 1);
+                    Gene = genes.FirstOrDefault(g => g.Name.Equals(colName));
+
+                    NotifyOfPropertyChange(() => IsTraitCol);
+                    return;
                 }
 
                 this.Set(() => Column, ref column, value);

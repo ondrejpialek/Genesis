@@ -198,7 +198,7 @@ namespace Genesis.ViewModels
                 var column = worksheet.GetCellValueAsString(letter + "1");
                 if (string.IsNullOrEmpty(column))
                     continue;
-                Columns.Add(new ColumnViewModel(letter, column));
+                Columns.Add(new ColumnViewModel(letter, column, Genes));
             }
 
             ApplyConventions();
