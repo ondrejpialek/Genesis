@@ -287,8 +287,8 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Label Content="Layers" />
-                    <Button Grid.Column="1" HorizontalAlignment="Right" Command="{Binding AddLayer}" Content="Add" />
-                    <Button Grid.Column="2" HorizontalAlignment="Right" Command="{Binding ClearLayers}" Content="Cls" />
+                    <Button Grid.Column="1" HorizontalAlignment="Right" x:Name="AddLayer" Content="Add" />
+                    <Button Grid.Column="2" HorizontalAlignment="Right" x:Name="ClearLayers" Content="Cls" />
                 </Grid>
 
                 <WindowsFormsHost x:Name="windowsFormsHost1" Grid.Row="1">

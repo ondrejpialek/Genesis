@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WPF45"
              xmlns:cal="http://www.caliburnproject.org"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
@@ -34,16 +33,7 @@
         <ListBox Grid.Column="2" ItemsSource="{Binding Genes}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <CheckBox Content="{Binding Name}">
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="Checked">
-                                <cal:ActionMessage MethodName="AddColumn($dataContext)" />
-                            </i:EventTrigger>
-                            <i:EventTrigger EventName="Unchecked">
-                                <cal:ActionMessage MethodName="RemoveColumn($dataContext)" />
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </CheckBox>
+                    <CheckBox Content="{Binding Name}" cal:Message.Attach="[Event Checked] = [Action AddColumn($dataContext)];[Event Unchecked] = [Action RemoveColumn($dataContext)]" />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
