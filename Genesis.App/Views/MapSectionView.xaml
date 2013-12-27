@@ -258,10 +258,24 @@
             <StackPanel Grid.Row="1">
                 <Label Content="Select data" />
                 <UniformGrid Rows="1">
-                    <RadioButton GroupName="ViewType" Command="{Binding ChangeView}" CommandParameter="Localities"
-                                 Content="Localities" />
-                    <RadioButton GroupName="ViewType" Command="{Binding ChangeView}" CommandParameter="Frequencies"
-                                 Content="Frequencies:" />
+                    <RadioButton GroupName="ViewType" CommandParameter="Localities" Content="Localities">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Checked">
+                                <cal:ActionMessage MethodName="ChangeView">
+                                    <cal:Parameter Value="Localities" />
+                                </cal:ActionMessage>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </RadioButton>
+                    <RadioButton GroupName="ViewType" Content="Frequencies:">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Checked">
+                                <cal:ActionMessage MethodName="ChangeView">
+                                    <cal:Parameter Value="Frequencies" />
+                                </cal:ActionMessage>
+                            </i:EventTrigger>   
+                        </i:Interaction.Triggers>
+                    </RadioButton>
                 </UniformGrid>
             </StackPanel>
             <ListBox Grid.Row="2" ItemsSource="{Binding FrequencyAnalysis}"
@@ -350,7 +364,7 @@
                 </ComboBox>
             </Border>
             <Button Content="SAVE" VerticalAlignment="Bottom" Grid.Row="7" Margin="{DynamicResource DefaultMargin}"
-                    Grid.ColumnSpan="2" Command="{Binding SaveImage, Mode=OneWay}" />
+                    Grid.ColumnSpan="2" x:Name="SaveImage" />
         </Grid>
 
 
