@@ -79,7 +79,7 @@
                 <Run Text="named" />
             </TextBlock>
             <TextBox Grid.Row="6" Margin="6,0,6,6" Text="{Binding AnalysisName, Mode=TwoWay}" />
-            <Button Grid.Row="7" Padding="4" Command="{Binding Analyze}" Margin="{DynamicResource DefaultMargin}"
+            <Button Grid.Row="7" Padding="4" x:Name="Analyze" Margin="{DynamicResource DefaultMargin}"
                     Content="Go" />
         </Grid>
         <Grid Grid.Column="1" Grid.Row="1">
@@ -90,7 +90,7 @@
             <ListBox x:Name="FrequencyAnalysis" ItemTemplate="{DynamicResource AnalysisDataTemplate}"
                      Margin="{DynamicResource DefaultMargin}" />
             <UniformGrid HorizontalAlignment="Right" Rows="1" Grid.Row="1">
-                <Button Margin="{DynamicResource DefaultMargin}" Command="{Binding Export}">
+                <Button Margin="{DynamicResource DefaultMargin}" x:Name="Export">
                     <StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
                         <Rectangle Width="32" Height="32">
                             <Rectangle.Fill>

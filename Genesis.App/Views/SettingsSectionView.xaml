@@ -38,7 +38,7 @@
                     </Grid>
                     <HierarchicalDataTemplate.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Alleles}">
-                            <Grid>
+                            <Grid cal:Bind.Model="{Binding}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"></ColumnDefinition>
                                     <ColumnDefinition Width="Auto"/>
@@ -54,7 +54,7 @@
                             </Grid>
                             <HierarchicalDataTemplate.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid>
+                                    <Grid cal:Bind.Model="{Binding}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition></ColumnDefinition>
                                             <ColumnDefinition Width="Auto" SharedSizeGroup="SpeciesSelection" />
@@ -62,7 +62,7 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBox Text="{Binding Value}" MinWidth="100" />
                                         <ComboBox Grid.Column="1" SelectedItem="{Binding Species, Mode=TwoWay}" ItemsSource="{Binding Path=DataContext.Species, RelativeSource={RelativeSource AncestorType={x:Type views:SettingsSectionView}}}" DisplayMemberPath="Name" />
-                                        <Button Grid.Column="2" cal:Message.Attach="RemoveAllele($dataContext)">Remove allele</Button>
+                                        <Button Grid.Column="2" cal:Message.Attach="RemoveAllele($dataContext)" cal:Action.TargetWithoutContext="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}, AncestorLevel=2}}">Remove allele</Button>
                                     </Grid>
                                 </DataTemplate>
                             </HierarchicalDataTemplate.ItemTemplate>
@@ -91,7 +91,7 @@
             </ListBox>
         </Grid>
         <UniformGrid Grid.Row="1" Grid.ColumnSpan="2" Margin="{DynamicResource DefaultVerticalMargin}" Rows="1" HorizontalAlignment="Right">
-        	<Button Command="{Binding Recreate}" Margin="{DynamicResource DefaultHorizontalMargin}">
+            <Button x:Name="Recreate" Margin="{DynamicResource DefaultHorizontalMargin}">
         		<StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
         			<Rectangle Width="32" Height="32">
         				<Rectangle.Fill>
@@ -101,7 +101,7 @@
         			<TextBlock TextWrapping="Wrap" Text="RECREATE DB" HorizontalAlignment="Center"/>
         		</StackPanel>
         	</Button>
-        	<Button Command="{Binding Reset}" Margin="{DynamicResource DefaultHorizontalMargin}">
+            <Button x:Name="Reset" Margin="{DynamicResource DefaultHorizontalMargin}">
         		<StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
         			<Rectangle Width="32" Height="32">
         				<Rectangle.Fill>
@@ -111,7 +111,7 @@
         			<TextBlock TextWrapping="Wrap" Text="DELETE DATA" HorizontalAlignment="Center"/>
         		</StackPanel>
         	</Button>
-        	<Button Command="{Binding Save}" Margin="{DynamicResource DefaultHorizontalMargin}">
+        	<Button x:Name="Save" Margin="{DynamicResource DefaultHorizontalMargin}">
         		<StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
         			<Rectangle Width="32" Height="32">
         				<Rectangle.Fill>

@@ -30,7 +30,7 @@ namespace Genesis.Excel
         public bool TryRead(IExcelWorksheet worksheet, int row, out IApplicator<TEntity> applicator)
         {
             var cell = worksheet.GetCellValue(Column + row.ToString());
-            if (this.IsRequired && cell.IsEmpty)
+            if (IsRequired && cell.IsEmpty)
             {
                 applicator = null;
                 return false;

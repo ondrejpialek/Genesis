@@ -8,7 +8,7 @@ namespace Genesis.Excel
 {
     public class TraitColumn : CellReader<Mouse, string>
     {
-        public TraitColumn() : base("Trait", true) {
+        public TraitColumn() : base("Trait") {
         }
 
         public Gene Gene
@@ -22,6 +22,11 @@ namespace Genesis.Excel
             var alleles = mouse.Alleles.Where(a => a.Allele.Gene == Gene).ToList();
             foreach(var a in alleles) {
                 mouse.Alleles.Remove(a);
+            }
+
+            if (string.IsNullOrEmpty(value))
+            {
+                return;
             }
 
             var newAlleles = (from str in value.Split('/')

@@ -82,7 +82,7 @@ namespace Genesis.ViewModels
             }
 
             NotifyOfPropertyChange(() => Fields);
-            ApplyConventions();
+                ApplyConventions();
         }
 
         private ImportType selectedImport = ImportType.Localities;
