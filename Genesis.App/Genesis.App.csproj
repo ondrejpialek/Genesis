@@ -282,10 +282,6 @@
     <Compile Include="Migrations\201306021340169_FixAlleleRecordFKs.Designer.cs">
       <DependentUpon>201306021340169_FixAlleleRecordFKs.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201308112151461_Diff.cs" />
-    <Compile Include="Migrations\201308112151461_Diff.Designer.cs">
-      <DependentUpon>201308112151461_Diff.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ViewModels\FrequenciesSectionViewModel.cs" />
     <Compile Include="ViewModels\ColumnViewModel.cs" />
@@ -399,9 +395,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201306021340169_FixAlleleRecordFKs.resx">
       <DependentUpon>201306021340169_FixAlleleRecordFKs.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201308112151461_Diff.resx">
-      <DependentUpon>201308112151461_Diff.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
