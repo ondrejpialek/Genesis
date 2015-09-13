@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using Caliburn.Micro;
 using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.Resolvers.SpecializedResolvers;
@@ -10,9 +11,14 @@ using Genesis.ViewModels;
 
 namespace Genesis.Bootstrap
 {
-    public class AppBootstrapper : Bootstrapper<IShellViewModel>
+    public class AppBootstrapper : BootstrapperBase
     {
         private WindsorContainer container;
+
+        public AppBootstrapper()
+        {
+            Initialize();
+        }
 
         protected override void Configure()
         {
@@ -43,6 +49,12 @@ namespace Genesis.Bootstrap
         protected override IEnumerable<object> GetAllInstances(Type serviceType)
         {
             return container.ResolveAll(serviceType).Cast<object>();
+        }
+
+        protected override void OnStartup(object sender, StartupEventArgs e)
+        {
+            DisplayRootViewFor<IShellViewModel>();
+            base.OnStartup(sender, e);
         }
     }
 }
