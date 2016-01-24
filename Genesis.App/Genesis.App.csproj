@@ -8,7 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Genesis</RootNamespace>
     <AssemblyName>Genesis</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -50,6 +50,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -183,7 +184,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\BingMapsWpfControl.1.0.0\lib\net40-client\Microsoft.Maps.MapControl.WPF.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Office.Interop.Excel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.SqlServer.Types, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
@@ -236,21 +237,29 @@
     <Compile Include="Bootstrap\AppBootstrapper.cs" />
     <Compile Include="Bootstrap\EventRegistrationFacility.cs" />
     <Compile Include="Bootstrap\ExcelInstaller.cs" />
-    <Compile Include="Data\AlleleRecord.cs" />
+    <Compile Include="Data\Category.cs" />
     <Compile Include="Data\FstAnalysis.cs" />
     <Compile Include="Data\Frequency.cs" />
     <Compile Include="Data\FrequencyAnalysis.cs" />
+    <Compile Include="Data\NominalRecord.cs" />
+    <Compile Include="Data\NominalTrait.cs" />
+    <Compile Include="Data\OrdinalRecord.cs" />
+    <Compile Include="Data\OrdinalTrait.cs" />
     <Compile Include="Data\PairwiseFst.cs" />
+    <Compile Include="Data\Record.cs" />
+    <Compile Include="Data\Trait.cs" />
     <Compile Include="DotSpatial\MapLayerCollectionExtensions.cs" />
     <Compile Include="Excel\Alphabet.cs" />
     <Compile Include="Excel\Applicator.cs" />
     <Compile Include="Excel\ArgsParser.cs" />
     <Compile Include="Excel\CellReader.cs" />
-    <Compile Include="Excel\CodeColumn.cs" />
+    <Compile Include="Excel\LocalityCodeCellReader.cs" />
     <Compile Include="Excel\ColumnBase.cs" />
+    <Compile Include="Excel\GeneCellReader.cs" />
+    <Compile Include="Excel\NominalTraitCellReader.cs" />
     <Compile Include="Excel\SexColumn.cs" />
-    <Compile Include="Excel\TraitColumn.cs" />
-    <Compile Include="Excel\MouseLocalityColumn.cs" />
+    <Compile Include="Excel\OrdinalTraitCellReader.cs" />
+    <Compile Include="Excel\MouseLocalityCellReader.cs" />
     <Compile Include="Excel\PINColumn.cs" />
     <Compile Include="Excel\ExcelCell.cs" />
     <Compile Include="Excel\ExcelFile.cs" />
@@ -268,36 +277,41 @@
     <Compile Include="Excel\ImportArgs.cs" />
     <Compile Include="Excel\ImportState.cs" />
     <Compile Include="Excel\InternalImporter.cs" />
-    <Compile Include="Excel\LatitudeColumn.cs" />
+    <Compile Include="Excel\LatitudeLocationComponentCellReader.cs" />
     <Compile Include="Excel\LocalitiesColumnProvider.cs" />
-    <Compile Include="Excel\LocalityNameColumn.cs" />
-    <Compile Include="Excel\LongitudeColumn.cs" />
+    <Compile Include="Excel\LocalityNameCellReader.cs" />
+    <Compile Include="Excel\LongitudeLocationComponentCellReader.cs" />
     <Compile Include="Excel\RowApplicator.cs" />
     <Compile Include="Excel\RowReader.cs" />
     <Compile Include="Excel\WorksheetReader.cs" />
     <Compile Include="Extensions\MVVMExtensions.cs" />
     <Compile Include="Extensions\StreamWriterExtensions.cs" />
-    <Compile Include="Migrations\201209111926526_InitialCreate.cs" />
-    <Compile Include="Migrations\201209111926526_InitialCreate.Designer.cs">
-      <DependentUpon>201209111926526_InitialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201306021340169_FixAlleleRecordFKs.cs" />
-    <Compile Include="Migrations\201306021340169_FixAlleleRecordFKs.Designer.cs">
-      <DependentUpon>201306021340169_FixAlleleRecordFKs.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ViewModels\FrequenciesSectionViewModel.cs" />
-    <Compile Include="ViewModels\ColumnViewModel.cs" />
+    <Compile Include="ViewModels\Import\ColumnViewModel.cs" />
+    <Compile Include="ViewModels\Import\LocalityField.cs" />
+    <Compile Include="ViewModels\Import\LocalitySheetColumnViewModel.cs" />
+    <Compile Include="ViewModels\Import\MiceField.cs" />
+    <Compile Include="ViewModels\Import\MiceSheetColumnViewModel.cs" />
+    <Compile Include="ViewModels\Import\TraitCellEditorViewModel.cs" />
     <Compile Include="ViewModels\LocalitiesSectionViewModel.cs" />
     <Compile Include="ViewModels\MapSectionViewModel.cs" />
     <Compile Include="ViewModels\FstSectionViewModel.cs" />
-    <Compile Include="ViewModels\ImportSectionViewModel.cs" />
+    <Compile Include="ViewModels\Import\ImportSectionViewModel.cs" />
     <Compile Include="ViewModels\LocalityViewModel.cs" />
     <Compile Include="ViewModels\Messages.cs" />
     <Compile Include="ViewModels\MiceSectionViewModel.cs" />
     <Compile Include="ViewModels\MouseViewModel.cs" />
     <Compile Include="ViewModels\SectionViewModel.cs" />
-    <Compile Include="ViewModels\SettingsSectionViewModel.cs" />
+    <Compile Include="ViewModels\Settings\AlleleViewModel.cs" />
+    <Compile Include="ViewModels\Settings\CategoryViewModel.cs" />
+    <Compile Include="ViewModels\Settings\ChromosomeViewModel.cs" />
+    <Compile Include="ViewModels\Settings\GeneViewModel.cs" />
+    <Compile Include="ViewModels\Settings\NominalTraitViewModel.cs" />
+    <Compile Include="ViewModels\Settings\OrdinalTraitViewModel.cs" />
+    <Compile Include="ViewModels\Settings\SettingsSectionViewModel.cs" />
+    <Compile Include="ViewModels\Settings\TraitViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="Views\FrequenciesSectionView.xaml.cs">
       <DependentUpon>FrequenciesSectionView.xaml</DependentUpon>
@@ -331,7 +345,7 @@
     </Compile>
     <Compile Include="Data\Allele.cs" />
     <Compile Include="Data\Chromosome.cs" />
-    <Compile Include="Data\DataInitializer.cs" />
+    <Compile Include="Data\RecreateDatabaseInitializer.cs" />
     <Compile Include="Data\Gene.cs" />
     <Compile Include="Data\GenesisContext.cs" />
     <Compile Include="Data\Locality.cs" />
@@ -393,12 +407,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Migrations\201209111926526_InitialCreate.resx">
-      <DependentUpon>201209111926526_InitialCreate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201306021340169_FixAlleleRecordFKs.resx">
-      <DependentUpon>201306021340169_FixAlleleRecordFKs.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

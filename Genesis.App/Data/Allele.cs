@@ -1,18 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Genesis
 {
-    public class Allele
+    public class Allele : Category
     {
-        public virtual int Id { get; private set; }
-        [Required]
-        public virtual string Value { get; set; }
-        [Required]
-        public virtual Gene Gene { get; set; }
+        [NotMapped]
+        public virtual Gene Gene {
+            get
+            {
+                return (Gene) Trait;
+            }
+            set { Trait = value; }
+        }
+
         [Required]
         public virtual Species Species { get; set; }
     }

@@ -4,74 +4,118 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:cal="http://www.caliburnproject.org" xmlns:views="clr-namespace:Genesis.Views"
-             xmlns:designTimeSupport="clr-namespace:Caliburn.Micro.DesignTimeSupport;assembly=Caliburn.Micro.Contrib"
-             xmlns:viewModels="clr-namespace:Genesis.ViewModels"
+             xmlns:settings="clr-namespace:Genesis.ViewModels.Settings"
              mc:Ignorable="d" 
-             d:DesignWidth="494.773" d:DesignHeight="420.56" cal:Bind.AtDesignTime="True" d:DataContext="{d:DesignInstance viewModels:SettingsSectionViewModel, IsDesignTimeCreatable=True}"
+             d:DesignWidth="494.773" d:DesignHeight="420.56" cal:Bind.AtDesignTime="True" d:DataContext="{d:DesignInstance settings:SettingsSectionViewModel, IsDesignTimeCreatable=True}"
              >
-
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.7*" />
             <ColumnDefinition Width="0.3*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="31*"></RowDefinition>
+            <RowDefinition Height="321*"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TreeView  x:Name="Chromosomes" HorizontalContentAlignment="Stretch" Margin="{DynamicResource DefaultMargin}" Grid.IsSharedSizeScope="True">
-			<TreeView.Resources>
-				<Style TargetType="TreeViewItem"> 
-					<Setter Property="IsExpanded" Value="True" /> 
-				</Style> 			
-			</TreeView.Resources>
+        <StackPanel Grid.Row="0" HorizontalAlignment="Stretch" Orientation="Horizontal">
+            <Button x:Name="AddOrdinalTrait">Add Ordinal Trait</Button>
+            <Button x:Name="AddNominalTrait">Add Nominal Trait</Button>
+        </StackPanel>
+        <TreeView x:Name="Traits" HorizontalContentAlignment="Stretch" Grid.IsSharedSizeScope="True" Grid.Row="1">
+            <TreeView.Resources>
+                <Style TargetType="TreeViewItem">
+                    <Setter Property="IsExpanded" Value="True" />
+                </Style>
+                
+                <!-- TREE VIEW VIEWS -->
 
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Genes}">
-                    <Grid cal:Bind.ModelWithoutContext="{Binding}">
+                <HierarchicalDataTemplate DataType="{x:Type TypeName=settings:ChromosomeViewModel}"  ItemsSource="{Binding Genes}">
+                    <Grid cal:Bind.Model="{Binding}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"></ColumnDefinition>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Label Content="{Binding Name}"/>
-                        <Button Grid.Column="1" x:Name="AddTrait">Add trait</Button>
+                        <Button Grid.Column="1" x:Name="AddGene">Add Trait</Button>
                     </Grid>
-                    <HierarchicalDataTemplate.ItemTemplate>
-                        <HierarchicalDataTemplate ItemsSource="{Binding Alleles}">
-                            <Grid cal:Bind.Model="{Binding}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-								<StackPanel Orientation="Horizontal">
-	                                <TextBox Text="{Binding Name}" MinWidth="100"/>
-									<TextBlock VerticalAlignment="Center"> start base pair: </TextBlock>
-									<TextBox Text="{Binding StartBasePair}" MinWidth="100" />								
-								</StackPanel>
-                                <Button Command="{Binding Path=DataContext.RemoveTrait, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}, AncestorLevel=2}}" CommandParameter="{Binding}" Grid.Column="1">Remove trait</Button>
-                                <Button x:Name="AddAllele" Grid.Column="2">Add allele</Button>
-                            </Grid>
-                            <HierarchicalDataTemplate.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid cal:Bind.Model="{Binding}">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition></ColumnDefinition>
-                                            <ColumnDefinition Width="Auto" SharedSizeGroup="SpeciesSelection" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBox Text="{Binding Value}" MinWidth="100" />
-                                        <ComboBox Grid.Column="1" SelectedItem="{Binding Species, Mode=TwoWay}" ItemsSource="{Binding Path=DataContext.Species, RelativeSource={RelativeSource AncestorType={x:Type views:SettingsSectionView}}}" DisplayMemberPath="Name" />
-                                        <Button Grid.Column="2" cal:Message.Attach="RemoveAllele($dataContext)" cal:Action.TargetWithoutContext="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}, AncestorLevel=2}}">Remove allele</Button>
-                                    </Grid>
-                                </DataTemplate>
-                            </HierarchicalDataTemplate.ItemTemplate>
-                        </HierarchicalDataTemplate>
-                    </HierarchicalDataTemplate.ItemTemplate>
-                </HierarchicalDataTemplate >
-            </TreeView.ItemTemplate>
+                </HierarchicalDataTemplate>
+                
+                <HierarchicalDataTemplate DataType="{x:Type settings:GeneViewModel}" ItemsSource="{Binding Categories}">
+                    <Grid cal:Bind.Model="{Binding}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox Text="{Binding Name}" MinWidth="100"/>
+                            <TextBlock VerticalAlignment="Center"> start base pair:</TextBlock>
+                            <TextBox Text="{Binding StartBasePair}" MinWidth="100" />
+                        </StackPanel>
+                        <Button cal:Message.Attach="RemoveTrait($dataContext)" Grid.Column="1">Remove Trait</Button>
+                        <Button x:Name="AddCategory" Grid.Column="2">Add Allele</Button>
+                    </Grid>
+                </HierarchicalDataTemplate>
+                
+                <HierarchicalDataTemplate DataType="{x:Type settings:NominalTraitViewModel}" ItemsSource="{Binding Categories}">
+                    <Grid cal:Bind.Model="{Binding}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox Text="{Binding Name}" MinWidth="100"/>
+                        </StackPanel>
+                        <Button x:Name="AddCategory" Grid.Column="2">Add Category</Button>
+                        <Button cal:Message.Attach="RemoveTrait($dataContext)" Grid.Column="1">Remove Trait</Button>
+                    </Grid>
+                </HierarchicalDataTemplate>
+                
+                <DataTemplate DataType="{x:Type settings:OrdinalTraitViewModel}">
+                    <Grid cal:Bind.Model="{Binding}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox Text="{Binding Name}" MinWidth="100"/>
+                        </StackPanel>
+                        <Button cal:Message.Attach="RemoveTrait($dataContext)" Grid.Column="1">Remove Trait</Button>
+                    </Grid>
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type settings:AlleleViewModel}">
+                    <Grid cal:Bind.Model="{Binding}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="SpeciesSelection" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Text="{Binding Value}" MinWidth="100" />
+                        <ComboBox Grid.Column="1" SelectedItem="{Binding Species, Mode=TwoWay}" ItemsSource="{Binding Path=DataContext.Species, RelativeSource={RelativeSource AncestorType={x:Type views:SettingsSectionView}}}" DisplayMemberPath="Name" />
+                        <Button Grid.Column="2" cal:Message.Attach="RemoveCategory($dataContext)">Remove Category</Button>
+                    </Grid>
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type settings:CategoryViewModel}">
+                    <Grid cal:Bind.Model="{Binding}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Text="{Binding Value}" MinWidth="100" />
+                        <Button Grid.Column="1" cal:Message.Attach="RemoveCategory($dataContext)">Remove Category</Button>
+                    </Grid>
+                </DataTemplate>
+
+                <!-- END OF TREE VIEW VIEWS -->
+
+            </TreeView.Resources>
         </TreeView>
-        <Grid Grid.Column="1" Margin="{DynamicResource DefaultMargin}">
+        <Grid Grid.Column="1" Grid.RowSpan="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -79,48 +123,48 @@
             </Grid.RowDefinitions>
             <Label>Species</Label>
             <StackPanel Grid.Row="1" Orientation="Horizontal">
-                <Button Command="{Binding AddSpecies}">Add</Button>
-                <Button Command="{Binding RemoveSpecies}" CommandParameter="{Binding SelectedItem, ElementName=speciesBox}">Remove</Button>
+                <Button x:Name="AddSpecies">Add</Button>
+                <Button x:Name="RemoveSpecies" CommandParameter="{Binding SelectedItem, ElementName=Species}" Content="Remove" Margin="0,0,0,-0.111"/>
             </StackPanel>
-            <ListBox x:Name="speciesBox" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ItemsSource="{Binding Species}">
+            <ListBox x:Name="Species" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBox Text="{Binding Name, Mode=TwoWay}" />
                     </DataTemplate>
-                    </ListBox.ItemTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
-        <UniformGrid Grid.Row="1" Grid.ColumnSpan="2" Margin="{DynamicResource DefaultVerticalMargin}" Rows="1" HorizontalAlignment="Right">
+        <UniformGrid Grid.Row="2" Grid.ColumnSpan="2" Margin="0,6,-0.185,5.741" Rows="1" HorizontalAlignment="Right">
             <Button x:Name="Recreate" Margin="{DynamicResource DefaultHorizontalMargin}">
-        		<StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
-        			<Rectangle Width="32" Height="32">
-        				<Rectangle.Fill>
-        					<VisualBrush Visual="{StaticResource appbar_explosion}" Stretch="Uniform"/>
-        				</Rectangle.Fill>
-        			</Rectangle>
-        			<TextBlock TextWrapping="Wrap" Text="RECREATE DB" HorizontalAlignment="Center"/>
-        		</StackPanel>
-        	</Button>
+                <StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
+                    <Rectangle Width="32" Height="32">
+                        <Rectangle.Fill>
+                            <VisualBrush Visual="{StaticResource appbar_explosion}" Stretch="Uniform"/>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <TextBlock TextWrapping="Wrap" Text="RECREATE DB" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
             <Button x:Name="Reset" Margin="{DynamicResource DefaultHorizontalMargin}">
-        		<StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
-        			<Rectangle Width="32" Height="32">
-        				<Rectangle.Fill>
-        					<VisualBrush Visual="{StaticResource appbar_reset}" Stretch="Uniform"/>
-        				</Rectangle.Fill>
-        			</Rectangle>
-        			<TextBlock TextWrapping="Wrap" Text="DELETE DATA" HorizontalAlignment="Center"/>
-        		</StackPanel>
-        	</Button>
-        	<Button x:Name="Save" Margin="{DynamicResource DefaultHorizontalMargin}">
-        		<StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
-        			<Rectangle Width="32" Height="32">
-        				<Rectangle.Fill>
-        					<VisualBrush Visual="{StaticResource appbar_save}" Stretch="Uniform"/>
-        				</Rectangle.Fill>
-        			</Rectangle>
-        			<TextBlock TextWrapping="Wrap" Text="SAVE" HorizontalAlignment="Center"/>
-        		</StackPanel>
-        	</Button>
+                <StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
+                    <Rectangle Width="32" Height="32">
+                        <Rectangle.Fill>
+                            <VisualBrush Visual="{StaticResource appbar_reset}" Stretch="Uniform"/>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <TextBlock TextWrapping="Wrap" Text="DELETE DATA" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Button x:Name="Save" Margin="{DynamicResource DefaultHorizontalMargin}">
+                <StackPanel Margin="{DynamicResource DefaultHorizontalMargin}">
+                    <Rectangle Width="32" Height="32">
+                        <Rectangle.Fill>
+                            <VisualBrush Visual="{StaticResource appbar_save}" Stretch="Uniform"/>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <TextBlock TextWrapping="Wrap" Text="SAVE" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
         </UniformGrid>
     </Grid>
 </UserControl>

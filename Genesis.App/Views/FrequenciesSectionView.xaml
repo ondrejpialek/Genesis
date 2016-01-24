@@ -9,14 +9,11 @@
     d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <ResourceDictionary>
-            <DataTemplate x:Key="GeneDataTemplate">
+            <DataTemplate x:Key="TraitDataTemplate">
                 <StackPanel Orientation="Horizontal">
                     <CheckBox IsChecked="{Binding Selected}" VerticalAlignment="Center" />
-                    <Label Content="{Binding Gene.Name}" />
+                    <Label Content="{Binding Trait.Name}" />
                 </StackPanel>
-            </DataTemplate>
-            <DataTemplate x:Key="SpeciesDataTemplate">
-                <Label Content="{Binding Name}" />
             </DataTemplate>
             <DataTemplate x:Key="AnalysisDataTemplate">
                 <Grid>
@@ -32,8 +29,7 @@
                         <Label Content="{Binding Analyzed}" />
                         <Label Content=")" />
                     </StackPanel>
-                    <Button Grid.Column="1" Width="20" cal:Message.Attach="DeleteAnalysis($dataContext)"
-                            CommandParameter="{Binding}">
+                    <Button Grid.Column="1" Width="20" cal:Message.Attach="DeleteAnalysis($dataContext)">
                         <Path Style="{StaticResource DeleteGlyph}" Margin="1,1,1,1" />
                     </Button>
                 </Grid>
@@ -60,27 +56,12 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <TextBlock Margin="{DynamicResource DefaultMargin}">
-                <Run Text="Calculate frequencies of" />
-            </TextBlock>
-            <ListView Grid.Row="2" ItemsSource="{Binding Genes}" ItemTemplate="{DynamicResource GeneDataTemplate}"
-                      Margin="{DynamicResource DefaultHorizontalMargin}" />
-            <TextBlock Grid.Row="3" Margin="{DynamicResource DefaultMargin}">
-                <Run Text="for species" />
-            </TextBlock>
-            <ComboBox Grid.Row="4" Padding="4" ItemsSource="{Binding Species}"
-                      SelectedItem="{Binding SelectedSpecies, Mode=TwoWay}"
-                      ItemTemplate="{DynamicResource SpeciesDataTemplate}"
-                      Margin="{DynamicResource DefaultHorizontalMargin}" />
-            <TextBlock Grid.Row="5" Margin="{DynamicResource DefaultMargin}">
-                <Run Text="named" />
-            </TextBlock>
-            <TextBox Grid.Row="6" Margin="6,0,6,6" Text="{Binding AnalysisName, Mode=TwoWay}" />
-            <Button Grid.Row="7" Padding="4" x:Name="Analyze" Margin="{DynamicResource DefaultMargin}"
-                    Content="Go" />
+            <TextBlock Margin="{DynamicResource DefaultMargin}" Text="Calculate frequencies of" />
+            <ListView Grid.Row="2" ItemsSource="{Binding Traits}" ItemTemplate="{DynamicResource TraitDataTemplate}" Margin="{DynamicResource DefaultMargin}" />
+            <TextBlock Grid.Row="3" Margin="{DynamicResource DefaultMargin}" Text="named" />
+            <TextBox Grid.Row="4" Margin="{DynamicResource DefaultMargin}" Text="{Binding AnalysisName, Mode=TwoWay}" />
+            <Button Grid.Row="5" x:Name="Analyze" Margin="{DynamicResource DefaultMargin}" Content="Go" />
         </Grid>
         <Grid Grid.Column="1" Grid.Row="1">
             <Grid.RowDefinitions>

@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.Entity;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Windows.Input;
 using Caliburn.Micro;
 using DotSpatial.Controls;
@@ -71,9 +72,33 @@ namespace Genesis.ViewModels
             set
             {
                 this.Set(() => SelectedAnalysis, ref selectedAnalysis, value);
+                NotifyOfPropertyChange(() => Dimensions);
+                Dimension = null;
                 UpdateData();
             }
         }
+
+        public string Dimension
+        {
+            get
+            {
+                return dimension;
+            }
+            set
+            {
+                this.Set(() => Dimension, ref dimension, value);
+                UpdateData();
+            }
+        }
+
+        public IEnumerable<string> Dimensions
+        {
+            get
+            {
+                var dimensions = selectedAnalysis?.Frequencies.Select(f => f.Name).Distinct();
+                return dimensions;
+            }
+        } 
 
         public ObservableCollection<FrequencyAnalysis> FrequencyAnalysis
         {
@@ -105,6 +130,7 @@ namespace Genesis.ViewModels
 
         public ObservableCollection<Point> Points;
         private MapLineLayer layerBeingEdited;
+        private string dimension = null;
 
         public MapView View
         {
@@ -370,16 +396,19 @@ namespace Genesis.ViewModels
             }
             else
             {
-                if (selectedAnalysis != null)
-                {
-                    foreach (Frequency frequency in selectedAnalysis.Frequencies)
-                    {
-                        if (string.IsNullOrEmpty(frequency.Locality.Code) || frequency.Locality.Location == null)
-                            continue;
+                if (selectedAnalysis == null) return;
+                if (string.IsNullOrEmpty(dimension)) return;
 
-                        Data.Add(new PushpinViewModel(frequency.Locality,
-                                                      string.Format("{0} {1:F2} ({2})", frequency.Locality.Code, frequency.Value, frequency.SampleSize)));
-                    }
+                foreach (Frequency frequency in selectedAnalysis.Frequencies)
+                {
+                    if (!frequency.Name.StartsWith(dimension))
+                        continue;
+
+                    if (string.IsNullOrEmpty(frequency.Locality.Code) || frequency.Locality.Location == null)
+                        continue;
+
+                    Data.Add(new PushpinViewModel(frequency.Locality,
+                        string.Format("{0} {1:F2} ({2})", frequency.Locality.Code, frequency.Value, frequency.SampleSize)));
                 }
             }
         }
@@ -410,102 +439,121 @@ namespace Genesis.ViewModels
 
         private void UpdateGisData()
         {
-            if (spatialMap != null)
+            if (spatialMap == null) return;
+
+            var dataset = GetSpatialDataSet();
+
+            dataset.DataTable.BeginInit();
+            dataset.Features.Clear();
+            dataset.DataTable.Clear();
+            dataset.DataTable.Columns.Clear();
+            dataset.DataTable.Columns.Add(new DataColumn("Code", typeof (string)));
+
+            if (View == MapView.Localities)
             {
-                IFeatureSet dataset;
-                if (spatialDataLayer == null)
-                {
-                    dataset = new FeatureSet(FeatureType.Point);
+                UpdateLocalitiesGisData(dataset);
+            }
+            else
+            {
+                UpdateFrequenciesGisData(dataset);
+            }
 
-                    dataset.Projection = KnownCoordinateSystems.Geographic.World.WGS1984;
+            dataset.DataTable.EndLoadData();
+            dataset.InvalidateVertices();
+        }
 
-                    dataset.DataTable.BeginInit();
-                    dataset.DataTable.Columns.Add(new DataColumn("Code", typeof (string)));
-                    spatialDataLayer = spatialMap.Layers.Add(dataset);
-                }
-                else
-                {
-                    dataset = spatialDataLayer.DataSet;
-                    spatialDataLayer.DataSet.DataTable.BeginInit();
-                    dataset.Features.Clear();
-                    dataset.DataTable.Clear();
-                }
+        private void UpdateFrequenciesGisData(IFeatureSet dataset)
+        {
+            dataset.DataTable.Columns.Add(new DataColumn("Frequency", typeof (double)));
+            dataset.DataTable.Columns.Add(new DataColumn("Dimension", typeof (string)));
 
+            if (selectedAnalysis == null) return;
+            if (string.IsNullOrEmpty(dimension)) return;
 
-                if (View == MapView.Localities)
-                {
-                    if (dataset.DataTable.Columns.Count == 2)
-                        dataset.DataTable.Columns.RemoveAt(1);
+            foreach (var frequency in selectedAnalysis.Frequencies)
+            {
+                if (!frequency.Name.StartsWith(dimension))
+                    continue;
 
-                    foreach (Locality locality in context.Localities)
-                    {
-                        if (string.IsNullOrEmpty(locality.Code) || locality.Location == null)
-                            continue;
+                var location = frequency.Locality.Location;
+                if (location == null)
+                    continue;
 
-                        var coord = new Coordinate(locality.Location.Longitude ?? 0, locality.Location.Latitude ?? 0);
-                        IFeature feature = dataset.AddFeature(new Point(coord));
+                //should it instead skip the locality if part of the coordinate is missing?
+                var coord = new Coordinate(location.Longitude ?? 0, location.Latitude ?? 0);
+                var feature = dataset.AddFeature(new Point(coord));
+                
+                feature.DataRow["Code"] = frequency.Locality.Code;
+                feature.DataRow["Frequency"] = frequency.Value;
+                feature.DataRow["Dimension"] = frequency.Name;
 
-                        feature.DataRow["Code"] = locality.Code;
-                    }
-                }
-                else
-                {
-                    if (dataset.DataTable.Columns.Count == 1)
-                        dataset.DataTable.Columns.Add(new DataColumn("Frequency", typeof (double)));
-
-                    if (selectedAnalysis != null)
-                    {
-                        foreach (Frequency frequency in selectedAnalysis.Frequencies)
-                        {
-                            if (string.IsNullOrEmpty(frequency.Locality.Code) || frequency.Locality.Location == null)
-                                continue;
-
-                            var coord = new Coordinate(frequency.Locality.Location.Longitude ?? 0, frequency.Locality.Location.Latitude ?? 0);
-                            IFeature feature = dataset.AddFeature(new Point(coord));
-                            feature.DataRow["Frequency"] = frequency.Value;
-                            feature.DataRow["Code"] = frequency.Locality.Code;
-                        }
-                    }
-                }
-
-                dataset.DataTable.EndLoadData();
-                dataset.InvalidateVertices();
+                
             }
         }
 
-        public class PushpinViewModel : PropertyChangedBase
+        private void UpdateLocalitiesGisData(IFeatureSet dataset)
         {
-            private readonly Locality locality;
-            private string label;
-
-            public PushpinViewModel(Locality locality, string label)
+            foreach (var locality in context.Localities)
             {
-                this.locality = locality;
-                this.label = label;
+                if (string.IsNullOrEmpty(locality.Code) || locality.Location == null)
+                    continue;
+
+                var coord = new Coordinate(locality.Location.Longitude ?? 0, locality.Location.Latitude ?? 0);
+                var feature = dataset.AddFeature(new Point(coord));
+
+                feature.DataRow["Code"] = locality.Code;
+            }
+        }
+
+        private IFeatureSet GetSpatialDataSet()
+        {
+            if (spatialDataLayer == null)
+            {
+                var dataset = new FeatureSet(FeatureType.Point)
+                {
+                    Projection = KnownCoordinateSystems.Geographic.World.WGS1984
+                };
+                spatialDataLayer = spatialMap.Layers.Add(dataset);
             }
 
-            public Location Location
-            {
-                get
-                {
-                    if (locality.Location == null)
-                        return null;
+            return spatialDataLayer.DataSet;
+        }
+    }
 
-                    return new Location(locality.Location.Latitude.Value, locality.Location.Longitude.Value);
-                }
+
+    public class PushpinViewModel : PropertyChangedBase
+    {
+        private readonly Locality locality;
+        private string label;
+
+        public PushpinViewModel(Locality locality, string label)
+        {
+            this.locality = locality;
+            this.label = label;
+        }
+
+        public Location Location
+        {
+            get
+            {
+                if (locality.Location == null)
+                    return null;
+
+                return new Location(locality.Location.Latitude.Value, locality.Location.Longitude.Value);
             }
+        }
 
-            public string Label
+        public string Label
+        {
+            get
             {
-                get
-                {
-                    return label;
-                }
-                set
-                {
-                    this.Set(() => Label, ref label, value);
-                }
+                return label;
+            }
+            set
+            {
+                this.Set(() => Label, ref label, value);
             }
         }
     }
+
 }

@@ -9,18 +9,25 @@ namespace Genesis
 {
     public class Locality
     {
-        public virtual int Id { get; private set; }
-        [Required]
-        public virtual String Name { get; set; }
-        [Required]
-        public virtual String Code { get; set; }
-        public virtual DbGeography Location { get; set; }
+        public int Id { get; private set; }
 
-        private ICollection<Mouse> mice;
-        public virtual ICollection<Mouse> Mice
+        [Required]
+        public string Name { get; set; }
+
+        [Required]
+        public string Code { get; set; }
+
+        public DbGeography Location { get; set; }
+
+        public virtual ICollection<Mouse> Mice { get; private set; }
+
+        public Locality() : this(null, null) { }
+
+        public Locality(string code, string name)
         {
-            get { return mice ?? (mice = new List<Mouse>()); }
-            set { mice = value; }
+            Code = code;
+            Name = name;
+            Mice = new List<Mouse>();
         }
 
         public override string ToString()

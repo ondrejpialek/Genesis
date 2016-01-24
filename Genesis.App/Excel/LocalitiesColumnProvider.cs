@@ -10,7 +10,7 @@ namespace Genesis.Excel
     {
         public IEnumerable<ICellReader<Locality>> GetColumns()
         {
-            return new List<ICellReader<Locality>> { new CodeColumn(), new LatitudeColumn(), new LongitudeColumn(), new LocalityNameColumn() };
+            return new List<ICellReader<Locality>> { new LocalityCodeCellReader(), new LatitudeLocationComponentCellReader(), new LongitudeLocationComponentCellReader(), new LocalityNameCellReader() };
         }
     }
 }

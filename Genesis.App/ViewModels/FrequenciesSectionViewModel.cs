@@ -14,19 +14,12 @@ namespace Genesis.ViewModels
 
     public class FrequenciesSectionViewModel : SectionViewModel
     {      
-        public class GeneViewModel : PropertyChangedBase {
-            public GeneViewModel(Gene gene) {
-                this.gene = gene;
+        public class NominalTraitViewModel : PropertyChangedBase {
+            public NominalTraitViewModel(NominalTrait trait) {
+                Trait = trait;
             }
 
-            private Gene gene;
-            public Gene Gene
-            {
-                get
-                {
-                    return gene;
-                }
-            }
+            public NominalTrait Trait { get; }
 
             private bool selected = false;
             public bool Selected
@@ -51,8 +44,8 @@ namespace Genesis.ViewModels
         {
             DisplayName = "Frequencies";
             Order = 20;
-            
-            Genes = new ObservableCollection<GeneViewModel>();
+
+            Traits = new ObservableCollection<NominalTraitViewModel>();
             SelectedAnalysis = new ObservableCollection<FrequencyAnalysis>();
         }
 
@@ -69,37 +62,10 @@ namespace Genesis.ViewModels
             }
         }
 
-        public ObservableCollection<GeneViewModel> Genes
+        public ObservableCollection<NominalTraitViewModel> Traits
         {
             get;
             protected set;
-        }
-
-        public ObservableCollection<Species> Species
-        {
-            get
-            {
-                if (context != null)
-                {
-
-                    context.Species.OrderByDescending(s => s.Id).Load();
-                    return context.Species.Local;
-                }
-                return null;
-            }
-        }
-
-        private Species selectedSpecies = null;
-        public Species SelectedSpecies
-        {
-            get
-            {
-                return selectedSpecies;
-            }
-            set
-            {
-                this.Set(() => SelectedSpecies, ref selectedSpecies, value);
-            }
         }
 
 
@@ -110,7 +76,7 @@ namespace Genesis.ViewModels
         }
 
 
-        private FrequencyAnalysis selectedFrequencyAnalysis = null;
+        private FrequencyAnalysis selectedFrequencyAnalysis;
         public FrequencyAnalysis SelectedFrequencyAnalysis
         {
             get
@@ -146,8 +112,7 @@ namespace Genesis.ViewModels
         {
             currentAnalysis = new FrequencyAnalyzer(AnalysisName, new FrequencyAnalyzer.Settings()
             {
-                Genes = Genes.Where(g => g.Selected).Select(g => g.Gene).ToList(),
-                Species = SelectedSpecies
+                Traits = Traits.Where(g => g.Selected).Select(g => g.Trait).ToList()
             });
 
             var context = new GenesisContext();
@@ -169,15 +134,13 @@ namespace Genesis.ViewModels
 
             context = new GenesisContext();
 
-            Genes.Clear();
+            Traits.Clear();
             foreach (var gene in context.Genes.OrderBy(g => g.StartBasePair))
             {
-                Genes.Add(new GeneViewModel(gene));
+                Traits.Add(new NominalTraitViewModel(gene));
             }
 
             NotifyOfPropertyChange(() => FrequencyAnalysis);
-            NotifyOfPropertyChange(() => Species);
-            SelectedSpecies = Species.FirstOrDefault();
         }
 
         private FrequencyAnalyzer currentAnalysis { get; set; }

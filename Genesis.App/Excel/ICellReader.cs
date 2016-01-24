@@ -13,8 +13,6 @@ namespace Genesis.Excel
     {
         bool IsRequired { get; }
 
-        bool IsKey { get; }
-
         bool TryRead(IExcelWorksheet worksheet, int row, out IApplicator<TEntity> applicator);
     }
 }

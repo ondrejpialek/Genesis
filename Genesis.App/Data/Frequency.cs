@@ -12,6 +12,8 @@ namespace Genesis
         [Required]
         public virtual Locality Locality { get; set; }
         [Required]
+        public virtual string Name { get; set; }
+        [Required]
         public virtual double Value { get; set; }
         [Required]
         public virtual int SampleSize { get; set; }

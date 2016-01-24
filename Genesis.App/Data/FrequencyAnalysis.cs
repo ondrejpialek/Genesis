@@ -9,8 +9,10 @@ namespace Genesis
     public class FrequencyAnalysis
     {
         public virtual int Id { get; private set; }
+
         [Required]
-        public virtual String Name { get; set; }
+        public virtual string Name { get; set; }
+
         [Required]
         public virtual DateTime Analyzed { get; set; }
         

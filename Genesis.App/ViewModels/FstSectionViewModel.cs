@@ -94,7 +94,7 @@ namespace Genesis.ViewModels
             }
         }
 
-        public void Refresh()
+        public new void Refresh()
         {    
             if (context != null)
                 context.Dispose();

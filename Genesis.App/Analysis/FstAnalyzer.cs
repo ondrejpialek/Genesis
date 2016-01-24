@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Genesis.Analysis
 {
@@ -14,43 +12,32 @@ namespace Genesis.Analysis
             public Species Species { get; set; }
         }
 
-        public FstAnalyzer(string title, FstAnalyzer.Settings settings) : base(title, settings) { }
+        public FstAnalyzer(string title, Settings settings) : base(title, settings) { }
 
         public override FstAnalysis Analyse(GenesisContext context)
         {
-            var geneIds = this.settings.Genes.Select(g => g.Id).ToList();
-            int speciesId = this.settings.Species.Id;
+            var genes = settings.Genes.Select(g => g.Id).ToList();
 
-            var result = new FstAnalysis {Analyzed = DateTime.Now, Name = this.Title};
+            var result = new FstAnalysis {Analyzed = DateTime.Now, Name = Title};
 
             context.Alleles.Load();
-            context.Mice.Include(m => m.Alleles).Load();
+            context.Mice.Include(m => m.Records).Load();
 
             var frequencies = context.Localities.Include(l => l.Mice).ToList().Select(l =>
             {
-                var alleles = (from mouse in l.Mice
-                                from record in mouse.Alleles
-                                where geneIds.Contains(record.Allele.Gene.Id)
-                                select new { Mouse = mouse, SpeciesId = record.Allele.Species.Id }).ToList();
+                var analysis = FrequencyAnalyzer.Frequencies(l, genes).First(f => f.Name.StartsWith(settings.Species.Name));
 
-                double frequency = 0;
-                int sampleSize = 0;
-                if (alleles.Count > 0)
-                {
-                    double spec = alleles.Count(s => s.SpeciesId == speciesId);
-                    frequency = spec / alleles.Count;
+                if (analysis.SampleSize == 0)
+                    return null;
 
-                    sampleSize = alleles.Select(a => a.Mouse).Distinct().Count();
-                }
-
-                return new Frequency
+                return new Frequency()
                 {
                     Locality = l,
-                    SampleSize = sampleSize,
-                    Value = frequency
+                    SampleSize = analysis.SampleSize,
+                    Value = analysis.Value
                 };
             })
-            .Where(r => r.SampleSize > 0)
+            .Where(r => r != null)
             .ToList();
 
             var n = frequencies.Sum(f => f.SampleSize);

@@ -3,7 +3,6 @@ using System.Data.Entity;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Caliburn.Micro;
 using Genesis.Views;
 
 namespace Genesis.ViewModels

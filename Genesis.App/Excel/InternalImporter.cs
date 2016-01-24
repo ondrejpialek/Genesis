@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Genesis;
 using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Text;
 
 namespace Genesis.Excel
@@ -42,8 +43,6 @@ namespace Genesis.Excel
 
         private double step;
 
-        private IEnumerable<TEntity> results;
-
         private WorksheetReader<TEntity> worksheetReader;
         private GenesisContext context;
 
@@ -64,31 +63,33 @@ namespace Genesis.Excel
             {
                 using (ExcelFile file = parser.GetExcelFile())
                 {
-                    ExcelWorksheet excelWorksheet = parser.GetExcelWorksheet(file);
-                    RowReader<TEntity> rowReader = parser.GetRowReader();
+                    var excelWorksheet = parser.GetExcelWorksheet(file);
+                    var rowReader = parser.GetRowReader();
                     worksheetReader = new WorksheetReader<TEntity>(excelWorksheet, rowReader);
                     try
                     {
                         var import = Task.Factory.StartNew(Import, cancellationToken);
-
                         var cont = import.ContinueWith(x =>
-                            {
-                                if (CompletedAction != null)
-                                    CompletedAction.Invoke();
-                            }, CancellationToken.None, TaskContinuationOptions.OnlyOnRanToCompletion, synchronizedScheduler);
+                        {
+                            CompletedAction?.Invoke();
+                        }, CancellationToken.None, TaskContinuationOptions.OnlyOnRanToCompletion, synchronizedScheduler);
                         
                         cont.Wait();
                     }
                     catch (AggregateException ae)
                     {
+                        if (Debugger.IsAttached)
+                        {
+                            Debugger.Break();
+                        }
+
                         var exceptions = ae.Flatten();
                         if (exceptions.InnerExceptions.Any(x => x is TaskCanceledException))
                         {
                             Task.Factory.StartNew(() =>
-                                {
-                                    if (CancelledAction != null)
-                                        CancelledAction.Invoke();
-                                }, CancellationToken.None, TaskCreationOptions.None, synchronizedScheduler);
+                            {
+                                CancelledAction?.Invoke();
+                            }, CancellationToken.None, TaskCreationOptions.None, synchronizedScheduler);
                             exceptions.Handle(e => e is TaskCanceledException);
                         }
                         else if (ErrorAction != null)
@@ -97,7 +98,7 @@ namespace Genesis.Excel
                             var sb = new StringBuilder();
                             foreach (var entry in validations)
                             {
-                                sb.Append(entry.Key.Entity.ToString() + ":\n");
+                                sb.Append(entry.Key.Entity + ":\n");
                                 foreach (var validation in entry)
                                 {
                                     foreach(var error in validation.ValidationErrors) {
@@ -106,8 +107,9 @@ namespace Genesis.Excel
                                 }
                             }
 
-                            var errors = exceptions.InnerExceptions.Where(e => !(e is DbEntityValidationException)).Select(e => string.Format("{0} ({1})", e.Message, e.InnerException != null ? e.InnerException.Message : "no more info"));
-                            var msg = sb.ToString() + string.Join("\n", errors);
+                            var errors = exceptions.InnerExceptions.Where(e => !(e is DbEntityValidationException)).Select(e =>
+                                $"{e.Message} ({e.InnerException?.Message ?? "no more info"})");
+                            var msg = sb + string.Join("\n", errors);
                             Task.Factory.StartNew(() =>
                             {
                                 ErrorAction.Invoke(msg);
@@ -164,7 +166,7 @@ namespace Genesis.Excel
                 return () => { };
             });
 
-            results = o.ObserveOn(Scheduler.TaskPool).Select(x => Update(x.Item1, x.Item2)).ToList().Wait();
+            o.ObserveOn(Scheduler.TaskPool).Select(x => Update(x.Item1, x.Item2)).ToList().Wait();
         }
 
         private TEntity Update(RowApplicator<TEntity> applicator, TEntity entity) {

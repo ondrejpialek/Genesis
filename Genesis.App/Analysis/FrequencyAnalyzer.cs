@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
 
@@ -12,73 +9,134 @@ namespace Genesis.Analysis
 {
     public class FrequencyAnalyzer : Analyzer<FrequencyAnalyzer.Settings, FrequencyAnalysis>
     {
-        public class Settings
+        public struct Result
         {
-            public IEnumerable<Gene> Genes { get; set; }
-            public Species Species { get; set; }
+            public double Frequency;
+            public int SampleSize;
         }
 
-        public FrequencyAnalyzer(string title, FrequencyAnalyzer.Settings settings) : base(title, settings) { }
+        public class Settings
+        {
+            public IEnumerable<NominalTrait> Traits { get; set; }
+        }
+
+        public FrequencyAnalyzer(string title, Settings settings) : base(title, settings) { }
 
         public override FrequencyAnalysis Analyse(GenesisContext context)
         {
-            var genes = this.settings.Genes.Select(g => g.Id).ToList();
-            int species = this.settings.Species.Id;
+            var traitIds = settings.Traits.Select(t => t.Id).ToList();
+            var analyzeSpecies = settings.Traits.All(t => t is Gene);
 
-            var analysis = new FrequencyAnalysis();
-            analysis.Analyzed = DateTime.Now;
-            analysis.Name = this.Title;
+            var analysis = new FrequencyAnalysis
+            {
+                Analyzed = DateTime.Now,
+                Name = Title
+            };
 
             //prepare context
             context.Configuration.AutoDetectChangesEnabled = false;
             context.Configuration.ValidateOnSaveEnabled = false;
-            context.Mice.Include(m => m.Alleles.Select(a => a.Allele)).Load();
+            context.Mice.Include(m => m.Records).Load();
 
             var localities = context.Localities.Include(l => l.Mice).ToList();
-            var recordCount = localities.Count;
-  
-            if (recordCount > 0)
+            var localitiesCount = localities.Count;
+
+            if (localitiesCount > 0)
             {
-                context.Localities.ToObservable(Scheduler.TaskPool).Select(l =>
-                {
-                    var alleles = (from mouse in l.Mice
-                                    from record in mouse.Alleles
-                                    where genes.Contains(record.Allele.Gene.Id)
-                                    select new { Mouse = mouse, AlleleSpecies = record.Allele.Species }).ToList();
-
-                    double frequency = 0;
-                    int sampleSize = 0;
-                    if (alleles.Count > 0)
-                    {
-                        double spec = alleles.Where(s => s.AlleleSpecies.Id == species).Count();
-                        frequency = spec / alleles.Count;
-
-                        sampleSize = alleles.Select(a => a.Mouse).Distinct().Count();
-                    }
-
-                    return new Frequency
-                    {
-                        Locality = l,
-                        SampleSize = sampleSize,
-                        Value = frequency
-                    };
-                })
-                .Do((_) => this.Progress += 1 / recordCount)
-                .Where(r => r.SampleSize > 0)
+                context.Localities.ToObservable(Scheduler.TaskPool).SelectMany(l => Frequencies(l, traitIds))
+                .Do(_ => Progress += (double)1 / localitiesCount)
+                .Where(r => r != null)
                 .Do(f =>
                 {
                     analysis.Frequencies.Add(f);
                 }).Wait();
 
-                this.Done = true;
+                Done = true;
             }
             else
             {
-                this.Done = true;
-            };
+                Done = true;
+            }
 
 
             return analysis;
+        }
+
+        public class RawRecord
+        {
+            private readonly Mouse mouse;
+            private readonly Category value;
+            private readonly Species species;
+
+            public Mouse Mouse
+            {
+                get { return mouse; }
+            }
+
+            public Category Value
+            {
+                get { return value; }
+            }
+
+            public Species Species
+            {
+                get { return species; }
+            }
+
+            public RawRecord(Mouse mouse, Category value, Species species)
+            {
+                this.mouse = mouse;
+                this.value = value;
+                this.species = species;
+            }
+        }
+
+        public static IEnumerable<Frequency> Frequencies(Locality locality, List<int> traitIds)
+        {
+            var records = (from mouse in locality.Mice
+                from record in mouse.Records.OfType<NominalRecord>()
+                where traitIds.Contains(record.Trait.Id)
+                select new RawRecord(mouse, record.Category, (record.Category as Allele)?.Species)).ToList();
+
+            if (records.Count > 0)
+            {
+                foreach (var frequency in SpeciesFrequencies(locality, records)) yield return frequency;
+                foreach (var frequency in ValuesFrequencies(locality, records)) yield return frequency;
+            }
+        }
+
+        private static IEnumerable<Frequency> SpeciesFrequencies(Locality locality, List<RawRecord> records)
+        {
+            var species = records.GroupBy(v => v.Species).Where(g => g.Key != null).ToList();
+            var total = species.Sum(s => s.Count());
+            var sampleSize = records.Where(v => v.Species != null).Select(v => v.Mouse).Distinct().Count();
+            foreach (var speciesResults in species)
+            {
+                yield return new Frequency
+                {
+                    Locality = locality,
+                    SampleSize = sampleSize,
+                    Name = $"{speciesResults.Key.Name} [species]",
+                    Value = (double)speciesResults.Count() / total
+                };
+            }
+        }
+
+        private static IEnumerable<Frequency> ValuesFrequencies(Locality locality, List<RawRecord> records)
+        {
+            var valueGroups = records.GroupBy(v => v.Value).Where(g => g.Key != null).ToList();
+            var total = valueGroups.Sum(s => s.Count());
+            var sampleSize = records.Where(v => v.Species != null).Select(v => v.Mouse).Distinct().Count();
+            foreach (var values in valueGroups)
+            {
+                yield return new Frequency
+                {
+                    Locality = locality,
+                    SampleSize = sampleSize,
+                    Name = $"{values.Key.Value} [value]",
+                    Value = (double)values.Count() / total
+                };
+            }
         }
     }
 }

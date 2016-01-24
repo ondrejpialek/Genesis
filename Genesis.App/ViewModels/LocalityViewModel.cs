@@ -78,9 +78,9 @@ namespace Genesis.ViewModels
                         {
                             var locality = c.Localities.Single(l => l.Id == this.locality.Id);
                             var alleles = (from mouse in locality.Mice
-                                           from allAlleles in mouse.Alleles
-                                           where allAlleles.Allele.Gene.Name == "Btk"
-                                           group allAlleles by allAlleles.Allele.Value).ToArray();
+                                           from allAlleles in mouse.Records.OfType<NominalRecord>()
+                                           where allAlleles.Category.Trait.Name == "Btk"                //why is this here???
+                                           group allAlleles by allAlleles.Category.Value).ToArray();
 
                             double d = alleles.Where(a => a.Key == "d").Select(r => r.Count()).SingleOrDefault();
                             double m = alleles.Where(a => a.Key == "m").Select(r => r.Count()).SingleOrDefault();

@@ -10,7 +10,7 @@ namespace Genesis.Excel
     {
         private static Func<Mouse, string, bool> COMPARATOR = (mouse, value) => (!string.IsNullOrEmpty(value) && value.Equals(mouse.Name, StringComparison.InvariantCultureIgnoreCase));
 
-        public PINColumn() : base("PIN", COMPARATOR) { }
+        public PINColumn() : base("PIN", COMPARATOR, true) { }
 
         protected override void Apply(Mouse entity, string value)
         {

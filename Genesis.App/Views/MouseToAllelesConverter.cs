@@ -12,14 +12,28 @@ namespace Genesis.Views
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             var mouse = value as Mouse;
-            var gene = parameter as Gene;
+            var trait = parameter as Trait;
 
-            if (mouse == null || gene == null)
+            if (mouse == null || trait == null)
                 return null;
 
-            var alleles = mouse.Alleles.ToList().Where(a => a.Allele.Gene == gene).OrderBy(a => a.Allele.Species.Name).ThenBy(a => a.Allele.Value).Select(a => a.Allele.Value).ToArray();
-            var str = string.Join("/", alleles);
-            return str;
+
+            var ordinalTrait = trait as OrdinalTrait;
+            if (ordinalTrait != null)
+            {
+                var values = mouse.Records.OfType<OrdinalRecord>().Where(r => r.Trait == ordinalTrait).Select(r => $"{r.Value}");
+                return string.Join(",", values);
+            }
+
+            var gene = trait as Gene;
+            if (gene != null)
+            {
+                var alleles = mouse.Records.OfType<NominalRecord>().Where(r => r.Category.Trait == gene).ToList().OrderBy(a => ((Allele)a.Category).Species.Name).ThenBy(a => a.Category.Value).Select(a => a.Category.Value).ToArray();
+                var str = string.Join("/", alleles);
+                return str;
+            }
+
+            return string.Empty;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

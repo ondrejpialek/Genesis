@@ -1,26 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Genesis
 {
     public class Mouse
     {
-        public virtual int Id { get; private set; }
+        public int Id { get; private set; }
         [Required]
-        public virtual String Name { get; set; }
+        public string Name { get; set; }
         [Required]
-        public virtual Sex Sex { get; set; }
-        [Required]
+        public Sex Sex { get; set; }
+
+        public int LocalityId { get; set; }
+
         public virtual Locality Locality { get; set; }
 
-        public virtual ICollection<AlleleRecord> Alleles { get; private set; }
+        public virtual ICollection<Record> Records { get; private set; }
 
-        public Mouse()
+        public Mouse() : this(null, Sex.Male, null)
         {
-            Alleles = new List<AlleleRecord>();
+        }
+
+        public Mouse(string name, Sex sex, Locality locality)
+        {
+            Name = name;
+            Sex = sex;
+            Locality = locality;
+            if (locality != null)
+            {
+                LocalityId = locality.Id;
+            }
+            Records = new List<Record>();
         }
 
         public override string ToString()
