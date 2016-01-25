@@ -17,6 +17,8 @@ namespace Genesis.Analysis
         public override FstAnalysis Analyse(GenesisContext context)
         {
             var genes = settings.Genes.Select(g => g.Id).ToList();
+            var categories = context.Categories.Where(c => genes.Contains(c.TraitId)).ToList();
+            var species = categories.OfType<Allele>().Select(a => a.Species).Distinct().ToList();
 
             var result = new FstAnalysis {Analyzed = DateTime.Now, Name = Title};
 
@@ -25,7 +27,7 @@ namespace Genesis.Analysis
 
             var frequencies = context.Localities.Include(l => l.Mice).ToList().Select(l =>
             {
-                var analysis = FrequencyAnalyzer.Frequencies(l, genes).First(f => f.Name.StartsWith(settings.Species.Name));
+                var analysis = FrequencyAnalyzer.Frequencies(l, genes, categories, species).First(f => f.Name.StartsWith(settings.Species.Name));
 
                 if (analysis.SampleSize == 0)
                     return null;

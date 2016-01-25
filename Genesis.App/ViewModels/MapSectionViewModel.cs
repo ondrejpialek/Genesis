@@ -486,8 +486,6 @@ namespace Genesis.ViewModels
                 feature.DataRow["Code"] = frequency.Locality.Code;
                 feature.DataRow["Frequency"] = frequency.Value;
                 feature.DataRow["Dimension"] = frequency.Name;
-
-                
             }
         }
 
