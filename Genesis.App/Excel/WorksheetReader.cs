@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Genesis;
+﻿using System.Collections.Generic;
 
 namespace Genesis.Excel
 {
     internal class WorksheetReader<TEntity>
     {
-        private ExcelWorksheet worksheet;
-        private RowReader<TEntity> rowReader;
-        private int skip;
+        private readonly IExcelWorksheet worksheet;
+        private readonly RowReader<TEntity> rowReader;
+        private readonly int skip;
 
-        public WorksheetReader(ExcelWorksheet worksheet, RowReader<TEntity> rowReader, int skip = 1)
+        public WorksheetReader(IExcelWorksheet worksheet, RowReader<TEntity> rowReader, int skip = 1)
         {
             this.worksheet = worksheet;
             this.rowReader = rowReader;
@@ -29,7 +24,7 @@ namespace Genesis.Excel
         {
             get {
                 int rowsCount = worksheet.GetRowCount();
-                for (int i = 1 + skip; i <= rowsCount; i++)
+                for (int i = 0 + skip; i < rowsCount; i++)
                 { 
                     RowApplicator<TEntity> applicator;
                     if (rowReader.TryRead(worksheet, i, out applicator))

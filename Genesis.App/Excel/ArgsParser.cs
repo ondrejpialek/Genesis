@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Genesis;
-using Genesis.Excel;
+﻿using System.Linq;
 
 namespace Genesis.Excel
 {
     public class ArgsParser<TEntity>
     {
-        private ImportArgs<TEntity> args;
+        private readonly ImportArgs<TEntity> args;
 
         public ArgsParser(ImportArgs<TEntity> args)
         {
@@ -19,12 +16,12 @@ namespace Genesis.Excel
             return new RowReader<TEntity>(args.Columns);
         }
 
-        public ExcelFile GetExcelFile()
+        public IExcelFile GetExcelFile()
         {
-            return new ExcelFile(args.Filename);
+            return new DataTableExcelFile(args.Filename);
         }
 
-        public ExcelWorksheet GetExcelWorksheet(ExcelFile file)
+        public IExcelWorksheet GetExcelWorksheet(IExcelFile file)
         {
             return file.Worksheets.First(x => x.Name == args.WorkSheetName);
         }

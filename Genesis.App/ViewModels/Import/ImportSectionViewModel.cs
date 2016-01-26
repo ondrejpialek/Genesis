@@ -62,7 +62,6 @@ namespace Genesis.ViewModels.Import
             {
                 this.Set(() => SelectedImportType, ref selectedImportType, value);
                 LoadColumns();
-                //ReloadFields();
             }
         }
 
@@ -141,21 +140,21 @@ namespace Genesis.ViewModels.Import
             if (worksheet == null)
                 return;
 
-            var alphabet = Alphabet.GetAlphabet(worksheet.GetColCount());
-
-            foreach (var letter in alphabet)
+            var columnNames = worksheet.GetColumns();
+            for(var i = 0; i < columnNames.Length; i++)
             {
-                var header = worksheet.GetCellValueAsString(letter + "1");
-                if (string.IsNullOrEmpty(header))
+                var name = columnNames[i];
+
+                if (string.IsNullOrEmpty(name))
                     continue;
 
                 if (SelectedImportType == ImportType.Localities)
                 {
-                    Columns.Add(new LocalitySheetColumnViewModel(letter, header));
+                    Columns.Add(new LocalitySheetColumnViewModel(i, name));
                 }
                 else
                 {
-                    Columns.Add(new MiceSheetColumnViewModel(letter, header, context));
+                    Columns.Add(new MiceSheetColumnViewModel(i, name, context));
                 }
             }
 

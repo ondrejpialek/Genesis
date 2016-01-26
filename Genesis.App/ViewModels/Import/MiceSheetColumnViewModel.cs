@@ -26,7 +26,7 @@ namespace Genesis.ViewModels.Import
                 NotifyOfPropertyChange(() => CellContent);
             }
         }
-        public MiceSheetColumnViewModel(string excelColumn, string name, GenesisContext context) : base(excelColumn, name)
+        public MiceSheetColumnViewModel(int columnIndex, string name, GenesisContext context) : base(columnIndex, name)
         {
             this.context = context;
             ApplyConvention(name);
@@ -78,7 +78,7 @@ namespace Genesis.ViewModels.Import
 
             if (result != null)
             {
-                result.Column = ExcelColumn;
+                result.ColumnIndex = ColumnIndex;
             }
             
             return result;

@@ -1,26 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
-
 using Microsoft.Office.Interop.Excel;
 using System.Collections.ObjectModel;
 
 namespace Genesis.Excel
 {
+    [Obsolete("", true)]
     public class ExcelFile : IExcelFile
     {
         public string Filename { get; protected set; }
 
-        ReadOnlyCollection<ExcelWorksheet> worksheets;
-        public ReadOnlyCollection<ExcelWorksheet> Worksheets
+        ReadOnlyCollection<IExcelWorksheet> worksheets;
+        public ReadOnlyCollection<IExcelWorksheet> Worksheets
         {
             get
             {
                 if (worksheets == null)
                 {
-                    var sheets = new List<ExcelWorksheet>();
+                    var sheets = new List<IExcelWorksheet>();
 
                         foreach (var s in workbook.Worksheets)
                         {
@@ -30,21 +28,9 @@ namespace Genesis.Excel
                                 sheets.Add(new ExcelWorksheet(w));
                             }
                         }
-                    worksheets = new ReadOnlyCollection<ExcelWorksheet>(sheets);
+                    worksheets = new ReadOnlyCollection<IExcelWorksheet>(sheets);
                 }
                 return worksheets;
-            }
-        }
-
-        public bool Visible
-        {
-            get
-            {
-                return application.Visible;
-            }
-            set
-            {
-                application.Visible = value;
             }
         }
 

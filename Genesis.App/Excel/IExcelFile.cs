@@ -6,7 +6,6 @@ namespace Genesis.Excel
     public interface IExcelFile : IDisposable
     {
         string Filename { get; }
-        bool Visible { get; set; }
-        ReadOnlyCollection<ExcelWorksheet> Worksheets { get; }
+        ReadOnlyCollection<IExcelWorksheet> Worksheets { get; }
     }
 }

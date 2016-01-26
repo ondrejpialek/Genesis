@@ -7,28 +7,44 @@ namespace Genesis.Excel
 {
     public static class Alphabet
     {
+        private static int currentSize = 0;
+        private static List<string> currentAlphabet;
+
         public static IEnumerable<string> GetAlphabet()
         {
-            long i = 0L;
+            var i = 0;
             while (true)
                 yield return Encode(i++);
         }
 
-        public static IEnumerable<string> GetAlphabet(Int64 numberOfElements)
+        public static IEnumerable<string> GetAlphabet(int numberOfElements)
         {
-            long i = 0L;
+            var i = 0;
             while (i < numberOfElements)
                 yield return Encode(i++);
         }
 
-        private static char[] chars = "abcdefghijklmnopqrstuvwxyz".ToCharArray();
-        private static string Encode(Int64 value)
+        public static string GetExcelColumn(int index)
         {
-            int count = chars.Length;
+            if (index >= currentSize)
+            {
+                if (currentSize == 0)
+                    currentSize++;
+                while (index >= currentSize)
+                    currentSize = currentSize * 2;
+                currentAlphabet = GetAlphabet(currentSize).ToList();
+            }
+            return currentAlphabet[index];
+        }
+
+        private static readonly char[] Chars = "abcdefghijklmnopqrstuvwxyz".ToCharArray();
+        private static string Encode(int value)
+        {
+            var count = Chars.Length;
             string returnValue = null;
             do
             {
-                returnValue = chars[value % count] + returnValue;
+                returnValue = Chars[value % count] + returnValue;
                 value /= count;
             } while (value-- != 0);
             return returnValue;

@@ -2,7 +2,7 @@
 
 namespace Genesis.Excel
 {
-    public abstract class CellReader<TEntity, TValue> : ColumnBase, ICellReader<TEntity>
+    public abstract class CellReader<TEntity, TValue> : CellReader, ICellReader<TEntity>
     {
         public bool IsRequired { get; protected set; }
 
@@ -21,7 +21,7 @@ namespace Genesis.Excel
 
         public bool TryRead(IExcelWorksheet worksheet, int row, out IApplicator<TEntity> applicator)
         {
-            var cell = worksheet.GetCellValue(Column + row);
+            var cell = worksheet.GetCellValue(ColumnIndex, row);
             if (IsRequired && cell.IsEmpty)
             {
                 applicator = null;

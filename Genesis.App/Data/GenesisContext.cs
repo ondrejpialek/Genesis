@@ -1,6 +1,5 @@
 ﻿using System.Data.Entity;
 using System.Data.Entity.Migrations;
-using Genesis.App.Data;
 using Genesis.Migrations;
 
 
@@ -40,14 +39,7 @@ namespace Genesis
             //Introducing FOREIGN KEY constraint 'FK_dbo.Records_dbo.Categories_CategoryId' on table 'Records' may cause cycles 
             //or multiple cascade paths. Specify ON DELETE NO ACTION or ON UPDATE NO ACTION, or modify other FOREIGN KEY constraints.
             modelBuilder.Entity<NominalRecord>().HasRequired(f => f.Category).WithMany().Map(c => c.MapKey("CategoryId")).WillCascadeOnDelete(false);
-
-            //Fixing: 
-            //Entities in 'GenesisContext.Mice' participate in the 'Mouse_Locality' relationship. 0 related 'Mouse_Locality_Target' were found. 1 'Mouse_Locality_Target' is expected.
-            //modelBuilder.Entity<Locality>()
-            //    .HasMany(l => l.Mice)
-            //    .WithRequired(m => m.Locality)
-            //    .Map(c => c.MapKey("LocalityId"));
+            modelBuilder.Entity<Record>().HasKey(r => new {r.Id, r.MouseId});
         }
-
     }
 }

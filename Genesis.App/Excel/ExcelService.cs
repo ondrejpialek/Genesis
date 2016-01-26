@@ -9,7 +9,7 @@ namespace Genesis.Excel
     {
         public IExcelFile Open(string filename)
         {
-            return new ExcelFile(filename);
+            return new DataTableExcelFile(filename);
         }
     }
 }

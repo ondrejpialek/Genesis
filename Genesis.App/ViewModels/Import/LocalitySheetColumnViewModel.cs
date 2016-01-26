@@ -11,7 +11,7 @@ namespace Genesis.ViewModels.Import
 
         public override Array Fields => Enum.GetValues(typeof(LocalityField));
 
-        public LocalitySheetColumnViewModel(string excelColumn, string name) : base(excelColumn, name)
+        public LocalitySheetColumnViewModel(int columnIndex, string name) : base(columnIndex, name)
         {
             ApplyConvention(name);
         }
@@ -56,7 +56,7 @@ namespace Genesis.ViewModels.Import
 
             if (result != null)
             {
-                result.Column = ExcelColumn;
+                result.ColumnIndex = ColumnIndex;
             }
 
             return result;

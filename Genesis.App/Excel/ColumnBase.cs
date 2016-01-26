@@ -6,13 +6,13 @@ using Genesis;
 
 namespace Genesis.Excel
 {
-    public abstract class ColumnBase : ICellReader
+    public abstract class CellReader : ICellReader
     {
         public string Name { get; protected set; }
 
-        public string Column { get; set; }
+        public int ColumnIndex { get; set; }
 
-        protected ColumnBase(string name)
+        protected CellReader(string name)
         {
             Name = name;
         }

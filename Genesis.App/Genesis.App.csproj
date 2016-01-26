@@ -34,7 +34,7 @@
     <PublisherName>Ondřej Piálek</PublisherName>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>index.html</WebPage>
-    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationRevision>4</ApplicationRevision>
     <ApplicationVersion>0.2.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -253,6 +253,9 @@
     <Compile Include="Excel\Applicator.cs" />
     <Compile Include="Excel\ArgsParser.cs" />
     <Compile Include="Excel\CellReader.cs" />
+    <Compile Include="Excel\DataRowExcelCell.cs" />
+    <Compile Include="Excel\DataTableExcelFile.cs" />
+    <Compile Include="Excel\DataTableExcelWorksheet.cs" />
     <Compile Include="Excel\LocalityCodeCellReader.cs" />
     <Compile Include="Excel\ColumnBase.cs" />
     <Compile Include="Excel\GeneCellReader.cs" />
@@ -303,6 +306,7 @@
     <Compile Include="ViewModels\Messages.cs" />
     <Compile Include="ViewModels\MiceSectionViewModel.cs" />
     <Compile Include="ViewModels\MouseViewModel.cs" />
+    <Compile Include="ViewModels\PushpinViewModel.cs" />
     <Compile Include="ViewModels\SectionViewModel.cs" />
     <Compile Include="ViewModels\Settings\AlleleViewModel.cs" />
     <Compile Include="ViewModels\Settings\CategoryViewModel.cs" />

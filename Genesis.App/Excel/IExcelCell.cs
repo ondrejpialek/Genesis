@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace Genesis.Excel
 {
     public interface IExcelCell

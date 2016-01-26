@@ -61,7 +61,7 @@ namespace Genesis.Excel
         {
             Task.Factory.StartNew(() =>
             {
-                using (ExcelFile file = parser.GetExcelFile())
+                using (IExcelFile file = parser.GetExcelFile())
                 {
                     var excelWorksheet = parser.GetExcelWorksheet(file);
                     var rowReader = parser.GetRowReader();

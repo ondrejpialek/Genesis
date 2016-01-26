@@ -5,7 +5,7 @@ namespace Genesis.Excel
 {
     public interface ICellReader
     {
-        string Column { get; set; }
+        int ColumnIndex { get; set; }
         string Name { get; }
     }
 

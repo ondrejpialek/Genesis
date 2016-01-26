@@ -7,14 +7,13 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Windows.Input;
-using Caliburn.Micro;
 using DotSpatial.Controls;
 using DotSpatial.Data;
 using DotSpatial.Data.Forms;
 using DotSpatial.Projections;
+using DotSpatial.Symbology;
 using DotSpatial.Topology;
 using Microsoft.Win32;
-using Location = Microsoft.Maps.MapControl.WPF.Location;
 using Point = DotSpatial.Topology.Point;
 
 namespace Genesis.ViewModels
@@ -221,8 +220,7 @@ namespace Genesis.ViewModels
             dataset.Projection = KnownCoordinateSystems.Geographic.World.WGS1984;
 
             dataset.DataTable.BeginInit();
-            //dataset.DataTable.Columns.Add(new DataColumn("Code", typeof (string)));
-                layer.DataSet = dataset;
+            layer.DataSet = dataset;
 
             dataset.DataTable.EndLoadData();
             dataset.InvalidateVertices();
@@ -509,7 +507,7 @@ namespace Genesis.ViewModels
             {
                 var dataset = new FeatureSet(FeatureType.Point)
                 {
-                    Projection = KnownCoordinateSystems.Geographic.World.WGS1984
+                    Projection = KnownCoordinateSystems.Geographic.World.WGS1984,
                 };
                 spatialDataLayer = spatialMap.Layers.Add(dataset);
             }
@@ -517,41 +515,5 @@ namespace Genesis.ViewModels
             return spatialDataLayer.DataSet;
         }
     }
-
-
-    public class PushpinViewModel : PropertyChangedBase
-    {
-        private readonly Locality locality;
-        private string label;
-
-        public PushpinViewModel(Locality locality, string label)
-        {
-            this.locality = locality;
-            this.label = label;
-        }
-
-        public Location Location
-        {
-            get
-            {
-                if (locality.Location == null)
-                    return null;
-
-                return new Location(locality.Location.Latitude.Value, locality.Location.Longitude.Value);
-            }
-        }
-
-        public string Label
-        {
-            get
-            {
-                return label;
-            }
-            set
-            {
-                this.Set(() => Label, ref label, value);
-            }
-        }
-    }
-
+    
 }

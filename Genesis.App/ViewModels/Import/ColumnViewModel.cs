@@ -9,9 +9,10 @@ namespace Genesis.ViewModels.Import
     {
         public abstract Array Fields { get; }
 
-        protected ColumnViewModel(string excelColumn, string name)
+        protected ColumnViewModel(int columnIndex, string name)
         {
-            ExcelColumn = excelColumn;
+            ExcelColumn = Alphabet.GetExcelColumn(columnIndex);
+            ColumnIndex = columnIndex;
             Name = name;
         }
 
@@ -28,8 +29,22 @@ namespace Genesis.ViewModels.Import
             }
         }
 
+        private int columnIndex;
+        public int ColumnIndex
+        {
+            get
+            {
+                return columnIndex;
+            }
+            set
+            {
+                this.Set(() => ColumnIndex, ref columnIndex, value);
+            }
+        }
 
         private string name;
+
+
         public string Name
         {
             get

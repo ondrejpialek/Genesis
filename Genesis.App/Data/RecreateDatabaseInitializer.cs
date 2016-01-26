@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 
-namespace Genesis.App.Data
+namespace Genesis
 {
     class RecreateDatabaseInitializer : DropCreateDatabaseAlways<GenesisContext>
     //class RecreateDatabaseInitializer : DropCreateDatabaseIfModelChanges<GenesisContext>
