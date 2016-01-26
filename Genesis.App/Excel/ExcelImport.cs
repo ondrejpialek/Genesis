@@ -6,14 +6,6 @@ using System.Threading.Tasks;
 
 namespace Genesis.Excel
 {
-    public class ExcelImportErrorEventArgs: EventArgs {
-        public ExcelImportErrorEventArgs(string error) {
-            Error = error;
-        }
-
-        public string Error { get; }
-    }
-
     public class ExcelImport<TEntity> : IImport<ImportArgs<TEntity>>
         where TEntity : class, new()
     {
