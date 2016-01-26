@@ -64,11 +64,7 @@ namespace Genesis.ViewModels.Import
 
         public void ApplyConvention(string name)
         {
-            LocalityField field;
-            if (Enum.TryParse(name, true, out field))
-            {
-                Field = field;
-            }
+            Field = name.ToEnum<LocalityField>();
         }
     }
 }
