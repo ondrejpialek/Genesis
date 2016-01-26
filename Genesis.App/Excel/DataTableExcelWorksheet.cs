@@ -1,32 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.OleDb;
 
 
 namespace Genesis.Excel
 {
-    /*
-
-private static DataTable ConvertExcelFileToDataTable(string excelFileName)
-{
-string connectionString =
-String.Format("Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Extended Properties=\"Excel 12.0 Xml;HDR=YES;IMEX=1\"", excelFileName);
-
-using (OleDbConnection connection = new OleDbConnection(connectionString))
-{
-string query = "SELECT * FROM [Sheet1$]";
-      connection.Open();
-      OleDbCommand command = new OleDbCommand(query, connection);
-      OleDbDataAdapter adapter = new OleDbDataAdapter(command);
-      DataTable excelTable = new DataTable();
-      dapter.Fill(excelTable);
-      return excelTable;
-}
-}
-
-
-*/
     public class DataTableExcelWorksheet : IExcelWorksheet
     {
         private readonly OleDbConnection connection;
@@ -50,7 +27,6 @@ string query = "SELECT * FROM [Sheet1$]";
             var list = new string[excelTable.Columns.Count];
             for (var i = 0; i < excelTable.Columns.Count; i++)
             {
-                //list[i] = excelTable.Rows[0].IsNull(i) ? null : excelTable.Rows[0][i].ToString();
                 list[i] = excelTable.Columns[i].ColumnName;
             }
             return list;
