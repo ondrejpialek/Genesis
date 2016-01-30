@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0-*",
+  "description": "Genesis.Core Class Library",
+  "authors": [ "ondre" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "frameworks": {
+    "net451": { },
+    "dnx451": { }
+  },
+  "dependencies": {
+    "EntityFramework": "6.1.3"
+  }
+}
